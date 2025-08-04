@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Jekyll-based GitHub Pages site for WP Villain. The site uses the standard Jekyll structure with the Minima theme and is automatically deployed via GitHub Actions.
+This is a Jekyll-based GitHub Pages site for WP Villain, a modern WordPress development blog. The site focuses on advanced WordPress development topics including Gutenberg blocks, Roots Sage theme, Ollie WP, ACF, and modern WordPress techniques. It uses the standard Jekyll structure with the Minima theme and is automatically deployed via GitHub Actions.
 
 ## Development Commands
 
@@ -33,6 +33,8 @@ The site is automatically built and deployed via GitHub Actions on pushes to the
 ### Content Guidelines
 - Blog posts should be placed in `_posts/` with filename format: `YYYY-MM-DD-title.markdown`
 - Posts require YAML front matter with title, date, and categories/tags
+- Focus on WordPress development topics: Gutenberg blocks, Roots Sage, Ollie WP, ACF, performance, multilingual development
+- Use relevant tags like: wordpress, php, gutenberg, sage, acf, polylang, walker, navigation, blocks
 - Site metadata (title, description, social links) is configured in `_config.yml`
 
 ### Deployment
