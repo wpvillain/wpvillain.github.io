@@ -30,9 +30,12 @@ twitter_username:
 github_username:  wpvillain
 
 # Build settings
-theme: minima
+theme: jekyll-theme-console
+style: dark
+
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
 
 # Publish future-dated posts (useful with timezone differences)
 future: true
