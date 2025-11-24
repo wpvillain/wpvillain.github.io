@@ -4,15 +4,24 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+WP Villain is a WordPress developer blog run by Jasper Frumau, covering advanced WordPress development topics including Gutenberg blocks, Roots Sage, Full Site Editing, ACF, and modern WordPress techniques.
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
+## What We Do
 
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
+We specialize in:
 
+- **WordPress Development** - Custom themes, plugins, and solutions
+- **WooCommerce** - E-commerce implementations and customizations
+- **Roots Sage** - Modern WordPress development with the Roots stack
+- **Full Site Editing** - Block-based themes and patterns
 
-[jekyll-organization]: https://github.com/jekyll
+## Open Source Projects
+
+We maintain several open source WordPress themes:
+
+- [Nynaeve](https://github.com/imagewize/nynaeve) - A Roots Sage hybrid theme
+- [Moiraine](https://github.com/imagewize/moiraine) - A Full Site Editing (FSE) theme
+
+## Work With Us
+
+For professional WordPress development work, visit [Imagewize](https://imagewize.com).
