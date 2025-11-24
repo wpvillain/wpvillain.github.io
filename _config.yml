@@ -33,6 +33,11 @@ github_username:  wpvillain
 theme: jekyll-theme-console
 style: dark
 
+# Navigation
+header_pages:
+  - index.markdown
+  - about.markdown
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
