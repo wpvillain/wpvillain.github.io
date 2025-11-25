@@ -344,4 +344,4 @@ If you're experiencing similar issues on your Trellis/Bedrock/Sage stack, I hope
 
 ---
 
-*Have you dealt with PHP-FPM memory issues on WordPress? Share your experiences and solutions in the comments!*
+*Have you dealt with PHP-FPM memory issues on WordPress? Find me on Mastodon at [@jfrumau@mastodon.social](https://mastodon.social/@jfrumau) to share your experiences and solutions!*
