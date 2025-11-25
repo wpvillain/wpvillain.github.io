@@ -35,7 +35,6 @@ style: dark
 
 # Navigation
 header_pages:
-  - index.markdown
   - about.markdown
 
 plugins:

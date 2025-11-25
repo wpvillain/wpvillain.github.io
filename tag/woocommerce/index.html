@@ -1,0 +1,28 @@
+---
+layout: default
+title: "WooCommerce Tutorials"
+---
+
+<h1>WooCommerce Tutorials</h1>
+
+<p>WordPress eCommerce tutorials and guides for building and optimizing WooCommerce stores.</p>
+
+<ul class="post-list">
+  {% for post in site.tags.woocommerce %}
+    <li>
+      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+      <h3>
+        <a class="post-link" href="{{ post.url | relative_url }}">
+          {{ post.title | escape }}
+        </a>
+      </h3>
+      {% if post.excerpt %}
+        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+
+{% if site.tags.woocommerce.size == 0 %}
+  <p>No WooCommerce posts yet. Check back soon!</p>
+{% endif %}
