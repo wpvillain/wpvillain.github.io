@@ -7,6 +7,15 @@
         <a href="{{ '/' | relative_url }}"><strong>{{ site.title }}</strong></a>
       </li>
       <li class="nav-links">
+        <li>
+          <a href="{{ '/tag/woocommerce/' | relative_url }}">woocommerce</a>
+        </li>
+        <li>
+          <a href="{{ '/tag/wordpress/' | relative_url }}">wordpress</a>
+        </li>
+        <li>
+          <a href="{{ '/tag/speed-optimization/' | relative_url }}">speed</a>
+        </li>
         {%- for path in page_paths -%}
           {%- assign my_page = site.pages | where: "path", path | first -%}
           {%- if my_page.title -%}

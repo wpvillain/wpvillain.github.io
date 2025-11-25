@@ -26,9 +26,11 @@ The site is automatically built and deployed via GitHub Actions on pushes to the
 - `404.html` - Custom 404 error page
 
 ### Theme and Plugins
-- Uses the `minima` theme (~> 2.5)
+- Uses the `jekyll-theme-console` theme with dark style
 - Includes `jekyll-feed` plugin for RSS/Atom feeds
+- Includes `jekyll-seo-tag` plugin for SEO optimization
 - Jekyll version pinned to ~> 4.4.1
+- Custom navigation in `_includes/header.html` includes tag links for WooCommerce and Speed (wordpress-speed-optimization)
 
 ### Content Guidelines
 - Blog posts should be placed in `_posts/` with filename format: `YYYY-MM-DD-title.markdown`
