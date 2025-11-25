@@ -4,24 +4,45 @@ title: About
 permalink: /about/
 ---
 
-WP Villain is a WordPress developer blog run by Jasper Frumau, covering advanced WordPress development topics including Gutenberg blocks, Roots Sage, Full Site Editing, ACF, and modern WordPress techniques.
+WP Villa is a WordPress tutorial and resource site focused on helping SMEs and developers get the most out of WordPress, WooCommerce, and modern web development.
 
-## What We Do
+## What We Cover
 
-We specialize in:
+Our tutorials and guides focus on:
 
-- **WordPress Development** - Custom themes, plugins, and solutions
-- **WooCommerce** - E-commerce implementations and customizations
-- **Roots Sage** - Modern WordPress development with the Roots stack
-- **Full Site Editing** - Block-based themes and patterns
+- **WordPress Development** - Theme customization, optimization techniques, and best practices
+- **WooCommerce** - E-commerce setup guides, speed optimization, and payment gateway integrations
+- **WordPress Performance** - Speed optimization, caching strategies, and hosting recommendations
+- **WordPress Security** - Backup solutions, security hardening, and maintenance practices
+- **Site Migration** - Moving WordPress sites safely and efficiently
 
-## Open Source Projects
+## Who Runs WP Villa
 
-We maintain several open source WordPress themes:
+WP Villa is maintained by **[Jasper Frumau](https://imagewize.com)**, founder of Imagewize - a WordPress development agency specializing in SME websites since 2009.
 
-- [Nynaeve](https://github.com/imagewize/nynaeve) - A Roots Sage hybrid theme
-- [Moiraine](https://github.com/imagewize/moiraine) - A Full Site Editing (FSE) theme
+With over 15 years of WordPress experience, we've:
+- Built 100+ custom WordPress and WooCommerce sites
+- Optimized countless slow WordPress sites to achieve sub-1s load times
+- Migrated dozens of sites to modern hosting stacks (Trellis/Bedrock)
+- Developed open source WordPress themes used by developers worldwide
 
-## Work With Us
+## Open Source Contributions
 
-For professional WordPress development work, visit [Imagewize](https://imagewize.com).
+We actively contribute to the WordPress community:
+
+- **[Nynaeve](https://github.com/imagewize/nynaeve)** - A modern Roots Sage hybrid theme combining block editor with classic PHP templating
+- **[Moiraine](https://github.com/imagewize/moiraine)** - A Full Site Editing (FSE) theme built with WordPress patterns
+- **[Callandor](https://github.com/imagewize/callandor)** - WordPress block patterns for rapid site building
+
+## Need Professional Help?
+
+While WP Villa provides free tutorials and guides, if you need hands-on WordPress development, speed optimization, or custom WooCommerce solutions, visit **[Imagewize](https://imagewize.com)** for professional services.
+
+We offer:
+- Custom WordPress development for SMEs
+- WooCommerce store setup and optimization
+- WordPress speed optimization (Target: <1s load times)
+- Premium hosting on Trellis stack (VPS with micro-caching)
+- Ongoing maintenance and support
+
+**[Contact Imagewize](https://imagewize.com/contact-us/)** for a free consultation.
