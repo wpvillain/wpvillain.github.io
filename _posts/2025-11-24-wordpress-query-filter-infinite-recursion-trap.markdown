@@ -186,4 +186,4 @@ The silver lining: this mistake is now documented, and I'll never make it again.
 
 ---
 
-*Have you been bitten by recursive WordPress filters? Share your war stories in the comments.*
+*Have you been bitten by recursive WordPress filters? Find me on Mastodon at [@jfrumau@mastodon.social](https://mastodon.social/@jfrumau) to share your war stories.*
