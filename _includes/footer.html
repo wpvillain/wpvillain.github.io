@@ -1,0 +1,18 @@
+{%- assign default_paths = site.html_pages | map: 'path' -%}
+{%- assign page_paths = site.footer_pages | default: default_paths -%}
+<footer>
+  <div class="menu">
+    <ul>
+      <li class="nav-links">
+        {%- for path in page_paths -%}
+          {%- assign my_page = site.pages | where: "path", path | first -%}
+          {%- if my_page.title -%}
+          <li>
+            <a href="{{ my_page.url | relative_url }}"{% if page.url == my_page.url %} aria-current="page"{% endif %}>{{ my_page.title | escape }}</a>
+          </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </li>
+    </ul>
+  </div>
+</footer>

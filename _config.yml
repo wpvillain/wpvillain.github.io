@@ -34,7 +34,8 @@ theme: jekyll-theme-console
 style: dark
 
 # Navigation
-header_pages:
+header_pages: []
+footer_pages:
   - about.markdown
 
 plugins:
