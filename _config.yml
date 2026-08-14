@@ -30,8 +30,10 @@ twitter_username:
 github_username:  wpvillain
 
 # Build settings
-theme: jekyll-theme-console
-style: dark
+# "Villain" theme — local, no remote theme gem. Layouts/includes/assets
+# live in this repo (see _layouts, _includes, assets/main.css).
+markdown: kramdown
+highlighter: rouge
 
 # Navigation
 header_pages: []
