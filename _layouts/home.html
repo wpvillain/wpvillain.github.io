@@ -1,0 +1,47 @@
+---
+layout: default
+---
+
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow hero-eyebrow">Field notes from production · est. 2009</p>
+      <h1>We fix what WordPress&nbsp;<em>breaks.</em></h1>
+      <div class="hero-sub">
+        {{ content }}
+      </div>
+      <div class="stat-strip">
+        <div class="stat"><b>100+</b><span>Sites shipped</span></div>
+        <div class="stat"><b>15 yrs</b><span>In production</span></div>
+        <div class="stat"><b>&lt;1s</b><span>Load target</span></div>
+        <div class="stat"><b>Trellis</b><span>/ Bedrock stack</span></div>
+      </div>
+    </div>
+    <div class="case-stamp">
+      <div class="case-stamp-text"><b>Case</b>Open<br>File No. {{ site.posts.size }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Open case log</p>
+        <h2>Latest entries</h2>
+      </div>
+      <p class="archive-count">Newest first · {{ site.posts.size }} case{% unless site.posts.size == 1 %}s{% endunless %} on file</p>
+    </div>
+
+    {%- if site.posts.size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.posts %}
+      {%- assign case_no = site.posts.size | minus: forloop.index0 -%}
+      <li>{% include case-card.html post=post number=case_no %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No cases on file yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>
