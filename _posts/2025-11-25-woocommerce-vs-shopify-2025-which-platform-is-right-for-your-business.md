@@ -5,6 +5,8 @@ date: 2025-11-25 14:00:00 +0100
 categories: ecommerce woocommerce shopify
 tags: woocommerce shopify ecommerce-platforms comparison sme-ecommerce
 excerpt: "Choosing between WooCommerce and Shopify? This comprehensive comparison covers costs, features, flexibility, and real-world use cases to help SMEs make the right decision in 2025."
+case_category: ecommerce
+case_status: documented
 ---
 
 If you're starting an online store in 2025, you've likely narrowed your platform choice down to **WooCommerce** or **Shopify**. Both are excellent options, but they take fundamentally different approaches to e-commerce.

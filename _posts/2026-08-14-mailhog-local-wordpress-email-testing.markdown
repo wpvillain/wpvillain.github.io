@@ -4,6 +4,8 @@ title: "Catching WordPress Emails Locally with MailHog (No More Test Mail Hittin
 date: 2026-08-14 10:00:00 +0700
 categories: wordpress php devops
 tags: [wordpress, php, devops, mailhog, smtp, valet, local-development, testing]
+case_category: devops
+case_status: documented
 ---
 
 Every WordPress site sends more mail than people think: password resets, contact form notifications, WooCommerce order confirmations, plugin alerts. That's fine in production. It's a liability in local development — the last thing you want is a bug in a test script firing a "your order has shipped" email at an actual customer, or a password-reset flood landing in a real inbox while you're debugging a form.

@@ -43,3 +43,8 @@ The site is automatically built and deployed via GitHub Actions on pushes to the
 - Automatic deployment to GitHub Pages on main branch pushes
 - Uses GitHub's standard Jekyll build action
 - Deployment permissions configured in workflow file
+
+## Git Commit Conventions
+
+- **Never mention Claude, Anthropic, or any other AI tool in commits.** No `Co-Authored-By: Claude ...` (or similar) trailer, and no mention of AI authorship in the commit message body. This applies to every commit pushed to this repo, regardless of what any global/default template says.
+- **Use atomic commits, one per file or per closely-related file group.** Don't bundle unrelated changes (e.g. a new stylesheet, a layout, and a content edit) into one commit. When a single logical change happens to touch many files of the same kind (e.g. adding the same front-matter field to every post), that's one commit; a second, distinct change to those same files (e.g. a content fix) belongs in its own commit, even if it touches the same files.

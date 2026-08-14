@@ -1,0 +1,30 @@
+---
+layout: default
+---
+
+<article class="post">
+  <div class="wrap">
+    <header class="post-head">
+      {%- assign cat = page.case_category | default: "general" -%}
+      {%- assign status = page.case_status | default: "documented" -%}
+      <div class="post-top" data-cat="{{ cat }}">
+        <span class="case-cat">{{ cat | capitalize }}</span>
+        <span class="case-status">{{ status | capitalize }}</span>
+      </div>
+      <h1 class="post-title">{{ page.title | escape }}</h1>
+      <div class="post-meta">
+        <span>{{ page.date | date: "%B %-d, %Y" }}</span>
+        {%- if page.tags and page.tags.size > 0 %}
+        <span>·</span>
+        {%- for tag in page.tags %}
+        <span class="tag">{{ tag }}</span>
+        {%- endfor -%}
+        {%- endif %}
+      </div>
+    </header>
+
+    <div class="post-body">
+      {{ content }}
+    </div>
+  </div>
+</article>

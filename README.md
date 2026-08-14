@@ -14,12 +14,23 @@ WP Villain explores modern WordPress development practices including:
 - **Multilingual Development** - Building international WordPress sites
 - **Custom Walkers & Navigation** - Advanced menu systems and navigation patterns
 
+## Theme: Villain
+
+The site runs on **Villain**, a local Jekyll theme built for this repo (not a remote theme gem). Its design language is an open "case file": every post is a field report, with a colored side tab for its category and a status stamp (`Patched`, `Hardened`, `Resolved`, `Documented`, `Shipped`) for its outcome.
+
+- `_layouts/` — `default`, `home`, `post`, `page`
+- `_includes/` — `head`, `header`, `footer`, and a reusable `case-card.html` post-card partial
+- `assets/main.css` — the full stylesheet, including syntax highlighting
+- `assets/fonts/` — self-hosted `.woff2` fonts (Newsreader, IBM Plex Sans, IBM Plex Mono); no external font or CDN requests
+
+New posts should set `case_category` (e.g. `security`, `performance`, `debugging`, `devops`, `ecommerce`, `frontend`) and `case_status` (e.g. `documented`, `patched`, `hardened`, `resolved`, `shipped`) in front matter to drive the card's tab color and status stamp. Both fall back to sensible defaults if omitted.
+
 ## Technology Stack
 
 This blog is built with:
 - **Jekyll** - Static site generator
 - **GitHub Pages** - Hosting and deployment
-- **Minima Theme** - Clean, responsive design
+- **Villain** - Local, self-hosted theme (see above)
 - **GitHub Actions** - Automated CI/CD pipeline
 
 ## Local Development

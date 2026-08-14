@@ -3,26 +3,25 @@ layout: default
 title: "WordPress Speed Optimization Tutorials"
 ---
 
-<h1>WordPress Speed Optimization</h1>
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: speed-optimization</p>
+        <h2>WordPress Speed Optimization</h2>
+      </div>
+      <p class="archive-count">{{ site.tags.speed-optimization.size }} case{% unless site.tags.speed-optimization.size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">WordPress performance and speed optimization guides to help you achieve faster load times and better Core Web Vitals.</p>
 
-<p>WordPress performance and speed optimization guides to help you achieve faster load times and better Core Web Vitals.</p>
-
-<ul class="post-list">
-  {% for post in site.tags.speed-optimization %}
-    <li>
-      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-      <h3>
-        <a class="post-link" href="{{ post.url | relative_url }}">
-          {{ post.title | escape }}
-        </a>
-      </h3>
-      {% if post.excerpt %}
-        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
-      {% endif %}
-    </li>
-  {% endfor %}
-</ul>
-
-{% if site.tags.speed-optimization.size == 0 %}
-  <p>No speed optimization posts yet. Check back soon!</p>
-{% endif %}
+    {%- if site.tags.speed-optimization.size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags.speed-optimization %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No speed optimization posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>

@@ -1,0 +1,35 @@
+{%- comment -%}
+  Renders one post as a "case file" report card.
+  Usage: {% include case-card.html post=post number=n %}
+  - include.post   : the post object (required)
+  - include.number : case number to display (optional; falls back to a
+                      hash of the title so cards still look right on tag
+                      pages where a running index isn't available)
+{%- endcomment -%}
+{%- assign p = include.post -%}
+{%- assign cat = p.case_category | default: "general" -%}
+{%- assign status = p.case_status | default: "documented" -%}
+{%- assign case_no = include.number | default: "—" -%}
+<a class="case" data-cat="{{ cat }}" href="{{ p.url | relative_url }}">
+  <div class="case-tab"></div>
+  <div class="case-body">
+    <div class="case-top">
+      <span class="case-no">Case No. {{ case_no }}</span>
+      <span class="case-cat">{{ cat | capitalize }}</span>
+      <span class="case-status">{{ status | capitalize }}</span>
+    </div>
+    <h3 class="case-title">{{ p.title | escape }}</h3>
+    {%- if p.excerpt %}
+    <p class="case-excerpt">{{ p.excerpt | strip_html | strip_newlines | truncate: 160 }}</p>
+    {%- endif %}
+    <div class="case-meta">
+      <span>{{ p.date | date: "%b %-d, %Y" }}</span>
+      {%- if p.tags and p.tags.size > 0 %}
+      <span class="sep">·</span>
+      {%- for tag in p.tags limit: 4 %}
+      <span class="tag">{{ tag }}</span>
+      {%- endfor -%}
+      {%- endif %}
+    </div>
+  </div>
+</a>

@@ -4,9 +4,9 @@ title: "How Trellis's database-pull Playbook Works (And What We Fixed)"
 date: 2026-02-27 10:00:00 +0700
 categories: wordpress trellis ansible bedrock
 tags: [wordpress, trellis, ansible, bedrock, database, wp-cli, roots, deployment]
+case_category: devops
+case_status: patched
 ---
-
-# How Trellis's database-pull Playbook Works (And What We Fixed)
 
 One of the most useful Trellis commands in day-to-day WordPress development is `trellis db pull`. It syncs your production (or staging) database down to local — switching URLs automatically so your dev site works immediately. But the playbook behind it does more than most developers realise, and the default Trellis version had some issues we needed to fix before it worked reliably.
 
