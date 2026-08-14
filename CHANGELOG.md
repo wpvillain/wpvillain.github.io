@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-14
+
+### Added
+- **Villain theme**: a new local Jekyll theme replacing `jekyll-theme-console`, owned entirely in this repo (`_layouts`, `_includes`, `assets/main.css`) instead of a remote gem
+- "Case file" design language: every post is a field report — a colored side tab encodes its category and a status stamp (`Patched`, `Hardened`, `Resolved`, `Documented`, `Shipped`) encodes its outcome, driven by new `case_category` / `case_status` front matter on each post
+- New editorial type system: Newsreader (serif display), IBM Plex Sans (body), IBM Plex Mono (metadata/code) — all self-hosted as `.woff2` under `assets/fonts/`, no external font/CDN requests
+- New layouts: `_layouts/default.html`, `home.html`, `post.html`, `page.html`
+- New includes: `_includes/head.html`, `header.html`, `footer.html`, and a reusable `_includes/case-card.html` post-card partial
+- Redesigned homepage hero with a stat strip (sites shipped, years in production, load target, hosting stack) and a rotating "Case Open" stamp
+- Syntax highlighting for code blocks (Rouge) restyled to match the new palette
+- `_config.yml`: `markdown: kramdown` and `highlighter: rouge` set explicitly now that the theme gem no longer sets defaults
+
+### Changed
+- The three tag archive pages (WordPress, WooCommerce, Speed Optimization) and the homepage now render posts through the shared `case-card.html` partial for a consistent look
+- Homepage intro copy trimmed to a single paragraph, now rendered directly inside the hero instead of a separate `<ul>` post list
+- `404.html` restyled to match the new theme and rewritten as HTML (was invalid Markdown link syntax in a `.html` file, so it never actually rendered as a link)
+- Content Security Policy tightened to `style-src 'self'` / `font-src 'self'` now that fonts are self-hosted (previously allowed `fonts.googleapis.com` / `fonts.gstatic.com`)
+- `Gemfile` / `Gemfile.lock`: removed the `jekyll-theme-console` dependency
+
+### Fixed
+- Four posts had a redundant `# Title` heading duplicating their front-matter `title`, which was leaking into Jekyll's auto-generated `excerpt` (showing the title as the card summary) and double-printing the title on the post page itself
+
 ## [0.7.0] - 2025-12-05
 
 ### Added
@@ -130,6 +152,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom 404 page
 
 [Unreleased]: https://github.com/wpvillain/wpvillain.github.io/compare/main...HEAD
+[1.0.0]: https://github.com/wpvillain/wpvillain.github.io/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/wpvillain/wpvillain.github.io/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wpvillain/wpvillain.github.io/pull/6
 [0.5.0]: https://github.com/wpvillain/wpvillain.github.io/pull/5
