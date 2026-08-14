@@ -8,8 +8,6 @@ case_category: debugging
 case_status: resolved
 ---
 
-# Debugging PHP-FPM Memory Exhaustion on WordPress with WooCommerce and Trellis
-
 Over the past weekend, I spent considerable time debugging persistent memory exhaustion errors on a WordPress site running WooCommerce and the Roots stack (Trellis + Bedrock + Sage). What started as simple "critical error" messages turned into a deep investigation that uncovered **five distinct root causes**. This post documents the entire debugging journey, the tools used, and the solutions applied.
 
 ## The Symptoms
