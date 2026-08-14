@@ -4,6 +4,8 @@ title: "Debugging PHP-FPM Memory Exhaustion on WordPress with WooCommerce and Tr
 date: 2025-11-24 10:00:00 +0700
 categories: wordpress php-fpm trellis woocommerce performance
 tags: [wordpress, php, php-fpm, memory, woocommerce, trellis, nginx, debugging, performance, server]
+case_category: debugging
+case_status: resolved
 ---
 
 # Debugging PHP-FPM Memory Exhaustion on WordPress with WooCommerce and Trellis

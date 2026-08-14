@@ -4,6 +4,8 @@ title: "Building a Custom WordPress Walker for Multilingual Mobile Navigation wi
 date: 2025-08-03 10:00:00 +0200
 categories: wordpress navigation walker polylang multilingual
 tags: [wordpress, php, walker, navigation, multilingual, polylang, mobile, acf]
+case_category: frontend
+case_status: shipped
 ---
 
 # Building a Custom WordPress Walker for Multilingual Mobile Navigation with Secondary Menus

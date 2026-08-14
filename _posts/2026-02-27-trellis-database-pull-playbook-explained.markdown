@@ -4,6 +4,8 @@ title: "How Trellis's database-pull Playbook Works (And What We Fixed)"
 date: 2026-02-27 10:00:00 +0700
 categories: wordpress trellis ansible bedrock
 tags: [wordpress, trellis, ansible, bedrock, database, wp-cli, roots, deployment]
+case_category: devops
+case_status: patched
 ---
 
 # How Trellis's database-pull Playbook Works (And What We Fixed)

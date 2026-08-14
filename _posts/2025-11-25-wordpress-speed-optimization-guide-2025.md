@@ -5,6 +5,8 @@ date: 2025-11-25 10:00:00 +0100
 categories: wordpress performance
 tags: speed-optimization core-web-vitals lcp cls wordpress-performance
 excerpt: "Learn battle-tested WordPress speed optimization techniques that have helped us achieve sub-1 second load times for SME websites. Based on real implementations from 100+ client projects."
+case_category: performance
+case_status: documented
 ---
 
 If your WordPress site takes more than 2 seconds to load, you're losing visitors and potential customers. In 2025, speed isn't just a nice-to-have—it's a business requirement.

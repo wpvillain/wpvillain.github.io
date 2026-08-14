@@ -4,6 +4,8 @@ title: "The WordPress Query Filter Trap: How I Caused Infinite Recursion and Cra
 date: 2025-11-24 14:00:00 +0700
 categories: wordpress php debugging
 tags: [wordpress, php, debugging, filters, wpdb, recursion, woocommerce]
+case_category: debugging
+case_status: resolved
 ---
 
 # The WordPress Query Filter Trap: How I Caused Infinite Recursion and Crashed Production

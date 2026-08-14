@@ -4,6 +4,8 @@ title: "WP 2FA on Roots Bedrock/Trellis: Per-Environment Encryption Keys and a C
 date: 2026-07-03 14:00:00 +0700
 categories: wordpress php security
 tags: [wordpress, php, security, 2fa, bedrock, trellis, composer]
+case_category: security
+case_status: hardened
 ---
 
 We added [WP 2FA](https://wordpress.org/plugins/wp-2fa/) (two-factor authentication) to a client site this week to help lock down `/wp-login.php` after a brute-force wave that hit us — 20 IPs, 176 to 851 login attempts each in 48 hours. Blocking the IPs at the Nginx level stops that specific wave, but 2FA is the actual fix: even a leaked or brute-forced password stops being enough on its own.
