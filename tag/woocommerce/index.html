@@ -3,26 +3,25 @@ layout: default
 title: "WooCommerce Tutorials"
 ---
 
-<h1>WooCommerce Tutorials</h1>
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: woocommerce</p>
+        <h2>WooCommerce Tutorials</h2>
+      </div>
+      <p class="archive-count">{{ site.tags.woocommerce.size }} case{% unless site.tags.woocommerce.size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">WordPress eCommerce tutorials and guides for building and optimizing WooCommerce stores.</p>
 
-<p>WordPress eCommerce tutorials and guides for building and optimizing WooCommerce stores.</p>
-
-<ul class="post-list">
-  {% for post in site.tags.woocommerce %}
-    <li>
-      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-      <h3>
-        <a class="post-link" href="{{ post.url | relative_url }}">
-          {{ post.title | escape }}
-        </a>
-      </h3>
-      {% if post.excerpt %}
-        <p>{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
-      {% endif %}
-    </li>
-  {% endfor %}
-</ul>
-
-{% if site.tags.woocommerce.size == 0 %}
-  <p>No WooCommerce posts yet. Check back soon!</p>
-{% endif %}
+    {%- if site.tags.woocommerce.size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags.woocommerce %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No WooCommerce posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>
