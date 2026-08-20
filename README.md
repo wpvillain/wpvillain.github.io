@@ -1,5 +1,7 @@
 # WP Villain
 
+[![Visitors](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fwpvillain.goatcounter.com%2Fcounter%2FTOTAL.json&label=visitors&query=%24.count&color=blue)](https://wpvillain.goatcounter.com/)
+
 A modern WordPress development blog focused on cutting-edge techniques and tools for building WordPress sites.
 
 ## About
