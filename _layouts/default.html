@@ -2,11 +2,12 @@
 <html lang="{{ page.lang | default: site.lang | default: 'en' }}">
 {%- comment -%}
   All assets (fonts, CSS) are self-hosted under /assets, so the CSP can
-  stay tight — no external font/style hosts to allow.
+  stay tight — the only external hosts allowed are GoatCounter's script
+  (gc.zgo.at) and its beacon endpoint (wpvillain.goatcounter.com).
 {%- endcomment -%}
 {%- capture csp -%}
 default-src 'none';
-connect-src 'self';
+connect-src 'self' https://wpvillain.goatcounter.com;
 base-uri 'self';
 form-action 'none';
 img-src 'self' https: data:;
@@ -15,7 +16,7 @@ font-src 'self';
 media-src 'self';
 object-src 'none';
 child-src 'self';
-script-src 'self';
+script-src 'self' https://gc.zgo.at;
 {%- endcapture -%}
 {%- capture csp_final -%}{{ csp | strip | replace: '\n', ' ' }}{%- if site.csp_extra %} {{ site.csp_extra }}{%- endif -%}{%- endcapture -%}
 <meta http-equiv="Content-Security-Policy" content="{{ csp_final | strip }}" />
