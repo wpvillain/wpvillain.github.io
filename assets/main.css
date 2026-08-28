@@ -505,7 +505,11 @@ button:focus-visible,
   font-size:13px;
 }
 .post-body table{
+  display:block;
   width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
   border-collapse:collapse;
   margin:0 0 24px;
   font-size:14.5px;

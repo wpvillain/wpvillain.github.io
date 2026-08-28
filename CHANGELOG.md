@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-28
+
+### Fixed
+- Wide post tables (e.g. multi-column comparison tables) had no way to scroll on mobile and got clipped at the viewport edge instead. `.post-body table` is now `display:block` with `overflow-x:auto`, giving it its own horizontal scrollbar when it's wider than the screen
+
 ## [1.1.0] - 2026-08-28
 
 ### Fixed
