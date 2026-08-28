@@ -505,7 +505,11 @@ button:focus-visible,
   font-size:13px;
 }
 .post-body table{
+  display:block;
   width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
   border-collapse:collapse;
   margin:0 0 24px;
   font-size:14.5px;
@@ -637,9 +641,13 @@ button:focus-visible,
     height:2px;
     background:var(--paper);
     border-radius:1px;
-    transition:background .15s ease;
+    transition:transform .18s ease, opacity .18s ease, background .15s ease;
   }
+  /* open state: morph the hamburger into an X so it reads as a close button */
   .nav-toggle[open] .nav-toggle-btn span{ background:var(--amber); }
+  .nav-toggle[open] .nav-toggle-btn span:nth-child(1){ transform:translateY(6px) rotate(45deg); }
+  .nav-toggle[open] .nav-toggle-btn span:nth-child(2){ opacity:0; }
+  .nav-toggle[open] .nav-toggle-btn span:nth-child(3){ transform:translateY(-6px) rotate(-45deg); }
   .nav-toggle .site-nav{ display:none; }
   .nav-toggle[open] .site-nav{
     display:flex;

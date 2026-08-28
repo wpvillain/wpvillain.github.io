@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-08-28
+
+### Fixed
+- Wide post tables (e.g. multi-column comparison tables) had no way to scroll on mobile and got clipped at the viewport edge instead. `.post-body table` is now `display:block` with `overflow-x:auto`, giving it its own horizontal scrollbar when it's wider than the screen
+- Mobile nav dropdown had no clear way to close it: the hamburger icon didn't change state when open, tapping outside it didn't dismiss it, and re-tapping it was inconsistent on some mobile browsers. The hamburger now morphs into an X when open (CSS-only), and a new small `assets/nav.js` (progressive enhancement — the `<details>` still works if it fails to load) takes over the toggle explicitly and adds outside-tap-to-close and Escape-to-close
+
 ## [1.1.0] - 2026-08-28
 
 ### Fixed
