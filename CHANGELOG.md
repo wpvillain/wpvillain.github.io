@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Header nav no longer overflows/gets cut off on mobile — `.site-nav` now collapses behind a `<details>`-based hamburger menu below 600px, with no JavaScript required. The nav links are defined once via a Liquid `capture` in `_includes/header.html` and rendered into both the always-visible desktop list and the mobile dropdown, so there's a single source of truth
+
 ## [1.0.0] - 2026-08-14
 
 ### Added

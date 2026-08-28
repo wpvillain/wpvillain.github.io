@@ -1,11 +1,18 @@
+{% capture nav_links %}
+  <li><a href="{{ '/tag/woocommerce/' | relative_url }}"{% if page.url contains 'woocommerce' %} aria-current="page"{% endif %}>WooCommerce</a></li>
+  <li><a href="{{ '/tag/wordpress/' | relative_url }}"{% if page.url contains '/tag/wordpress' %} aria-current="page"{% endif %}>WordPress</a></li>
+  <li><a href="{{ '/tag/speed-optimization/' | relative_url }}"{% if page.url contains 'speed-optimization' %} aria-current="page"{% endif %}>Speed</a></li>
+  <li><a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a></li>
+{% endcapture %}
 <header class="site-header">
   <div class="wrap">
     <a class="wordmark" href="{{ '/' | relative_url }}">WP<span class="dot">·</span>VILLAIN</a>
-    <ul class="site-nav">
-      <li><a href="{{ '/tag/woocommerce/' | relative_url }}"{% if page.url contains 'woocommerce' %} aria-current="page"{% endif %}>WooCommerce</a></li>
-      <li><a href="{{ '/tag/wordpress/' | relative_url }}"{% if page.url contains '/tag/wordpress' %} aria-current="page"{% endif %}>WordPress</a></li>
-      <li><a href="{{ '/tag/speed-optimization/' | relative_url }}"{% if page.url contains 'speed-optimization' %} aria-current="page"{% endif %}>Speed</a></li>
-      <li><a href="{{ '/about/' | relative_url }}"{% if page.url == '/about/' %} aria-current="page"{% endif %}>About</a></li>
-    </ul>
+    <ul class="site-nav">{{ nav_links }}</ul>
+    <details class="nav-toggle">
+      <summary class="nav-toggle-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </summary>
+      <ul class="site-nav nav-toggle-menu">{{ nav_links }}</ul>
+    </details>
   </div>
 </header>
