@@ -8,6 +8,7 @@ case_category: devops
 case_status: patched
 ---
 
+{% raw %}
 One of the most useful Trellis commands in day-to-day WordPress development is `trellis db pull`. It syncs your production (or staging) database down to local — switching URLs automatically so your dev site works immediately. But the playbook behind it does more than most developers realise, and the default Trellis version had some issues we needed to fix before it worked reliably.
 
 This post walks through exactly what `database-pull.yml` does, the safety feature hidden in the middle of it, and the two patches we made to get it working correctly with a Bedrock project.
@@ -214,3 +215,4 @@ This is part of the Trellis-based WordPress deployment workflow we use at [Image
 ---
 
 *Questions or issues with your Trellis setup? Find me on Mastodon at [@jfrumau@mastodon.social](https://mastodon.social/@jfrumau).*
+{% endraw %}

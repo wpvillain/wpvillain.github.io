@@ -164,6 +164,14 @@ button:focus-visible,
 .site-nav a{ text-decoration:none; color:var(--muted); border-bottom:1px solid transparent; padding-bottom:2px; transition:color .15s ease, border-color .15s ease; }
 .site-nav a:hover, .site-nav a[aria-current="page"]{ color:var(--amber); border-color:var(--amber); }
 
+/* nav-toggle: a <details> holding a duplicate .site-nav for the mobile
+   dropdown (see _includes/header.html). Hidden entirely on desktop, where
+   the plain .site-nav above already renders the links — a closed <details>
+   can't be forced visible via CSS (Chrome suppresses its content outright,
+   regardless of author display rules), so it can't double as the desktop
+   nav itself. */
+.nav-toggle{ display:none; }
+
 /* ---------- hero ---------- */
 .hero{
   position:relative;
@@ -608,7 +616,45 @@ button:focus-visible,
 }
 @media (max-width:600px){
   .wrap{ padding:0 18px; }
-  .site-nav{ gap:16px; }
+
+  /* collapse the nav into a <details> dropdown behind a hamburger button */
+  .wrap > .site-nav{ display:none; }
+  .nav-toggle{ display:block; position:relative; }
+  .nav-toggle-btn{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:4px;
+    width:26px;
+    height:26px;
+    cursor:pointer;
+    list-style:none;
+  }
+  .nav-toggle-btn::-webkit-details-marker{ display:none; }
+  .nav-toggle-btn::marker{ content:''; }
+  .nav-toggle-btn span{
+    display:block;
+    height:2px;
+    background:var(--paper);
+    border-radius:1px;
+    transition:background .15s ease;
+  }
+  .nav-toggle[open] .nav-toggle-btn span{ background:var(--amber); }
+  .nav-toggle .site-nav{ display:none; }
+  .nav-toggle[open] .site-nav{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    position:absolute;
+    top:calc(100% + 14px);
+    right:0;
+    min-width:190px;
+    background:var(--surface);
+    border:1px solid var(--hairline-strong);
+    border-radius:4px;
+    padding:16px 20px;
+    z-index:10;
+  }
   .hero{ padding:52px 0 40px; }
   .stat-strip{ gap:14px 0; }
   .stat{ padding-right:16px; margin-right:16px; }
