@@ -8,6 +8,7 @@ case_category: devops
 case_status: shipped
 ---
 
+{% raw %}
 Our Sage 11 theme, Nynaeve, used to live two places at once: as its own standalone repo, and as a plain git-tracked copy pasted into the main site repo's `web/app/themes/nynaeve`. A manual `rsync-theme.sh` script kept the copy in sync. That's exactly the kind of setup that looks fine until the two copies quietly disagree — which is what happened. The theme repo's docs described block *categories* (`nynaeve/hero`, `nynaeve/cta`, …) and block *namespaces* (`imagewize/hero`, `imagewize/cta`, …) correctly, but the copy that shipped to the site repo drifted, and content across the site ended up with broken `wp:nynaeve/*` markup where it should have been `wp:imagewize/*`. Found and fixed the same day we started this change.
 
 That was the last straw. This post covers [PR #397](https://github.com/imagewize/imagewize.com/pull/397): moving Nynaeve from a git-tracked directory to a real Composer dependency — the same pattern the project already used for `imagewize/min` and `imagewize/callandor` — and the deploy-hook rework that made it work with Trellis.
@@ -152,3 +153,4 @@ This is part of the Trellis/Bedrock/Sage deployment stack we run at [Imagewize](
 ---
 
 *Running a similar Composer-managed theme setup and hit a snag? Find me on Mastodon at [@jfrumau@mastodon.social](https://mastodon.social/@jfrumau).*
+{% endraw %}

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Header nav no longer overflows/gets cut off on mobile — `.site-nav` now collapses behind a `<details>`-based hamburger menu below 600px, with no JavaScript required. The nav links are defined once via a Liquid `capture` in `_includes/header.html` and rendered into both the always-visible desktop list and the mobile dropdown, so there's a single source of truth
+- Two posts (`2026-02-27-trellis-database-pull-playbook-explained`, `2026-08-24-sage-theme-composer-package-trellis-deploy`) had literal Jinja/Ansible `{{ var }}` template syntax in their Ansible/YAML code examples, which Jekyll's Liquid parser was silently evaluating (rendering as empty, or as Jekyll's own `site` object) instead of leaving as plain text. Wrapped each post body in `{% raw %}...{% endraw %}`
 
 ## [1.0.0] - 2026-08-14
 
