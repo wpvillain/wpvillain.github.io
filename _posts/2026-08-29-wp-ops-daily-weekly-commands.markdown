@@ -103,6 +103,16 @@ for the fast version — recent status codes, error counts, service status, good
 
 Fixing that surfaced a second, quieter bug in the same task: `systemctl status php*-fpm` was silently returning nothing. Systemd's unit-name globbing needs the full suffix, so `php*-fpm` never matched `php8.4-fpm.service` even though the unit was loaded and running — and it exited `rc=0` with empty output instead of erroring, so it went unnoticed right alongside the sudo fix. Quoting the glob and adding `.service` (`'php*-fpm.service'`) fixed it for good.
 
+For traffic alone — no security or AI-crawler noise mixed in — there's a narrower command:
+
+```bash
+wp-ops traffic-report imagewize.com production --hours 120
+```
+
+That's the last five days, and on a real run against imagewize.com it surfaces exactly what you'd hope: the homepage and `/contact/` up top (436 and 187 hits), then whichever blog post is actually pulling organic traffic that week — [`/how-to-audit-your-woocommerce-store/`](https://imagewize.com/how-to-audit-your-woocommerce-store/) at 131 hits over that window, well ahead of the [wp-ops post](https://imagewize.com/wp-ops-wordpress-devops-cli-mcp-server/) itself at 43. It's the same Nginx log parsing as the combined `monitor.sh` run below, minus the security and error-log sections — the one I reach for when I just want a pulse check on what's resonating that week, not a full report.
+
+One gotcha: `traffic-report` runs through `ansible-playbook`, so it needs `TRELLIS_DIR` pointed at your Trellis project (`export TRELLIS_DIR=/path/to/trellis`), or to be run from inside it — unlike `quick-status` and the other read-only checks above, which resolve that on their own.
+
 When I want the fuller picture — traffic, security, AI-crawler activity, and error logs together, saved as a timestamped report — that's:
 
 ```bash
