@@ -99,7 +99,9 @@ Scans Nginx access logs on the target for attack signatures — repeated `wp-log
 wp-ops quick-status imagewize.com production
 ```
 
-for the fast version — recent status codes, error counts, service status, good for "is this site okay right now." When I want the fuller picture — traffic, security, AI-crawler activity, and error logs together, saved as a timestamped report — that's:
+for the fast version — recent status codes, error counts, service status, good for "is this site okay right now." The Nginx and PHP-FPM status checks used to fail outright with `Missing sudo password`: the playbook had `become: yes` on those two tasks, but `systemctl status` is a read-only query that doesn't need root, and there's no password source when the command runs non-interactively. Dropped `become` from both tasks so they run as the regular deploy user, matching the other read-only monitoring playbooks in the repo.
+
+When I want the fuller picture — traffic, security, AI-crawler activity, and error logs together, saved as a timestamped report — that's:
 
 ```bash
 ssh web@imagewize.com 'bash -s' < scripts/monitoring/monitor.sh
