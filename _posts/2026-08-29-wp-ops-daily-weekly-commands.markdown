@@ -110,10 +110,10 @@ streamed over SSH stdin rather than installed on the server, so there's nothing 
 ## 7. GitHub traffic across the main repos
 
 ```bash
-wp-ops gh-traffic imagewize/imagewize.com imagewize/wp-ops imagewize/nynaeve --all
+wp-ops gh-traffic imagewize/wp-ops imagewize/nynaeve imagewize/aludra imagewize/elayne imagewize/aviendha imagewize/ixan --all
 ```
 
-Pulls views, clones, and referrers for each repo via GitHub's traffic API — `--all` gets you every section, `--quiet` drops table headers if you're piping the output somewhere. GitHub only retains 14 days of this data, so I run it weekly rather than let a slow week's numbers age out unseen.
+Pulls views, clones, and referrers for each repo via GitHub's traffic API — `--all` gets you every section, `--quiet` drops table headers if you're piping the output somewhere. GitHub only retains 14 days of this data, so I run it weekly rather than let a slow week's numbers age out unseen. `imagewize.com` itself is private, so it's left out here — the traffic API is really only worth checking on the public repos anyway.
 
 ## The point of collapsing this into a CLI
 
