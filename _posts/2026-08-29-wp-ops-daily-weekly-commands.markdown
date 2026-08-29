@@ -101,6 +101,8 @@ wp-ops quick-status imagewize.com production
 
 for the fast version — recent status codes, error counts, service status, good for "is this site okay right now." The Nginx and PHP-FPM status checks used to fail outright with `Missing sudo password`: the playbook had `become: yes` on those two tasks, but `systemctl status` is a read-only query that doesn't need root, and there's no password source when the command runs non-interactively. Dropped `become` from both tasks so they run as the regular deploy user, matching the other read-only monitoring playbooks in the repo.
 
+Fixing that surfaced a second, quieter bug in the same task: `systemctl status php*-fpm` was silently returning nothing. Systemd's unit-name globbing needs the full suffix, so `php*-fpm` never matched `php8.4-fpm.service` even though the unit was loaded and running — and it exited `rc=0` with empty output instead of erroring, so it went unnoticed right alongside the sudo fix. Quoting the glob and adding `.service` (`'php*-fpm.service'`) fixed it for good.
+
 When I want the fuller picture — traffic, security, AI-crawler activity, and error logs together, saved as a timestamped report — that's:
 
 ```bash
