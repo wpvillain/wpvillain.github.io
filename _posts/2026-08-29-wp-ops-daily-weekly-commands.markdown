@@ -113,6 +113,8 @@ That's the last five days, and on a real run against imagewize.com it surfaces e
 
 One gotcha: `traffic-report` runs through `ansible-playbook`, so it needs `TRELLIS_DIR` pointed at your Trellis project (`export TRELLIS_DIR=/path/to/trellis`), or to be run from inside it — unlike `quick-status` and the other read-only checks above, which resolve that on their own.
 
+One more thing worth knowing before you trust that "real user" number: if you routinely hit the site over a VPN while testing, that traffic counts as human too — the UA-based bot filter has no way to catch it. Pulling a six-week traffic trend on imagewize.com surfaced this directly: the same three IPs (`146.70.14.43`–`45`, a ProtonVPN Indonesia exit-node range I test through) kept showing up in "Top IP Addresses," inflating some weekly windows by up to 8%. `traffic-monitor.sh` 5.14.0 adds an `EXCLUDE_IP_PATTERN` for exactly this — set it once to your own VPN or dev-IP range and every section of the report (totals, top pages, top IPs, the SEO breakdowns) excludes it automatically, no extra filtering pass needed.
+
 When I want the fuller picture — traffic, security, AI-crawler activity, and error logs together, saved as a timestamped report — that's:
 
 ```bash
