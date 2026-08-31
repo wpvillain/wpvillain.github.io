@@ -126,10 +126,34 @@ streamed over SSH stdin rather than installed on the server, so there's nothing 
 ## 7. GitHub traffic across the main repos
 
 ```bash
-wp-ops gh-traffic imagewize/wp-ops imagewize/nynaeve imagewize/aludra imagewize/elayne imagewize/aviendha imagewize/ixian --all
+wp-ops gh-traffic imagewize/wp-ops imagewize/nynaeve imagewize/aludra imagewize/elayne imagewize/aviendha imagewize/ixian imagewize/ollama-opencode-setup imagewize/sage-native-block --all
 ```
 
 Pulls views, clones, and referrers for each repo via GitHub's traffic API — `--all` gets you every section, `--quiet` drops table headers if you're piping the output somewhere. GitHub only retains 14 days of this data, so I run it weekly rather than let a slow week's numbers age out unseen. `imagewize.com` itself is private, so it's left out here — the traffic API is really only worth checking on the public repos anyway.
+
+That's the per-repo detail; when I just want to know which of those eight is actually getting traction that fortnight, `--summary` collapses it to one table instead:
+
+```bash
+wp-ops gh-traffic imagewize/wp-ops imagewize/nynaeve imagewize/aludra imagewize/elayne imagewize/aviendha imagewize/ixian imagewize/ollama-opencode-setup imagewize/sage-native-block --summary --all
+```
+
+```
+Summary (14-day totals, sorted by unique views)
++---------------------------------+-------+--------+--------+--------+
+| Repo                            | Views | Unique | Clones | Unique |
++---------------------------------+-------+--------+--------+--------+
+| imagewize/ollama-opencode-setup |   173 |     96 |     12 |     12 |
+| imagewize/wp-ops                |   176 |      8 |    215 |     96 |
+| imagewize/nynaeve               |   278 |      7 |    108 |     50 |
+| imagewize/sage-native-block     |    12 |      3 |      6 |      6 |
+| imagewize/aviendha              |    62 |      3 |     83 |     41 |
+| imagewize/aludra                |   131 |      3 |    329 |    113 |
+| imagewize/elayne                |    56 |      2 |    153 |     55 |
+| imagewize/ixian                 |    98 |      1 |    121 |     29 |
++---------------------------------+-------+--------+--------+--------+
+```
+
+Sorted by unique views rather than raw views, which is the more honest ranking — `ollama-opencode-setup` had fewer total hits than `nynaeve` but far more distinct people looking, versus `wp-ops` itself pulling 176 views from what's mostly the same handful of visitors returning. Clones tell a different story again: `aludra` and `wp-ops` both see heavy clone volume relative to their view counts, which reads as CI or dependency installs pulling the repo rather than people browsing it on GitHub.
 
 ## The point of collapsing this into a CLI
 
