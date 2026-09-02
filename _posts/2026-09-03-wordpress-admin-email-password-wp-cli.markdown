@@ -136,6 +136,56 @@ direct-test@example.com
 
 One side effect to know about: `update_option_admin_email` is hooked to `wp_site_admin_email_change_notification`, which sends a courtesy heads-up to the **old** address. That's usually what you want. Suppress it with the `send_site_admin_email_change_email` filter if you're scripting a bulk change.
 
+### Forcing it does not cancel a pending change
+
+This is the part that will bite you, and it's the reason the two commands above belong together rather than being alternatives.
+
+Writing `admin_email` directly changes the live address. It does **not** touch `new_admin_email` or `adminhash`. If a pending change was already sitting there, it survives untouched:
+
+```
+$ wp option update new_admin_email pending@example.com   # pending change exists
+$ wp option update admin_email forced@example.com        # force the live value
+
+$ wp option get admin_email
+forced@example.com          <- changed
+$ wp option get new_admin_email
+pending@example.com         <- survived
+$ wp option get adminhash
+array ( 'hash' => 'd8f404f5…', 'newemail' => 'pending@example.com' )   <- survived
+```
+
+Now look at what redeems that token, in `wp-admin/options.php`:
+
+```php
+if ( ! empty( $_GET['adminhash'] ) ) {
+    $new_admin_details = get_option( 'adminhash' );
+    if ( is_array( $new_admin_details )
+        && hash_equals( $new_admin_details['hash'], $_GET['adminhash'] )
+        && ! empty( $new_admin_details['newemail'] )
+    ) {
+        update_option( 'admin_email', $new_admin_details['newemail'] );
+```
+
+**There is no expiry check.** No timestamp, no comparison against the current `admin_email`, no nonce. The only conditions are that `adminhash` exists and the hash matches. So the confirmation link stays redeemable indefinitely — and when a logged-in administrator eventually digs that mail out of an archive folder and clicks it out of curiosity, WordPress overwrites your forced address with the old pending one and reports success.
+
+There's a nastier variant. The admin notice only renders when the two differ:
+
+```php
+if ( $new_admin_email && get_option( 'admin_email' ) !== $new_admin_email ) {
+```
+
+So if you force `admin_email` to the *same* address that's pending, the warning disappears from Settings → General while the stale `adminhash` is still sitting in the database, still armed. The UI now looks completely clean and tells you nothing.
+
+The fix is to treat "set the admin email" as three commands, not one:
+
+```bash
+wp option update admin_email hallo@example.com
+wp option delete new_admin_email
+wp option delete adminhash
+```
+
+Set the live value, then revoke the token. Deleting `adminhash` is the part that actually disarms it.
+
 ### The assumption I had wrong
 
 I went into this believing the confirmation flow was an admin-UI thing — that WP-CLI wrote options "raw" and bypassed it. That's wrong, and I only found out by testing it:
