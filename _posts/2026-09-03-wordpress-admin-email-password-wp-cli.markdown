@@ -115,6 +115,20 @@ wp option delete adminhash
 
 **Delete both.** Dropping only `new_admin_email` leaves `adminhash` behind, and the confirmation link in that already-sent email stays live — so months later someone can dig it out of an archive folder, click it, and flip your production admin address. Deleting `adminhash` is what actually revokes the token.
 
+### If you're already looking at the notice, just click Cancel
+
+Worth saying plainly, because it's what I *didn't* do: that link is one click, and it does both deletes for you, behind a nonce check. I was staring straight at it and reached for WP-CLI out of habit — two commands to accomplish what the UI had sitting right there under my cursor.
+
+The CLI version earns its keep in the cases where the link isn't an option:
+
+- **You can't log in.** A locked-out admin, or a fresh site handover where nobody has credentials yet.
+- **The site can't send mail.** As above, the confirmation goes to the new address, so a broken-mail site can never complete the change through the UI at all. CLI is the only way through.
+- **You're auditing rather than fixing.** The notice tells you an address is pending; `wp option get` tells you all three values, which is what you actually need to reason about the state.
+- **More than one site.** Nobody clicks through twelve dashboards.
+- **It's in a script.** Provisioning, a migration, a handover checklist.
+
+Away from those, the button is the better tool. Knowing the option names is still what lets you *verify* the button did what you think — which is the real reason to know them.
+
 ## Setting it for real
 
 If you want the change to take effect *now*, skip the request/confirm dance and write the live option directly:
@@ -185,6 +199,14 @@ wp option delete adminhash
 ```
 
 Set the live value, then revoke the token. Deleting `adminhash` is the part that actually disarms it.
+
+And per the section above — if a pending change is already showing in the dashboard, **click Cancel first**. That clears both options in one click, and what's left for the CLI is a single command:
+
+```bash
+wp option update admin_email hallo@example.com
+```
+
+Order matters slightly, and not in the direction you'd guess. Cancel *then* set is clean. Set *then* cancel also works, but if you force `admin_email` to the same address that's pending, the notice vanishes on reload — so the Cancel link you were about to click disappears from the screen while the armed token is still in the database. Clear the pending change while you can still see it.
 
 ### The assumption I had wrong
 
