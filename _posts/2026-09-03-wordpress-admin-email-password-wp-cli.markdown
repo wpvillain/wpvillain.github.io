@@ -12,7 +12,7 @@ I opened Settings → General on a client site this week and found this sitting 
 
 > **There is a pending change of the admin email to `hallo@example.com`. Cancel**
 
-The change had been made two and a half weeks earlier. My own notes recorded it as *done*. It wasn't done — it had been sitting in limbo the entire time, and the site had been mailing its update notices and fatal-error alerts to the old address the whole while, silently.
+The change had been made 16 days earlier. My own notes recorded it as *done*. It wasn't done — it had been sitting in limbo the entire time, and the site had been mailing its update notices and fatal-error alerts to the old address the whole while, silently.
 
 The cause isn't a bug. It's that the input box labelled **Administration Email Address** does not write to the `admin_email` option, and never has. This post is the mental model I keep re-deriving, plus the WP-CLI commands for admin email and passwords that I keep half-remembering and looking up again.
 
@@ -85,7 +85,7 @@ new_admin_email: hallo@example.com
 adminhash:       array ( 'hash' => 'a2bd4e6c…', 'newemail' => 'hallo@example.com' )
 ```
 
-Two and a half weeks of "done." A one-liner for a fleet:
+Sixteen days of "done." A one-liner for a fleet:
 
 ```bash
 for site in site-a site-b site-c; do
