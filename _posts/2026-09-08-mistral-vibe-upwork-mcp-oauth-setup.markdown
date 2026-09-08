@@ -80,6 +80,20 @@ Both hit `_discover_http` → `streamable_http_client`. The distinction is a con
 
 I applied the three-line auth block, then used the Vibe MCP browser to authenticate. From the Vibe CLI, run `/mcp` to open the MCP server browser, select the **upwork** server from the list, and choose **Authenticate in browser**. This launches your default browser to Upwork's OAuth consent screen. Complete the consent flow there, and Vibe automatically receives the OAuth tokens and connects the server. No manual client registration, no static keys, no workarounds. DCR against Upwork's MCP endpoint works with zero pre-registration.
 
+## Direct terminal usage with --enabled-tools
+
+Once OAuth is configured and connected, you can also use Upwork MCP tools directly from the terminal without entering the full Vibe CLI. Pass a single-shot prompt with `-p`, restrict to the specific tool via `--enabled-tools`, and set `--output text` for clean output:
+
+```bash
+vibe -p "Call list_accounts and return ONLY the org_uid values, one per line, with no other text." \
+    --enabled-tools "upwork_upwork__list_accounts" \
+    --output text \
+    --workdir "$PWD" \
+    --trust
+```
+
+This pattern works for any Upwork MCP tool. Replace `upwork_upwork__list_accounts` with the tool you need (e.g., `upwork_upwork__get_account`, `upwork_upwork__find_jobs`, etc.) and adjust the prompt to match. The `--trust` flag allows the command to run non-interactively, and `--output text` strips the markdown formatting for easier parsing or scripting.
+
 As documented in [Mistral's MCP server docs under "Browse"](https://docs.mistral.ai/vibe/code/cli/mcp-servers#browse), the `/mcp` command opens an interactive MCP server browser that lists all configured servers and provides authentication options for each.
 
 Separately, the Upwork MCP server also works headlessly via **Claude Code 2.1.251+** (verified Aug 31, 2026), which handles its own OAuth internally. That path is independent of Vibe's DCR implementation and remains a proven alternative if you hit edge cases.
