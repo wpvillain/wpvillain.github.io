@@ -153,6 +153,33 @@ Summary (14-day totals, sorted by unique views)
 +---------------------------------+-------+--------+--------+--------+
 ```
 
+To rank by clone activity instead of views — useful when you care more about adoption than browsing — add `--sort-by unique-clones` (or `unique-views`, the default):
+
+```bash
+wp-ops gh-traffic imagewize/wp-ops imagewize/nynaeve imagewize/aludra imagewize/elayne imagewize/aviendha imagewize/ixian imagewize/ollama-opencode-setup imagewize/sage-native-block imagewize/pt-cli imagewize/warder-cookie-consent imagewize/waygate imagewize/wp-cli-pattern-validate imagewize/trellis-wp-monitoring --summary --all --sort-by unique-clones
+```
+
+```
+Summary (14-day totals, sorted by unique clones)
++-----------------------------------+-------+--------+--------+--------+
+| Repo                              | Views | Unique | Clones | Unique |
++-----------------------------------+-------+--------+--------+--------+
+| imagewize/wp-ops                  |   230 |      8 |    287 |    101 |
+| imagewize/elayne                  |   122 |      2 |    198 |     60 |
+| imagewize/aviendha                |    69 |      3 |    135 |     52 |
+| imagewize/warder-cookie-consent   |    38 |      1 |    104 |     51 |
+| imagewize/aludra                  |    29 |      2 |    115 |     47 |
+| imagewize/nynaeve                 |    88 |      5 |    117 |     45 |
+| imagewize/ixian                   |    32 |      1 |     56 |     23 |
+| imagewize/pt-cli                  |     3 |      1 |     18 |     14 |
+| imagewize/waygate                 |     4 |      3 |     13 |     12 |
+| imagewize/sage-native-block       |     5 |      2 |      9 |      8 |
+| imagewize/trellis-wp-monitoring   |    13 |      3 |      9 |      7 |
+| imagewize/ollama-opencode-setup   |   154 |     96 |      6 |      6 |
+| imagewize/wp-cli-pattern-validate |     2 |      1 |      4 |      4 |
++-----------------------------------+-------+--------+--------+--------+
+```
+
 Sorted by unique views rather than raw views, which is the more honest ranking — `ollama-opencode-setup` had fewer total hits than `nynaeve` but far more distinct people looking, versus `wp-ops` itself pulling 176 views from what's mostly the same handful of visitors returning. Clones tell a different story again: `aludra` and `wp-ops` both see heavy clone volume relative to their view counts, which reads as CI or dependency installs pulling the repo rather than people browsing it on GitHub.
 
 ## The point of collapsing this into a CLI
