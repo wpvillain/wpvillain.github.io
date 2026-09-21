@@ -81,6 +81,8 @@ The script connects using the same credentials WordPress itself uses (`DB_USER`,
 4. Saves the complete SQL dump to `wp-content/backup-YYYY-MM-DD-HHMMSS.sql`
 5. Outputs a message with the exact filename to download
 
+None of this touches the live database — it's a read-only export. The `DROP TABLE IF EXISTS` line is just text written into the `.sql` file; it only runs if you later *import* that file somewhere. This matches standard `mysqldump` behavior and exists so a restore is a clean, exact replacement rather than a merge. The catch: if you import this dump into a database where those tables already hold data you want to keep, that data is dropped first. Restore into an empty/target database, or a copy, not over live data you haven't backed up separately.
+
 This produces a standard MySQL dump that can be restored with `mysql -u user -p db_name < backup.sql` or imported via phpMyAdmin, Adminer, or any other MySQL client.
 
 ### Verify the Backup Before You Delete Anything
