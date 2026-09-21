@@ -48,11 +48,11 @@ PASS=$(openssl rand -base64 16) && wp user update admin --user_pass="$PASS" && e
 
 Breaking it down:
 
-1. **`openssl rand -base64 16`** generates 16 random bytes and base64-encodes them, producing a 24-character password like `7Xk9m+2vQxYq1LpX9rT8uW4K`. Base64 is URL-safe and avoids the ambiguity of punctuation some systems dislike.
+1. **[`openssl rand -base64 16`](https://docs.openssl.org/master/man1/openssl-rand/)** generates 16 random bytes and [base64-encodes](https://datatracker.ietf.org/doc/html/rfc4648#section-4) them, producing a 24-character password like `FYSB+DvNIUNZCw2wYekdGA==`. Note this is *standard* base64, not the URL-safe variant — it can contain `+`, `/`, and trailing `=` padding, which is why the `--user_pass="$PASS"` quoting in step 3 matters.
 
 2. **`PASS=$(...)`** captures that output into a shell variable. Variables don't survive the shell session — once you close the terminal or the script exits, the password is gone.
 
-3. **`wp user update admin --user_pass="$PASS"`** updates the user. The quotes around `$PASS` keep the shell from word-splitting or globbing parts of the password.
+3. **[`wp user update`](https://developer.wordpress.org/cli/commands/user/update/) `admin --user_pass="$PASS"`** updates the user. The quotes around `$PASS` keep the shell from word-splitting or globbing parts of the password.
 
 4. **`echo "New password: $PASS"`** prints it once so you can see it and copy it to your password manager. This is the only time it's visible.
 
@@ -63,7 +63,7 @@ The `&&` chains ensure that if any step fails (OpenSSL missing, `wp` not found, 
 This is secure against **history**, but not against **shoulder surfing** or **screen capture**. The password is still displayed on screen for anyone looking at your terminal. For environments where that's a risk, consider:
 
 - Running the command over SSH and only showing the output locally
-- Using `wp user reset-password admin --skip-email --porcelain` instead, which also avoids history but only prints the password
+- Using [`wp user reset-password`](https://developer.wordpress.org/cli/commands/user/reset-password/) `admin --skip-email --porcelain` instead, which also avoids history but only prints the password
 
 It is also **not** secure against **process listing**. For a brief moment the variable's value exists in the process environment. On a shared system where other users can run `ps eww`, this is a vulnerability. For most local or single-user deploy contexts it's fine.
 
@@ -73,7 +73,7 @@ If you need the highest level of paranoia, use WP-CLI's own password generator:
 wp user reset-password admin --porcelain --skip-email
 ```
 
-This generates a 24-character password internally and prints only the result. It never touches your shell, so it can't leak through history, environment, or process listing. The trade-off is you can't control the length or the character set.
+This generates a 12-character password internally (WordPress's [`wp_generate_password()`](https://developer.wordpress.org/reference/functions/wp_generate_password/) default) and prints only the result. It never touches your shell, so it can't leak through history, environment, or process listing. The trade-off is you can't control the length or the character set.
 
 ## Variations
 
@@ -122,7 +122,7 @@ PASS=$(openssl rand -base64 16) && wp user create deploybot bot@example.com --ro
 
 ## Why Not Just Use `--show-password` with `reset-password`?
 
-WP-CLI's `reset-password` command has a `--show-password` flag:
+WP-CLI's [`reset-password`](https://developer.wordpress.org/cli/commands/user/reset-password/) command has a `--show-password` flag:
 
 ```bash
 wp user reset-password admin --show-password
@@ -134,11 +134,11 @@ The OpenSSL version gives you more control, and it's a pattern you can reuse in 
 
 ## What This Doesn't Do
 
-- **It doesn't expire old sessions.** After changing a password, existing login sessions for that user remain valid until they expire or the user logs out. For incident response, add `wp user session destroy admin --all`.
+- **It doesn't expire old sessions.** After changing a password, existing login sessions for that user remain valid until they expire or the user logs out. For incident response, add [`wp user session destroy`](https://developer.wordpress.org/cli/commands/user/session/destroy/) `admin --all`.
 
-- **It doesn't verify the password.** Use `wp user check-password admin 'the-password'` to verify without changing it.
+- **It doesn't verify the password.** Use [`wp user check-password`](https://developer.wordpress.org/cli/commands/user/check-password/) `admin 'the-password'` to verify without changing it.
 
-- **It doesn't rotate application passwords.** For API access, use `wp user application-password create admin 'deploy-pipeline'`.
+- **It doesn't rotate application passwords.** For API access, use [`wp user application-password create`](https://developer.wordpress.org/cli/commands/user/application-password/create/) `admin 'deploy-pipeline'`.
 
 ## Real-World Use Cases
 
