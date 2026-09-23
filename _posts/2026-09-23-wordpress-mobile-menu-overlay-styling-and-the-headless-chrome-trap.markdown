@@ -9,11 +9,11 @@ case_status: shipped
 ---
 
 {% raw %}
-If you've ever styled a WordPress block theme's mobile navigation overlay and wondered why your 375px-wide screenshot shows a hamburger clipped off-screen while the live site works fine, this one's for you. A recent fix for the [Ecotuin](https://github.com/imagewize/ecotuin) theme — matching the light header's mobile overlay to the approved v3e design — turned into a lesson about viewport testing, CTA placement in `core/navigation`, and a Chrome flag that silently lies to you.
+If you've ever styled a WordPress block theme's mobile navigation overlay and wondered why your 375px-wide screenshot shows a hamburger clipped off-screen while the live site works fine, this one's for you. A recent fix for the Ecotuin theme — matching the light header's mobile overlay to the approved v3e design — turned into a lesson about viewport testing, CTA placement in `core/navigation`, and a Chrome flag that silently lies to you.
 
 ## The Visual Problem
 
-Issue [#9](https://github.com/imagewize/ecotuin/issues/9) was straightforward on the surface: on phones, the light header's mobile menu overlay rendered with core's default unstyled look — white background, black text, right-aligned links, no dividers — none of which matched the rest of the site's chalk-and-ivy palette. The design called for a `base` (chalk) background, `secondary` (ivy-green) Roggenkamp typography, left-aligned links with rule-coloured (`border-light`) dividers between them, and a full-width Contact CTA button below the links.
+Issue #9 was straightforward on the surface: on phones, the light header's mobile menu overlay rendered with core's default unstyled look — white background, black text, right-aligned links, no dividers — none of which matched the rest of the site's chalk-and-ivy palette. The design called for a `base` (chalk) background, `secondary` (ivy-green) Roggenkamp typography, left-aligned links with rule-coloured (`border-light`) dividers between them, and a full-width Contact CTA button below the links.
 
 Simple enough. The overlay needed restyling, the links needed left-aligning, and the CTA needed appending. What wasn't obvious: headless Chrome would spend the better part of a debugging session convincing us the header itself was broken.
 
@@ -32,7 +32,7 @@ Static HTML snapshots or DOM hacks that toggle `is-menu-open` miss any JavaScrip
 My first instinct was the usual headless Chrome one-liner:
 
 ```bash
-chrome --headless=new --window-size=390,700 --screenshot=/tmp/ecotuin-390.png https://duurzaam-doede.test/
+chrome --headless=new --window-size=390,700 --screenshot=/tmp/ecotuin-390.png https://ecotuin.test/
 ```
 
 Then click the hamburger via DevTools Protocol or a small Puppeteer script, wait for the overlay to open, screenshot again. Standard workflow.
@@ -43,7 +43,7 @@ Except it wasn't. A manual check on a real iPhone showed the hamburger sitting e
 
 ## The Footgun: `--window-size` Below ~500px
 
-The culprit, documented in [Ecotuin's CLAUDE.md](https://github.com/imagewize/ecotuin/blob/main/CLAUDE.md#never-use-raw-chrome---headlessnew---window-sizew-h-for-a-mobilenarrow-check): **headless Chrome silently ignores viewport widths below roughly 500px** when launched via `--window-size`. It renders at a wider width instead (around 500px minimum, inconsistently), and doesn't tell you it's doing so. The screenshot you get back *looks* plausible — it's a real render, just not at the width you asked for — and if your layout has a breakpoint or overflow issue between 375px and 500px, you'll never see it in that test.
+The culprit, documented in the project's internal CLAUDE.md notes: **headless Chrome silently ignores viewport widths below roughly 500px** when launched via `--window-size`. It renders at a wider width instead (around 500px minimum, inconsistently), and doesn't tell you it's doing so. The screenshot you get back *looks* plausible — it's a real render, just not at the width you asked for — and if your layout has a breakpoint or overflow issue between 375px and 500px, you'll never see it in that test.
 
 In our case, the lie was the opposite direction: the screenshot showed an overflow that didn't exist at the requested 375px, because Chrome was actually rendering at ~500px where the header *did* fit. The phantom bug sent us down a rabbit hole of header padding checks and icon positioning that all looked fine in isolation, because the real problem was the testing tool itself.
 
@@ -53,7 +53,7 @@ Playwright's `viewport: { width, height }` parameter, by contrast, is exact — 
 const { chromium } = require('/Users/…/ecotuin/node_modules/playwright');
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 700 } });
-await page.goto('https://duurzaam-doede.test/', { waitUntil: 'networkidle' });
+await page.goto('https://ecotuin.test/', { waitUntil: 'networkidle' });
 await page.click('.wp-block-navigation__responsive-container-open');
 await page.screenshot({ path: '/tmp/overlay-open-390.png' });
 ```
@@ -178,11 +178,11 @@ The `!important` flags are necessary because core emits its own `!important` sel
 
 4. **Core's overlay CSS makes assumptions about alignment.** It right-aligns for a right-anchored desktop nav, which doesn't translate cleanly to left-aligned mobile designs. Overriding `align-items` and `text-align` together gets you full-width items with left-aligned text.
 
-5. **Document the footguns.** We added the headless Chrome warning to [CLAUDE.md](https://github.com/imagewize/ecotuin/blob/main/CLAUDE.md#never-use-raw-chrome---headlessnew---window-sizew-h-for-a-mobilenarrow-check) so the next person (or the next project) doesn't repeat the same time sink. Small notes like that pay for themselves the first time someone else hits the same issue.
+5. **Document the footguns.** We added the headless Chrome warning to the project's internal CLAUDE.md notes so the next person (or the next project) doesn't repeat the same time sink. Small notes like that pay for themselves the first time someone else hits the same issue.
 
 ## What This Looked Like in Practice
 
-The PR that shipped this ([#10](https://github.com/imagewize/ecotuin/pull/10)) touched eight files across six commits:
+The PR that shipped this (#10) touched eight files across six commits:
 
 - `parts/header.html` — added `ecotuin-header__nav` className for scoping
 - `functions.php` — the `render_block_core/navigation` filter for CTA injection
