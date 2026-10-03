@@ -76,7 +76,7 @@ wp db query "SELECT COUNT(*) FROM wp_posts WHERE post_content LIKE '%://example.
 
 ## Side effects to expect
 
-- **A modified `wp-config.php`.** After the production database landed, a 2FA plugin that was active locally wrote its encryption key into `wp-config.php`. It's an uncommitted change, and a secret, so don't commit it. Revert it with `git checkout`.
+- **Production-only plugins come along for the ride.** The pulled database re-activates everything production had active, including a 2FA plugin that has no business running locally. While active, it wrote its encryption key into `wp-config.php`, an uncommitted change and a secret. I reverted the file with `git checkout`, then deactivated the plugin on every local site so it wouldn't happen again: `wp plugin deactivate <plugin>`, or with `--network` on a multisite where it is network-active (plain deactivate refuses with a warning). Make this a post-pull step.
 - **Shell gotcha.** I separated two commands with `echo =====` and zsh answered `=====: not found`, which aborted the rest of the line. The second pull silently didn't run until I noticed. Use `&&`, or run each command separately.
 - **Theme state.** If your themes are Composer-installed and git-ignored, a database pull doesn't change them, but production's active theme and any page or template-part overrides now apply locally. If a recent theme fix doesn't show up, the content in the database is probably shadowing the theme files.
 
