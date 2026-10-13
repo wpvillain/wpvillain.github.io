@@ -58,7 +58,7 @@ url_from: "{{ wordpress_sites[site].site_hosts.0.canonical }}"
 url_to:   "{{ dev_wordpress_sites.wordpress_sites[site].site_hosts.0.canonical }}"
 ```
 
-resolving both sides from `group_vars` — production's canonical hostname and your local `local_path` config — so `wp search-replace` runs with the right values without you typing either URL. I wrote up the playbook's internals (and two bugs I had to patch in the stock version) in [an earlier post]({% post_url 2026-02-27-trellis-database-pull-playbook-explained %}) if you want the full mechanics.
+resolving both sides from `group_vars` — production's canonical hostname and your local `local_path` config — so `wp search-replace` runs with the right values without you typing either URL. I wrote up the playbook's internals (and two bugs I had to patch in the stock version) in [an earlier post](/trellis-database-pull-playbook-explained/) if you want the full mechanics.
 
 ## 3. Files pull via rsync
 
