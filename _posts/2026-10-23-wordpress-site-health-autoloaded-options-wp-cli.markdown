@@ -123,8 +123,7 @@ To undo it, set the five rows back to `yes` and set `oxygen_options_autoload` ba
 ## What I didn't check
 
 - The Oxygen builder itself (icon picker, presets, font picker) wasn't opened after the change.
-- The WP Rocket page cache wasn't purged, because `wp rocket clean` isn't a registered command on this site. The cached HTML has the same content.
-- One page showed 6 SVG symbols on production against 7 on the copy. Most likely the live page differs from the copy, but I had no pre-change production number to compare.
+- One page showed 6 SVG symbols on production against 7 on the copy. After purging the page cache from the WP Rocket admin bar (`wp rocket clean` isn't a registered command on this site), I re-checked: every `<use>` on both pages has a matching `<symbol>`, so no icon is missing. The live page most likely uses one fewer icon than the copy, but I had no pre-change production number to prove it.
 
 ## Shared hosting note
 
