@@ -120,9 +120,13 @@ wp cache flush
 
 To undo it, set the five rows back to `yes` and set `oxygen_options_autoload` back to `yes`.
 
+## Checking the builder
+
+After the cache purge I opened the Oxygen builder as an administrator, without saving. The icon picker loaded the Linearicons set and found the icon, and the Font Family search worked, so the options I'd moved off autoload are still read when they're needed.
+
 ## What I didn't check
 
-- The Oxygen builder itself (icon picker, presets, font picker) wasn't opened after the change.
+- Saved element presets, which I didn't open, and whether a builder save keeps `oxygen_options_autoload` at `no`. I didn't want to save on a live client page.
 - One page showed 6 SVG symbols on production against 7 on the copy. After purging the page cache from the WP Rocket admin bar (`wp rocket clean` isn't a registered command on this site), I re-checked: every `<use>` on both pages has a matching `<symbol>`, so no icon is missing. The live page most likely uses one fewer icon than the copy, but I had no pre-change production number to prove it.
 
 ## Shared hosting note
