@@ -124,9 +124,20 @@ To undo it, set the five rows back to `yes` and set `oxygen_options_autoload` ba
 
 After the cache purge I opened the Oxygen builder as an administrator, without saving. The icon picker loaded the Linearicons set and found the icon, and the Font Family search worked, so the options I'd moved off autoload are still read when they're needed.
 
+## Will a builder save undo it?
+
+I didn't want to click Save on a live client page to find out, so I tested on the local copy. Oxygen's save handler writes these options with `update_option($name, $value, get_option("oxygen_options_autoload"))`. I ran exactly those calls on the copy, changing each value so WordPress really wrote it, then restored the originals. I ran it twice:
+
+| `oxygen_options_autoload` | Rows after a save |
+|---|---|
+| `no` | Stay out of autoload |
+| `yes` (the original value) | Flip back to autoload |
+
+So changing Oxygen's own setting was necessary, not optional, and it holds across saves. The element presets were readable (3 entries), and `oxy_get_svg_sets()` still returned both the Font Awesome and Linearicons sets. WordPress stores "not autoloaded" as `no` or `off` depending on how it was set. Both mean the same thing, and the total query confirmed it.
+
 ## What I didn't check
 
-- Saved element presets, which I didn't open, and whether a builder save keeps `oxygen_options_autoload` at `no`. I didn't want to save on a live client page.
+- I replicated the save calls rather than clicking Save in the builder, because the real save needs a session and a nonce, and I didn't want to do it on a live client page.
 - One page showed 6 SVG symbols on production against 7 on the copy. After purging the page cache from the WP Rocket admin bar (`wp rocket clean` isn't a registered command on this site), I re-checked: every `<use>` on both pages has a matching `<symbol>`, so no icon is missing. The live page most likely uses one fewer icon than the copy, but I had no pre-change production number to prove it.
 
 ## Shared hosting note
