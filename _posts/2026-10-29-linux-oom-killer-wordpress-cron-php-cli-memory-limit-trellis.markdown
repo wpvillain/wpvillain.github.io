@@ -81,7 +81,7 @@ Set it in `trellis/group_vars/production/main.yml`:
 php_cli_memory_limit: 512M
 ```
 
-Then provision. The PHP role does it, so `trellis provision --tags php production` is enough, and the manual equivalent is `memory_limit = 512M` in `/etc/php/8.3/cli/php.ini`.
+Then re-provision the PHP role (`trellis provision --tags php production`), or edit the file by hand. The manual equivalent is `memory_limit = 512M` in `/etc/php/8.3/cli/php.ini`.
 
 This does not fix the task that wants 3GB. It turns an OOM kill of an arbitrary process into a PHP fatal error with a name attached, in the log, for one job. That is a much better failure.
 
