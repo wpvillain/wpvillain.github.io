@@ -11,7 +11,7 @@ case_status: documented
 {% raw %}
 Some WordPress sites show promotional blocks for gambling operators, and those blocks must not be shown to younger visitors. The requirement was a modal on the first visit that asks for an age range, remembers the answer, and hides the blocks when the visitor should not see them.
 
-I built it as a small script, a modal template and a stylesheet. This post explains how it works and where it stops being enough. The files are in [wp-ops](https://github.com/imagewize/wp-ops/tree/main/docs/wordpress-utilities/age-verification).
+I built it as a small script, a modal template and a stylesheet. This post explains how it works and where it stops being enough. The full script is below. The modal template (`footer.php`) and the stylesheet are in [the wp-ops repository at the commit that last held them](https://github.com/imagewize/wp-ops/tree/ef8c3c2/docs/wordpress-utilities/age-verification).
 
 One limit first: this is a **self-declared** age gate. It records what the visitor clicks. It does not verify anything, and a visitor can click the wrong button, clear the cookie or disable JavaScript. If your jurisdiction requires real age verification, this is not it.
 
@@ -48,6 +48,96 @@ const hideCasinoHighlightBlocks = () => {
 That means the theme needs a `d-none` rule (`display: none !important`). If you do not use Bootstrap, add it yourself.
 
 **4. Apply the stored answer on every page load.** After the modal logic, the script reads the cookie again. `true` shows the blocks, anything else, including no cookie at all, hides them. The default is hidden, which is the safe direction to fail in.
+
+### The whole script
+
+```js
+jQuery(document).ready(function () {
+
+  const setCookie = (name, value, days) => {
+    var expires = '';
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = '; expires=' + date.toUTCString();
+    }
+    document.cookie = name + '=' + (value || '') + expires + '; path=/';
+  };
+
+  const getCookie = (name) => {
+    return (
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(name + '='))
+        ?.split('=')[1] || null
+    );
+  };
+  const modal = document.querySelector('.modal-verification');
+  const overlay = document.querySelector('.modal-overlayer');
+  const canSeeAds = document.querySelector('#age_verify');
+
+
+  const hideModal = () => {
+    modal.classList.remove('modal-visible');
+    overlay.classList.remove('visible');
+    document.body.classList.remove('overflow-hidden');
+  };
+
+  const hideCasinoHighlightBlocks = () => {
+    document.querySelectorAll('.code-block').forEach((element) => {
+      if (element) {
+        element.classList.add('d-none');
+      }
+    });
+  };
+
+  const displayCasinoHighlightBlocks = () => {
+    document.querySelectorAll('.code-block').forEach((element) => {
+      if (element) {
+        element.classList.remove('d-none');
+      }
+    });
+  };
+
+  if (!getCookie('canSeeAds')) {
+    modal.classList.add('modal-visible');
+    overlay.classList.add('visible');
+  }
+
+
+  const ageButtons = ['under-18', '18-23'];
+  ageButtons.forEach((id) => {
+    document.getElementById(id).addEventListener('click', () => {
+      setCookie('canSeeAds', 'false', 1);
+      hideModal();
+      hideCasinoHighlightBlocks();
+    });
+  });
+
+  document.getElementById('over-24').addEventListener('click', () => {
+    const advStatus = canSeeAds.checked ? 'true' : 'false';
+    setCookie('canSeeAds', advStatus, 365);
+    hideModal();
+    if (advStatus === 'false') {
+      hideCasinoHighlightBlocks();
+    } else {
+      displayCasinoHighlightBlocks();
+    }
+  });
+
+
+  handleInitialCheckboxState = () => {
+    const canSeeAds = getCookie('canSeeAds');
+    if (canSeeAds === 'true') {
+      displayCasinoHighlightBlocks();
+    } else {
+      hideCasinoHighlightBlocks();
+    }
+  };
+
+  handleInitialCheckboxState();
+});
+```
 
 ## The modal template
 
