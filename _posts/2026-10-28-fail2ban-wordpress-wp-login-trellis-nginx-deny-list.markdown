@@ -94,19 +94,19 @@ fail2ban bans temporarily and reads the log after the fact. For a known persiste
 ```nginx
 # Managed via trellis/nginx-includes/all/deny-ips.conf.j2
 # Last updated: {{ ansible_date_time.date }}
-# Apply: trellis provision --tags nginx production
+# Apply: trellis provision --tags nginx-includes production
 
 deny 62.60.130.228;   # 1,420 wp-login attempts
 deny 141.98.11.120;   # 860 wp-login attempts
 deny 91.224.92.114;   # 742 wp-login attempts
 ```
 
-Apply it with `trellis provision --tags nginx production`. It lives in Git, survives reboots and is checked early in request handling. The costs are manual upkeep, the risk of blocking yourself, and attackers rotating addresses anyway. Research an address with `whois` before you add it.
+Apply it with `trellis provision --tags nginx-includes production`. Not `--tags nginx`: the includes are templated by the `wordpress-setup` role, so that run finishes without deploying the file. I found this out when a redirect sat undeployed until `wordpress-setup` ran. The file lives in Git, survives reboots and is checked early in request handling. The costs are manual upkeep, the risk of blocking yourself, and attackers rotating addresses anyway. Research an address with `whois` before you add it.
 
 Dry-run first:
 
 ```bash
-ansible-playbook server.yml -e env=production --tags nginx --check
+ansible-playbook server.yml -e env=production --tags nginx-includes --check
 ```
 
 ### Testing a deny rule
