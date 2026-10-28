@@ -14,63 +14,47 @@ There are two ways to get WebP onto a WordPress site. One rewrites the HTML, so 
 
 A browser that can show WebP says so in its `Accept` header (`image/webp`, and `image/avif` for AVIF). Nginx looks at that header, and if a converted file sits next to the original it serves that instead. If not, the original is served. The URL does not change.
 
-The rule is about the file name: `photo.jpg` is replaced by `photo.jpg.webp` or `photo.jpg.avif`, the **original name plus the new extension**, not `photo.webp`.
+The rule is about the file name: `photo.jpg` is replaced by `photo.jpg.webp` or `photo.jpg.avif`, the **original name plus the new extension**, not `photo.webp`. (My first version of this include looked for `photo.webp`, so the commands below would have produced files it never served.)
 
 ## The include
 
-Save this as `trellis/nginx-includes/webp-avf.conf.j2`:
+Save this as `trellis/nginx-includes/all/00-webp-avif.conf.j2`:
 
 ```nginx
-map $http_accept $webp_suffix {
-    default "";
-    "~*image/webp" ".webp";
-}
+location ~* ^/app/uploads/.+\.(jpg|jpeg|png)$ {
+    expires 1y;
+    add_header Vary Accept;
 
-map $http_accept $avif_suffix {
-    default "";
-    "~*image/avif" ".avif";
-}
+    set $avif_suffix ".none";
+    set $webp_suffix ".none";
+    if ($http_accept ~* "image/avif") { set $avif_suffix ".avif"; }
+    if ($http_accept ~* "image/webp") { set $webp_suffix ".webp"; }
 
-location ~* ^/app/uploads/(.*)\.(jpg|jpeg|png)$ {
-    root {{ www_root }}/{{ site.name }}/current/web;
-
-    set $img_path /app/uploads/$1;
-
-    if (-f $document_root${img_path}${avif_suffix}) {
-        add_header Vary Accept;
-        rewrite ^ $img_path$avif_suffix break;
+    if (-f $document_root$uri$avif_suffix) {
+        rewrite ^ $uri$avif_suffix break;
     }
-
-    if (-f $document_root${img_path}${webp_suffix}) {
-        add_header Vary Accept;
-        rewrite ^ $img_path$webp_suffix break;
+    if (-f $document_root$uri$webp_suffix) {
+        rewrite ^ $uri$webp_suffix break;
     }
 
     try_files $uri =404;
 }
 ```
 
-Things worth knowing about it:
+Four details here come from how Trellis loads includes, and I got each of them wrong the first time I wrote this up:
 
-- **`/app/uploads/` is the Bedrock uploads path.** On a classic WordPress layout it would be `/wp-content/uploads/`. Change both the regex and `$img_path`.
-- **AVIF is checked before WebP**, so a browser that accepts both gets the smaller AVIF when it exists.
-- **`Vary: Accept`** tells caches (CDNs, browsers) that the same URL can return different bytes depending on the header. Without it, a cache can hand a WebP to a browser that cannot show one.
-- If neither converted file exists, `try_files $uri =404` serves the original.
-- It is a `.conf.j2`, so `{{ www_root }}` and `{{ site.name }}` are filled in by Trellis.
+- **It lives in `all/`, with a `00-` prefix.** Trellis reads includes inside each site's `server` block, `all/` first, then the site's own folder. Files in a folder are read alphabetically. When two regex locations match the same URL, the first one in the config wins. A caching include with its own `\.(jpg|png)$` block (like [the one in the next post]({% post_url 2026-10-29-nginx-browser-caching-headers-trellis-all-includes-expires %})) would win and the images would never be negotiated. `00-` makes this file come first. That is also why it sets `expires 1y` itself: the caching block never sees these requests.
+- **`set` and `if`, not `map`.** `map` is only allowed in the `http` block. In an include inside `server` it makes `nginx -t` fail with `"map" directive is not allowed here`. `set` and `if` are allowed in a location.
+- **`.none` is a placeholder that never exists.** If the suffix were empty, `$document_root$uri` would be the original file, the `-f` test would pass and the original would be served before WebP is considered.
+- **AVIF is checked before WebP**, so a browser that accepts both gets the AVIF when it exists, and falls back to WebP when it does not.
 
-## Wire it into the site
+`/app/uploads/` is the Bedrock uploads path. On a classic layout it would be `/wp-content/uploads/`.
 
-In `trellis/group_vars/production/wordpress_sites.yml`:
+`Vary: Accept` tells caches (CDNs, browsers) that one URL can return different bytes depending on the header. Without it a cache can hand a WebP to a browser that cannot show one.
 
-```yaml
-wordpress_sites:
-  example.com:
-    # ...
-    nginx_includes:
-      - nginx-includes/webp-avf.conf.j2
-```
+## Deploy it
 
-Then deploy only the includes:
+There is nothing to add to `wordpress_sites.yml`. Trellis has no `nginx_includes` setting; it copies every `*.conf.j2` from `nginx-includes/all/` (every site) and from `nginx-includes/<site key>/` (one site, named like the key in `wordpress_sites.yml`). The `.j2` is dropped on the server, so this ends up as `/etc/nginx/includes.d/all/00-webp-avif.conf`.
 
 ```bash
 trellis provision --tags nginx-includes production
@@ -100,13 +84,17 @@ If you instead want WebP in the page but a JPG in the share card, that is a diff
 ## Check it
 
 ```bash
-curl -H "Accept: image/webp" -I https://example.com/app/uploads/2026/10/photo.jpg
+curl -sI -H "Accept: image/webp,*/*" https://example.com/app/uploads/2026/10/photo.jpg
 ```
 
-You want `Content-Type: image/webp` and `Vary: Accept`. Then without the header:
+You want `Content-Type: image/webp`, `Vary: Accept` and a `Cache-Control: max-age=31536000`. Then without the header:
 
 ```bash
-curl -I https://example.com/app/uploads/2026/10/photo.jpg
+curl -sI -H "Accept: text/html" https://example.com/app/uploads/2026/10/photo.jpg
 ```
 
-That should still say `image/jpeg`. If you get the JPG for the first request, check that `photo.jpg.webp` exists with exactly that name, and that no other `location` is catching the image first. Two regex locations that match the same URL are resolved by order in the config, and a caching include with its own image rule can win. That is the next post's subject: [browser caching headers for Trellis]({% post_url 2026-10-29-nginx-browser-caching-headers-trellis-all-includes-expires %}).
+That should still say `image/jpeg`.
+
+I tested the include against a local Nginx with a caching include next to it. With both `photo.jpg.avif` and `photo.jpg.webp` present, `Accept: image/avif,image/webp` returned AVIF and `Accept: image/webp` returned WebP. With only a WebP, a browser asking for both got WebP. With neither, everyone got the JPG.
+
+If you get the JPG when a converted file exists, check in this order: that the file is named exactly `photo.jpg.webp`, that the include is `00-webp-avif.conf.j2` in `nginx-includes/all/` and was deployed (`ls /etc/nginx/includes.d/all/`), and that no other regex `location` for images is read earlier.
