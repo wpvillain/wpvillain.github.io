@@ -104,8 +104,14 @@ curl -sI https://example.com/app/uploads/2026/10/my-post-featured-1024x538.webp 
 
 On my production site the three posts I checked served `image/webp` at 15 to 21 KB, and the share tags still pointed at the JPG. One of them went from a 73 KB JPG to a 17 KB WebP.
 
-The filter above only maps `image/jpeg`. About half of my older featured images are PNG, and those stayed PNG: one tutorial post now shows a 327 KB PNG at the top. If your library has many, add `$formats['image/png'] = 'image/webp';` and regenerate those IDs as well, then check `og:image` again (the original-URL filter already accepts PNG).
+The filter above only maps `image/jpeg`, and I found that out the hard way. About half of my older featured images are PNG. They stayed PNG, and one tutorial post showed a 327 KB PNG at the top. The fix is one more line:
 
-Also keep in mind that the format filter applies to every JPG upload, so WooCommerce product images switch to WebP as well. If you only want it for featured images, wrap the filter in a check for the attachment's use, or regenerate only the IDs you want and leave the filter off for the rest.
+```php
+$formats['image/png'] = 'image/webp';
+```
+
+Then regenerate those IDs the same way (`--skip-delete`). The original-URL filter above already accepts PNG, so `og:image` stayed the original file. That tutorial image went from 327 KB to 15 KB. A metadata check afterwards (is the attachment's main `file` a `.webp`?) showed 325 of my 355 featured images converted. One regenerate failed because the attachment had been deleted long ago, and 29 other posts point at attachments with no file at all, which is why a post can show no image.
+
+Keep in mind that the format filter applies to every JPG and PNG upload, so WooCommerce product images and transparent logos switch to WebP sizes as well (WebP keeps transparency). If you only want it for featured images, wrap the filter in a check for the attachment's use, or regenerate only the IDs you want and leave the filter off for the rest.
 
 I wrote up the image-size side of this in a separate post on [serving the right-sized WebP to mobile](https://imagewize.com/wordpress-image-missing-srcset-pagespeed/), where a single 105 KB image was the only PageSpeed finding left.
