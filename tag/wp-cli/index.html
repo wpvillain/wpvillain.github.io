@@ -1,0 +1,27 @@
+---
+layout: default
+title: "WP-CLI Tutorials"
+---
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: wp-cli</p>
+        <h2>WP-CLI Tutorials</h2>
+      </div>
+      <p class="archive-count">{{ site.tags.wp-cli.size }} case{% unless site.tags.wp-cli.size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">WordPress from the command line: page creation, search-replace, backups, user management, diagnostics and scripting on Trellis and Bedrock.</p>
+
+    {%- if site.tags.wp-cli.size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags.wp-cli %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No WP-CLI posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>

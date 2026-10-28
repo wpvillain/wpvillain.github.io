@@ -1,0 +1,27 @@
+---
+layout: default
+title: "WordPress Security Tutorials"
+---
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: security</p>
+        <h2>WordPress Security Tutorials</h2>
+      </div>
+      <p class="archive-count">{{ site.tags.security.size }} case{% unless site.tags.security.size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">Protecting WordPress sites on Trellis: fail2ban, Nginx deny lists, malware scanning, IP reputation checks and hardening.</p>
+
+    {%- if site.tags.security.size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags.security %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No Security posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>
