@@ -12,14 +12,14 @@ PageSpeed's "serve static assets with an efficient cache policy" warning has a b
 
 ## Where it goes
 
-Trellis has two include scopes:
+Trellis reads includes from two kinds of folder in your project:
 
 | In your Trellis project | On the server | For |
 |---|---|---|
 | `nginx-includes/all/` | `/etc/nginx/includes.d/all/` | Everything every site wants: caching, security headers |
-| `nginx-includes/` | `/etc/nginx/includes.d/example.com/` | Per site, and named in `wordpress_sites.yml` under `nginx_includes` |
+| `nginx-includes/<site key>/` | `/etc/nginx/includes.d/<site key>/` | One site, named like its key in `wordpress_sites.yml` |
 
-Put the caching file in `all/` and you do not edit `wordpress_sites.yml` at all. Save this as `trellis/nginx-includes/all/assets-expiry.conf.j2`:
+There is no `nginx_includes` setting in `wordpress_sites.yml`; the folders are the whole mechanism. Put the caching file in `all/`. Save this as `trellis/nginx-includes/all/assets-expiry.conf.j2`:
 
 ```nginx
 # SVG first, so it takes precedence over the general static block
@@ -82,9 +82,13 @@ curl -I https://example.com/app/themes/mytheme/public/build/assets/app-4f3a9c.cs
 ```
 
 ```
-Cache-Control: max-age=31536000, public, no-transform
-Expires: ...
+Expires: Thu, 28 Oct 2027 06:39:38 GMT
+Cache-Control: max-age=31536000
+Cache-Control: public, no-transform
+Vary: Accept
 ```
+
+There are two `Cache-Control` lines: `expires` writes the first and `add_header` the second. Browsers combine them.
 
 Run it for a CSS, an image and a font. In DevTools, the Network tab shows the same under Response Headers; a reload that shows `(disk cache)` or `(memory cache)` means it worked.
 
@@ -93,4 +97,4 @@ If the headers are missing, in order: is the file really in `nginx-includes/all/
 ## Two things to watch
 
 - **Vary: Accept on everything.** The include adds it to CSS and JS too, though only images change by `Accept`. It is harmless for browsers, but it can make a CDN keep several copies of the same stylesheet. If that matters, delete the line from the CSS and JS blocks.
-- **Overlap with the WebP include.** The image block here and the one in [the WebP and AVIF include]({% post_url 2026-10-29-serve-webp-avif-nginx-trellis-accept-header-bedrock-uploads %}) both match `.jpg`. Nginx picks among regex locations by the order they appear in the generated config, so test both together: request an image with `Accept: image/webp` and check that you get `Content-Type: image/webp` **and** the long `Cache-Control`. I have not traced the include order on every Trellis version, so verify it on yours.
+- **Overlap with the WebP include.** The image block here and the one in [the WebP and AVIF include]({% post_url 2026-10-29-serve-webp-avif-nginx-trellis-accept-header-bedrock-uploads %}) both match `.jpg`, and the first matching regex location wins. Files in `all/` are read alphabetically, so the WebP file is named `00-webp-avif.conf.j2` to come before `assets-expiry.conf.j2`. With the names the other way round, the images are cached but never negotiated; I tested that case too. Keep the `00-` prefix if you rename anything.
