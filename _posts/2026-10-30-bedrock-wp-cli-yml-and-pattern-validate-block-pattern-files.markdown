@@ -75,7 +75,7 @@ The compliance flags call a stub, `run_compliance_checks()`. Point it at your ow
 The command lives in the wp-ops repository as `wp-cli/content-creation/wp-cli-pattern-validate.php`. Copy it to the Bedrock site root next to `wp-cli.yml`, or run it from the checkout without copying anything:
 
 ```bash
-WP_SITE_DIR=/path/to/site wp-ops bedrock wp-cli-pattern-validate web/app/themes/your-theme/patterns/ --fix
+WP_SITE_DIR=/path/to/site wp-ops wp-cli-pattern-validate web/app/themes/your-theme/patterns/ --fix
 ```
 
 If the file is not auto-loaded by `wp-cli.yml`, pass it explicitly:
