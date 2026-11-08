@@ -8,6 +8,8 @@ case_category: devops
 case_status: documented
 ---
 
+> **Update, November 8, 2026:** I no longer update Trellis this way. An exclude list only protects the files on it, and when I checked before a 1.28 → 1.33 upgrade, three files with real local changes were missing from mine. `wp-ops trellis-updater` now applies only what upstream changed between two releases, as a three-way merge: [Update Trellis with a three-way merge, not rsync excludes](/update-trellis-three-way-merge-git-merge-file-keep-customisations/). The backup, review and vault checks below still apply.
+
 Trellis lives inside your project, not as a dependency, so there is no `composer update` for it. The `trellis/` directory is a copy of the upstream repository that you have customised: a vault password, site definitions, PHP settings, SMTP credentials, extra playbooks and Nginx includes. Updating means getting the new upstream files without overwriting any of that.
 
 This is the routine I use. It is a backup, a diff to see what would change, then an `rsync` with explicit excludes. The excluded list is the useful part, because it is the inventory of what you have customised.
@@ -155,7 +157,7 @@ cp ~/trellis-backup/trellis/ansible.cfg ~/code/website.com/trellis/
 
 ## Doing it with a script
 
-The steps do not change from project to project, only the excluded list, so I keep them in a script, `wp-ops trellis-updater`. It makes a timestamped backup (so running it twice does not overwrite the first), generates the diff, asks for confirmation before it overwrites `trellis/`, and then commits. Whatever you use, keep the excludes in one place, because that list is what protects the project.
+The steps do not change from project to project, only the excluded list, so I kept them in a script, `wp-ops trellis-updater`. Since wp-ops 5.44.0 that script merges upstream changes instead of using rsync excludes; see the update note at the top.
 
 ---
 
