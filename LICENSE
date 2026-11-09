@@ -1,3 +1,21 @@
+WP Villain (wpvilla.in) — licensing
+
+1. Content: all rights reserved
+
+The blog posts in _posts/, the About and home page text, and any images
+published with them are Copyright (c) 2025-2026 Jasper Frumau. All rights
+reserved. They are NOT covered by the MIT License below. Short quotes with
+a link to the original post are welcome; republishing, reposting or
+reusing the text in whole or in substantial part, including as training
+data for machine learning or AI models, requires written permission.
+
+Code snippets shown inside posts may be used freely in your own projects.
+
+2. Site code: MIT License
+
+The site code (_layouts/, _includes/, assets/ other than post images,
+_config.yml and other build files) is licensed under the MIT License:
+
 MIT License
 
 Copyright (c) 2025 wpvillain
