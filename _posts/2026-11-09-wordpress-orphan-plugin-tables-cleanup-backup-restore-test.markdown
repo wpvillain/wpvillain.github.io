@@ -119,7 +119,7 @@ I measured on a local copy of production: restored the pre-cleanup dump, measure
 
 Two things worth knowing:
 - **Run `OPTIMIZE TABLE` afterwards.** InnoDB doesn't give space back on `DELETE`; the table size only drops after a rebuild.
-- **Page speed didn't change.** Time to first byte was 435 ms before and about 435–460 ms after, across 15 requests per page. Two runs on identical data differed by more than the cleanup did. That makes sense: WordPress never read those tables, and with Redis as the object cache, 32 KB less autoloaded data is nothing.
+- **Page speed didn't change.** Time to first byte was 435 ms before and about 435–460 ms after, across 15 requests per page. Two runs on identical data differed by more than the cleanup did. Production told the same story: the postmeta step took the live database from 126.3 to 114.2 MB, and TTFB stayed at about 570 ms for pages and about 810 ms for the REST API, before and after. That makes sense: WordPress never read those tables, and with Redis as the object cache, 32 KB less autoloaded data is nothing.
 
 So this was housekeeping, not a speed fix. If someone sells you "database cleanup" as a performance boost, ask for the before and after TTFB. The real wins are smaller and faster backups, faster pulls to local, no stored third-party credentials in every dump, and a database I can actually read.
 
