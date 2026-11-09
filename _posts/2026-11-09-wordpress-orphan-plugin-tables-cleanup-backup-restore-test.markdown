@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Cleaning 78 Orphan Plugin Tables Out of a WordPress Database: 20% Smaller, No Speed Gain, and the Backup Bugs I Hit First"
+seo_title: "WordPress Orphan Plugin Tables: 78 Dropped, 20% Smaller DB"
 date: 2026-11-09 16:00:00 +0700
 categories: wordpress devops database
 tags: [wordpress, mysql, mariadb, wp-cli, trellis, backups, devops, database]
