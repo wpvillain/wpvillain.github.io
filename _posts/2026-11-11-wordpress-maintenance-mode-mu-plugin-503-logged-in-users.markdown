@@ -79,6 +79,16 @@ curl -sS -o /dev/null -w "%{http_code}\n" https://example.nl/wp-sitemap.xml
 curl -sS -o /dev/null -w "%{http_code}\n" https://example.nl/wp-login.php
 ```
 
+The curl flags, in case you do not use them every day:
+
+- **`-s`** (silent) hides the progress meter, so only the result prints.
+- **`-S`** (show errors) brings error messages back when `-s` is on. `-sS` together means quiet output, but a failure like "connection reset" still prints.
+- **`-I`** sends a HEAD request and prints only the response headers, which is what you want for the status code, `retry-after` and `x-robots-tag`.
+- **`-o /dev/null`** sends the response body to nowhere. I use it when I only care about the status code, not the HTML.
+- **`-w "%{http_code}\n"`** (write-out) prints a value after the transfer. Here it prints the HTTP status code and a newline, so `-o /dev/null -w "%{http_code}\n"` gives a clean one-line result per URL.
+
+What came back:
+
 - The home page returned `HTTP/2 503` with `retry-after: 86400` and `x-robots-tag: noindex, nofollow`.
 - `/wp-json/wp/v2/pages` returned the `rest_maintenance` error with status 503.
 - `/feed/` and `/wp-sitemap.xml` both returned 503.
