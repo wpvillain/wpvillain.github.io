@@ -56,7 +56,15 @@ echo | openssl s_client -connect example.nl:443 -servername example.nl 2>/dev/nu
   | openssl x509 -noout -issuer -subject -dates
 ```
 
-`-servername` matters: without SNI you get the server's default certificate, not the one for your domain. Three stages showed up:
+What the command does, piece by piece:
+
+- **`echo |`** feeds an empty line into `openssl s_client`, which otherwise waits for input and never exits.
+- **`openssl s_client -connect example.nl:443`** opens a TLS connection to the site on the https port and prints what the server presents.
+- **`-servername example.nl`** sends the hostname during the handshake (SNI). It matters: without it you get the server's default certificate, not the one for your domain. On shared hosting that default is the hoster's own certificate.
+- **`2>/dev/null`** hides the connection chatter on stderr, so only the certificate comes through the pipe.
+- **`| openssl x509`** reads that certificate and prints selected fields. **`-noout`** suppresses the raw certificate text, and **`-issuer`**, **`-subject`** and **`-dates`** print who issued it, which hostname it is for, and its start and end dates.
+
+Three stages showed up:
 
 1. **The shared host certificate.** Subject the hosting company's own domain. No certificate for our domain yet, and `curl -I https://example.nl/` failed with "no alternative certificate subject name matches".
 2. **A connection reset.** `curl` returned "Recv failure: Connection reset by peer" and `openssl` printed "Could not find or decode certificate". This was the server reloading the vhost while it applied the change. It looks alarming, but it was progress.
@@ -83,6 +91,8 @@ HTTP 200 with no `-k` means curl trusted the certificate chain. At that moment C
 ```bash
 dig +short example.nl www.example.nl
 ```
+
+`dig` asks DNS for the records of the names you give it, and `+short` prints just the answer, here the IP address for each name.
 
 ## Check for mixed content
 
