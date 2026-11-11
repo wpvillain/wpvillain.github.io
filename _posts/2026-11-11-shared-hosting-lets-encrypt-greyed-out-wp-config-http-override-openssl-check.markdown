@@ -72,6 +72,12 @@ Once the certificate looked right, I checked it end to end:
 curl -sS -I https://example.nl/wp-login.php
 ```
 
+The curl flags here:
+
+- **`-s`** (silent) hides the progress meter, and **`-S`** (show errors) brings error messages back, so `-sS` means quiet output where a failure such as "connection reset" still prints.
+- **`-I`** sends a HEAD request and prints only the response headers, which is enough to see the status code.
+- **`-k`** (insecure) tells curl to skip certificate verification. I do not use it here. Its absence is the point: without `-k`, curl only succeeds if the certificate is valid for the host.
+
 HTTP 200 with no `-k` means curl trusted the certificate chain. At that moment Chrome still showed a certificate warning for the same URL. When the command line verifies and the browser does not, believe the command line first, then restart the browser or use a private window before touching the server again. Also confirm DNS for both the bare domain and `www` points at the right IP:
 
 ```bash
@@ -87,6 +93,8 @@ curl -sSL https://example.nl/ \
   | grep -o -i -E "(src|href|action|poster|data-src|srcset)=[\"']http://[^\"' ]+" \
   | grep -v -E "w3\.org|schema\.org" | sort -u
 ```
+
+The flags: `curl -L` follows redirects (so `www` or http redirects end up at the real page), and in `grep`, `-o` prints only the matching part, `-i` ignores case, `-E` uses extended regular expressions, and `-v` in the second grep drops lines that match (here the harmless `w3.org` and `schema.org` namespace links). `sort -u` removes duplicates.
 
 No output means no `http://` resources in that page's HTML. It does not catch resources that CSS or JavaScript load later, so also open the page with the browser console and look for "Mixed Content" messages. If the grep finds your own domain, fix it with `wp search-replace 'http://example.nl' 'https://example.nl' --all-tables --precise` (dry run first). Repeat for a few key pages, not just the home page.
 
