@@ -78,6 +78,18 @@ HTTP 200 with no `-k` means curl trusted the certificate chain. At that moment C
 dig +short example.nl www.example.nl
 ```
 
+## Check for mixed content
+
+A valid certificate does not mean every resource loads over https. Images, scripts or stylesheets with a hard-coded `http://` URL get blocked or flagged by the browser. A quick first pass is to grep the served HTML for them:
+
+```bash
+curl -sSL https://example.nl/ \
+  | grep -o -i -E "(src|href|action|poster|data-src|srcset)=[\"']http://[^\"' ]+" \
+  | grep -v -E "w3\.org|schema\.org" | sort -u
+```
+
+No output means no `http://` resources in that page's HTML. It does not catch resources that CSS or JavaScript load later, so also open the page with the browser console and look for "Mixed Content" messages. If the grep finds your own domain, fix it with `wp search-replace 'http://example.nl' 'https://example.nl' --all-tables --precise` (dry run first). Repeat for a few key pages, not just the home page.
+
 ## Clean up the override
 
 As soon as https worked, the override had no job left. In `wp-config.php` I commented the two `define()` lines out (deleting them is just as good), confirmed Settings → General showed `https://` for both URLs, and loaded the admin over https.
@@ -88,7 +100,7 @@ Final checklist:
 - `curl -I` over https returns 200 without `-k`.
 - `WP_HOME` and `WP_SITEURL` are removed or commented out in `wp-config.php`.
 - Site URL and Home URL both read `https://` in Settings → General.
-- Check the browser console for mixed content on a page with images.
+- Grep the HTML for `http://` resources and check the browser console for mixed content on a page with images.
 - Close the support ticket if you opened one.
 
 ## Short version for Webreus users
