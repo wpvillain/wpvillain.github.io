@@ -90,6 +90,20 @@ curl -sSL https://example.nl/ \
 
 No output means no `http://` resources in that page's HTML. It does not catch resources that CSS or JavaScript load later, so also open the page with the browser console and look for "Mixed Content" messages. If the grep finds your own domain, fix it with `wp search-replace 'http://example.nl' 'https://example.nl' --all-tables --precise` (dry run first). Repeat for a few key pages, not just the home page.
 
+## A firewall can look like a broken certificate
+
+An hour after the certificate went live, every request from my machine started failing again: `curl` returned "Connection reset by peer" and Chrome showed `ERR_CONNECTION_RESET`. That looked like the certificate problem coming back, but it was not.
+
+What gave it away:
+
+- **Plain http reset too**, and so did port 80 with an unrelated `Host:` header. A certificate problem cannot break that.
+- **A browser user agent, `--http1.1` and no SNI changed nothing.** The reset happens before any HTTP is exchanged, so a user-agent filter is ruled out.
+- **Ping and ssh still answered**, and other domains on the same hoster loaded fine from the same connection.
+
+That pattern points at a firewall or brute-force protection dropping traffic from one IP, not at the site. I had been probing `/wp-login.php` with `curl` a few times, and my VPN exit IP was not on the site's allow list. After that IP was added in the hosting panel's security tab, the site was reachable again. I cannot prove the probes were the trigger, so treat that as the likely cause, not a fact.
+
+If you get resets on a shared host, test from a different network first (mobile data is the quickest). If it loads there, your IP is blocked, and the fix is the allow list, not the certificate. Allow lists in this panel are per site, so an IP you added for one domain does not cover another. And space out your probe requests to the login page.
+
 ## Clean up the override
 
 As soon as https worked, the override had no job left. In `wp-config.php` I commented the two `define()` lines out (deleting them is just as good), confirmed Settings → General showed `https://` for both URLs, and loaded the admin over https.
