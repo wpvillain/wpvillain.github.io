@@ -29,15 +29,30 @@ I also downloaded the previous release (1.2.9) and listed it. The first entries 
 
 The theme's release workflow zipped the repo with `zip -r ... -x@.distignore`, run from the repo root. That puts `style.css`, `theme.json` and the rest at the **top level of the zip**, with no folder around them.
 
-Uploading that zip in wp-admin (Appearance, Themes, Add New, Upload) installed the theme in `wp-content/themes/mytheme-7UDAiHTr2pvX4XAZ`. Not `mytheme`. WordPress takes the folder name from the zip's top-level directory. With nothing to take, the folder is named after the uploaded file, and that file name is a temporary one with a random part. That is where `7UDAiHTr2pvX4XAZ` came from: it is not a hash of anything, just the random part of the temp name.
+Uploading that zip in wp-admin (Appearance, Themes, Add New, Upload) installed the theme in `wp-content/themes/mytheme-7UDAiHTr2pvX4XAZ`. Not `mytheme`. The zip does not contain that string. I listed it: no entry has `7UDA` in it, and the only folders are `assets`, `languages`, `parts`, `patterns`, `styles` and `templates`, all at the top level. WordPress made the name during the upload.
 
-I checked this against the core source of the WordPress 6.7.2 copy I had locally (`wp-admin/includes/class-wp-upgrader.php`), not 7.1.4 where I saw it:
+WordPress 7.1.4 added this to `wp-admin/includes/class-wp-upgrader.php`:
 
-- `unpack_package()` makes a working directory named after the package file, with `.tmp` and `.zip` stripped.
-- `install_package()` looks at what is inside it. If there is exactly one entry and it is a folder, that folder becomes the theme. If there are several entries (a flat zip), the working directory itself becomes the source.
-- The theme folder name is then the name of the source, so a flat zip gives a folder named after the temp file.
+```php
+/**
+ * Builds an unpredictable name for the directory a package is unpacked into.
+ *
+ * @since 7.1.4
+ */
+private function get_working_dir_name( $package ) {
+    $name = basename( basename( $package, '.tmp' ), '.zip' );
+    return $name . '-' . wp_generate_password( 16, false );
+}
+```
 
-I did not trace where the upload code creates the temp name, and I did not rerun it on 7.1.4. It matched what I saw: the same name appeared as `mytheme-` plus 16 random characters.
+So an upload is unpacked into `wp-content/upgrade/mytheme-` plus 16 random characters. What happens next depends on the zip:
+
+- **One top-level folder:** that folder becomes the theme folder, and the random working directory is thrown away. You never see the suffix.
+- **A flat zip:** there is no folder to take, so the working directory itself becomes the theme folder, random suffix and all.
+
+That also explains why this never bit me before. In WordPress 6.7.2, which I had locally, the working directory was just the zip name without `.zip`. A flat `mytheme.zip` installed as `mytheme`, which is exactly what you want, so the flat zip went unnoticed. 7.1.4 hardened the directory name, and this site was the first time I installed one of these zips on 7.1.4.
+
+So the flat zip was a mistake waiting to happen, and the 7.1.4 change set it off. Neither GitHub nor WordPress did anything wrong.
 
 Everything still looked fine in the browser, which is why I missed it:
 
@@ -134,8 +149,8 @@ A plain `REPLACE` is safe on post content because it is ordinary text. It is not
 
 ## What I did not test
 
-- **Other WordPress versions.** I saw this on 7.1.4 and read the source of 6.7.2. I did not test other versions.
-- **Whether the suffix changes on every upload.** I uploaded once, so I assume it does, because it comes from a temp file name.
+- **Other WordPress versions.** I read the source of 6.7.2 and 7.1.4 and saw the result on 7.1.4. I did not check the versions in between, so I do not know if 7.1.4 is the first with the random name beyond its `@since` tag.
+- **Whether the suffix changes on every upload.** The source says it does (`wp_generate_password()` on every unpack); I uploaded once.
 - **Installing the zip any other way**, such as `wp theme install` or Composer. I only know the wp-admin upload route.
 - **Other places the old URL could live**, such as theme mods, widgets or serialized options. In this database the dump showed none, but a different site could have them.
 - **The `admin-ajax.php` 403** on this host. I do not know the rule behind it or whether it is fixed.
