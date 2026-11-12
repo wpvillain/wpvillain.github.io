@@ -153,19 +153,38 @@ Every line is there because something went wrong without it:
 - **`no-ai-design-slop`** is a quality gate against the generic AI look: gradient blobs, three icon cards, "Elevate your…" headings.
 - **The hamburger** is in the prompt because the architect prototype had none, and the conversion then copied the missing menu into the theme as "never collapse".
 
-## Stage 2: review, then fix
+**Which model.** I ran the bakery build on GLM-5.3, which is fast at writing HTML and CSS. It cannot see its own screenshots, so it checked the page by measuring instead: contrast of every text pair (it even sampled the hero photo's pixels behind the headline), header height, overflow and the hamburger at six widths. That is a good fallback, but it is not a look. Check the result by eye before stage 2, or let stage 2 do it.
 
-The second agent reviews the page and writes numbered notes:
+**The 500px trap.** When I checked the bakery page myself, a 390px screenshot showed the headline running off the edge, the second button cut off and no hamburger. None of it was real. Headless Chrome on macOS will not make its window narrower than 500px, so `--window-size=390` lays the page out at 500px and the screenshot shows only its left 390px. A test page printing `innerWidth` gave 500. At a real 390px the page was fine. The toolbox now takes phone screenshots through `html-page-review/frame.html`, which loads the page in an iframe at the exact width, inside a window that is at least 500px wide:
 
 ```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --allow-file-access-from-files --virtual-time-budget=6000 --window-size=600,4000 --screenshot=/tmp/page-390.png "file:///Users/you/code/wp-vibe-toolbox/skills/html-page-review/frame.html?target=file:///Users/you/code/bakery-demo/index.html&w=390&h=4000"
+```
+
+If you check widths by hand, use your browser's device toolbar, not a small window.
+
+## Stage 2: review, then fix
+
+The second agent reviews the page and writes numbered notes. This stage is a look, so it needs a model that can see images. Start the agent, switch model, then paste the prompt:
+
+```bash
+cd ~/code/bakery-demo
 vibe --agent ux-designer --smart-approve
+```
+
+```
+/model mistral-medium-3.5
 ```
 
 ```
 Load html-page-review and review index.html against the brief in README.md.
 ```
 
-Back in `wp-frontend-builder`, apply a few notes at a time:
+Vibe will ask for permission to read the skill's `probe.html` and `frame.html`, because they live in the toolbox folder, outside the project. They are your own files and it only reads and runs them: "Allow for remainder of this session" is fine.
+
+A good review run measures the page with the probe at 390, 768 and 1440px, takes one screenshot per width through `frame.html`, says "Visual pass: done", and writes notes with a width and a concrete fix each. "Visual pass: not done" means the model could not see the screenshots: switch model and run it again. If it calls Chrome with `--window-size=390` directly, stop it; that is the 500px trap again.
+
+Back in `wp-frontend-builder`, on GLM again since this is code, apply a few notes at a time:
 
 ```
 Read index.html and REVIEW.md. Apply review notes 1–3 to index.html. Don't edit REVIEW.md. When done, list per note what you changed.
@@ -203,6 +222,8 @@ What each part prevents, from the [architect-demo runs](https://github.com/image
 
 The agent reports a table of sections and blocks, the gaps no block covers, and what still differs from `index.html`.
 
+**Which model.** Run the conversion on GLM: it is all code, and that is where GLM is fastest. Before you accept the report, switch the same session with `/model mistral-medium-3.5` and ask it to compare the screenshots of `index.html` and the site at 1440px and 390px. Without that switch, "what still differs" comes from measurements only.
+
 ## Stage 4: the design pass
 
 The report and your own screenshots become a numbered list for one more run on the same branch, so its diff shows only the design changes:
@@ -215,13 +236,15 @@ Load html-to-block-theme. theme-lindeboom/ does not yet match index.html. Do a d
 3. Order form: labels above the fields, no placeholders as labels.
 ```
 
-One point per difference makes the result easy to check against the screenshots. Expect one or two of these passes.
+One point per difference makes the result easy to check against the screenshots. Expect one or two of these passes. The same model split applies: GLM for the fixes, `/model mistral-medium-3.5` for the before and after comparison.
 
 ## What I would tell myself before the first run
 
 - **Start every stage in a fresh session.** The prompts are written to stand alone, and a long session drifts.
 - **Keep `PROMPTS.md` honest.** Write down after each run what went wrong. My skill changes came from those notes, not from planning.
 - **"All checks pass" is not done.** Ask for the screenshots.
+- **Code on a fast model, looks on a model that can see.** In Vibe, check `supports_images` in your model's entry in `~/.vibe/config.toml`. Without it, an agent that "checked" a screenshot or a photo did not.
+- **Never trust a phone screenshot from a narrow headless window.** Headless Chrome on macOS stops at 500px; use an iframe at the exact width.
 - **Check the starter and the plugin after each run.** `git status` in both, so a fork that ran a tool in the wrong folder does not leave logs in your starter theme.
 
 The agent, the skills and the prompt templates are public in [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox); the prompts for each stage are also in its [agents README](https://github.com/imagewize/wp-vibe-toolbox/blob/main/agents/README.md#running-the-agents). The full run log, including the block theme it produced, is in [architect-demo](https://github.com/imagewize/architect-demo). For which Mistral model to use for which of these stages, see [my model routing post]({% post_url 2026-11-06-mistral-vibe-model-routing-block-theme-patterns-elayne %}).
