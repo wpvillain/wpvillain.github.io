@@ -12,6 +12,19 @@ I released a block theme from GitHub, uploaded the zip through wp-admin on a cli
 
 The cause was one line in a GitHub Actions workflow. Here is the chain, the fix in the workflow, and how I repaired the page content in phpMyAdmin afterwards.
 
+## Where the line came from
+
+I went back through the history to find out why a theme I had released many times behaved like this only now. The answer is in the first commit. The theme was created from a starter theme through GitHub's template repository feature, and the workflow came with it, unchanged since then:
+
+```yaml
+- name: Zip Folder
+  run: zip -r ${{ github.event.repository.name }}.zip . -x@.distignore
+```
+
+`git log` on the workflow file shows two commits in the new repo: the initial one with exactly that line, and the fix from this week. The starter theme's own repo has the same line, and so do several of my other theme and plugin repos. Only one of them already wrapped its files in a folder, because its WordPress.org review asked for a clean zip.
+
+I also downloaded the previous release (1.2.9) and listed it. The first entries are `screenshot.png`, `readme.txt`, `CHANGELOG.md`, `theme.json`, `style.css`, with no `ecotuin/` in front. Nothing had gone wrong in the build. It produced the zip I asked it to; I never looked at the top level of the zip, because WordPress had always accepted it.
+
 ## What I saw
 
 The theme's release workflow zipped the repo with `zip -r ... -x@.distignore`, run from the repo root. That puts `style.css`, `theme.json` and the rest at the **top level of the zip**, with no folder around them.
