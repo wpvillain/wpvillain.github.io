@@ -16,7 +16,7 @@ vibe --agent wp-frontend-builder --smart-approve
 
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
-**What is and is not tested:** the HTML-to-block-theme stages ran end to end on architect-demo, an architecture studio site I built as a test case, over about fifteen runs. Its `PROMPTS.md` records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo, and it has not had its first real run yet.
+**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo, and it has not had its first real run yet.
 
 ## Why HTML first
 
@@ -152,7 +152,7 @@ Design layer, in this order: block style variations, then theme.json, then heade
 Checks, one command per call: php -l, phpcs, sentinel with --url, --user and --pass, the block-name check, and screenshots of index.html and the site at 1440px and 390px, compared section by section.
 ```
 
-What each part prevents, from the architect-demo runs:
+What each part prevents, from the [architect-demo runs](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md):
 
 - **Naming Mode B up front.** The first conversion slid into a hand-built core-block theme with one Aludra block in it.
 - **Copying markup from Aludra's own patterns.** Static blocks fail validation when their wrapper differs from `save()` by one class. A pattern that already passes is the fastest way to pass.
@@ -184,4 +184,4 @@ One point per difference makes the result easy to check against the screenshots.
 - **"All checks pass" is not done.** Ask for the screenshots.
 - **Check the starter and the plugin after each run.** `git status` in both, so a fork that ran a tool in the wrong folder does not leave logs in your starter theme.
 
-The agent, the skills and the prompt templates are public in [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox); the prompts for each stage are also in its [agents README](https://github.com/imagewize/wp-vibe-toolbox/blob/main/agents/README.md#running-the-agents). For which Mistral model to use for which of these stages, see [my model routing post]({% post_url 2026-11-06-mistral-vibe-model-routing-block-theme-patterns-elayne %}).
+The agent, the skills and the prompt templates are public in [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox); the prompts for each stage are also in its [agents README](https://github.com/imagewize/wp-vibe-toolbox/blob/main/agents/README.md#running-the-agents). The full run log, including the block theme it produced, is in [architect-demo](https://github.com/imagewize/architect-demo). For which Mistral model to use for which of these stages, see [my model routing post]({% post_url 2026-11-06-mistral-vibe-model-routing-block-theme-patterns-elayne %}).
