@@ -16,7 +16,7 @@ vibe --agent wp-frontend-builder --smart-approve
 
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
-**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already turned up one fix (see stage 0).
+**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0.
 
 ## Why HTML first
 
@@ -58,15 +58,7 @@ rsync -a ~/code/wp-vibe-toolbox/agents/ ~/.vibe/agents/
 
 ## Stage 0: set up the project
 
-If the site will use photos, put them in place before the run. Create the folder and download the photos into it:
-
-```bash
-mkdir -p ~/code/bakery-demo/images
-```
-
-Aim for about 1600px wide, mostly portrait for cards and a few landscape for the hero and any wide strip. If the photos are not ready yet, write "photos come later" in the prompt instead of "Photos are in …". The skill then lists the photos still needed and tells you that stage 1 waits for them. With no photos at all, write "no photos, use inline SVG drawings".
-
-Then start the agent in `~/code` (the project folder is created from there) and paste the set-up prompt:
+Start the agent in `~/code`, where the project folder will be created, and paste the set-up prompt. You don't need to create anything first:
 
 ```bash
 cd ~/code
@@ -74,26 +66,42 @@ vibe --agent wp-frontend-builder --smart-approve
 ```
 
 ```
-Load demo-project-setup. Set up ~/code/bakery-demo for Bakkerij Lindeboom, Utrecht (invented): a family bakery, 12 people, since 1987. Audience: neighbourhood customers and office caterers. Main actions: "Order a cake" and "Visit the shop". Tone: warm, plain Dutch. Sections: header, hero, cakes, workshop, about, order form (name, email, date, cake, message), contact, footer. References: example.com, take the full-bleed photos and the name-only captions; do not copy anything else. Photos are in ~/code/bakery-demo/images. Mode B, local site lindeboom-demo, theme slug lindeboom. Ask before creating a GitHub repository.
+Load demo-project-setup. Set up ~/code/bakery-demo for Bakkerij Lindeboom, Utrecht (invented): a family bakery, 12 people, since 1987. Audience: neighbourhood customers and office caterers. Main actions: "Order a cake" and "Visit the shop". Tone: warm, plain Dutch. Sections: header, hero, cakes, workshop, about, order form (name, email, date, cake, message), contact, footer. References: example.com, take the full-bleed photos and the name-only captions; do not copy anything else. Photos come later. Mode B, local site lindeboom-demo, theme slug lindeboom. Ask before creating a GitHub repository.
 ```
 
-The skill writes four files and sets up the site:
+The set-up run creates the project and the site:
 
 - `README.md` holds the brief. The review agent checks the page against it in stage 2.
-- `images/CREDITS.md` has one row per photo, with the photographer and the Unsplash link.
+- `images/CREDITS.md` lists the photos to download: how many, which orientation, for which section.
 - `PROMPTS.md` has one ready-to-paste prompt per stage, each with the exact `vibe --agent` command to start it, and an empty result line to fill in after each run.
+- `scripts/resize-images.sh` resizes the photos to at most 1600px wide.
 - A Laravel Valet site with `wp valet new`, plus Aludra and Contact Form 7 for Mode B, checked for a `200`.
 - A first commit, and a private GitHub repository only if you say yes.
 
-Then it stops and tells you which command and prompt start stage 1. It does not build in the same run.
+It does not build. It ends with the list of photos to download and the prompt for a short follow-up run.
+
+**Then add the photos.** Download them from Unsplash into `~/code/bakery-demo/images` and keep Unsplash's own filenames, such as `rafaella-mendes-diniz-AoL-mVxprmk-unsplash.jpg`. Start a fresh session in the project folder and paste:
+
+```
+Load demo-project-setup. Photos added to images/: fill in CREDITS.md, fit prompt 1 to the photos and commit.
+```
+
+The follow-up run:
+
+- resizes the photos and reads their sizes, so it knows which are portrait and which landscape
+- fills in `CREDITS.md` from the filenames: the photographer is the name part, the photo ID the last 11 characters before `-unsplash`, so the link is `https://unsplash.com/photos/AoL-mVxprmk`
+- leaves the credit blank for a file that does not follow Unsplash's naming, instead of guessing, and asks you to check names that lost their accents (`fulop-adam` is probably Fülöp Ádám)
+- gives each photo a section by its orientation, fits prompt 1 to the photos you have, and commits them
+
+Then it gives you the command and prompt for stage 1. If you want no photos at all, write "no photos, use inline SVG drawings" in the set-up prompt and skip the follow-up run.
 
 Three things from the hand-made run are now in the skill:
 
 **Reference sites need words, not just a URL.** I asked for a model agency site "like jimmodels.com", and the prompt passed the URL on as "reference for the feel". Nobody had opened the site, and the build agent may not be able to fetch it: a JavaScript-heavy agency site often comes back almost empty. The skill now asks what to take from each reference (full-bleed images, a model grid with only the name under each photo, black-and-white page chrome) and states that the name, logo, layout and copy are not copied.
 
-**Never let the agent pick stock photos.** A model asked for Unsplash images makes up photo IDs, which give broken images. You download the photos yourself. The skill reads their sizes with `file images/*.jpg` and tells you when an orientation is missing. In my case all sixteen photos were portrait, while the brief asked for a landscape hero and a landscape campaign strip.
+**Never let the agent pick stock photos.** A model asked for Unsplash images makes up photo IDs, which give broken images. You download the photos yourself, and the follow-up run checks their orientation with `file images/*.jpg`. In my case all sixteen photos were portrait, while the brief asked for a landscape hero and a landscape campaign strip.
 
-The first real run of the skill added a fourth lesson. My test prompt said "Photos are in ~/code/bakery-demo/images" while that folder did not exist yet. The agent created it empty, went on, and only planned to flag it at the end, so prompt 1 would have been written for photos that were not there. The skill now runs `ls` on the folder before writing anything and, when it is empty, asks whether the photos come later or the page uses drawings.
+The first real run of the skill added a fourth lesson. My test prompt said "Photos are in ~/code/bakery-demo/images" while that folder did not exist yet. The agent created it empty and would have written prompt 1 for photos that were not there. That led to the order above: set up first, then add the photos, then a follow-up run that reads the credits from the filenames, so you don't create folders or type credits by hand.
 
 **Valet details.** `wp valet new` already sets up HTTPS, so `valet secure` is not needed. But if your projects folder is not parked in Valet, the new site gets Valet's own 404 page until you run `valet link` in its folder. Mine is not parked: all my sites are linked one by one.
 
