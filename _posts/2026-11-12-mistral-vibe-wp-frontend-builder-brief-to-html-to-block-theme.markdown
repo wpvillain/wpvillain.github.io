@@ -113,7 +113,7 @@ It came out when a single screenshot of the whole sheet, made outside that sessi
 
 The skills now check this first. Before any visual step (the photo check, screenshots at set widths, the page review), the agent reads its model's entry in `~/.vibe/config.toml`. Without image support it does not describe anything: it sorts photos by shape only, writes "not checked by eye", and asks you to switch with `/model mistral-medium-3.5` for that step. With image support, the contact sheet is still built so photos cannot be mixed up: numbered tiles with the filename under each image, one screenshot of the whole sheet, a description per tile number before the filename is looked up, and a second look at every photo it chooses for a section.
 
-The practical rule: GLM is fast for writing HTML, CSS and block markup, but switch to a model that can see for anything that needs eyes. `/model` does that inside a running session, and you can switch back afterwards.
+The practical rule: run the whole workflow on a model that can see. I now use Mistral Large 4 for every stage: Mistral describes it as multimodal, it has a 1M-token context, and with `supports_images = true` in its entry it described the hero photo correctly. GLM 5.3 is text-only. If you use it anyway, switch with `/model` for anything that needs eyes. The preset, with the alias `large-4` used below, is in the toolbox's [install notes](https://github.com/imagewize/wp-vibe-toolbox/blob/main/docs/install.md).
 
 The same run showed a gap in the block map. The brief asks for full-bleed photos, and the map gave the hero `aludra/hero-split`, which puts the photo beside the text. The obvious alternative, `aludra/hero-banner`, is text-only: its `block.json` has no image attribute. A full-bleed photo hero is a `core/cover`, listed as a gap Aludra does not cover. The skill now picks the hero block by what the brief asks for and checks it against the chosen hero photo.
 
@@ -153,7 +153,7 @@ Every line is there because something went wrong without it:
 - **`no-ai-design-slop`** is a quality gate against the generic AI look: gradient blobs, three icon cards, "Elevate your…" headings.
 - **The hamburger** is in the prompt because the architect prototype had none, and the conversion then copied the missing menu into the theme as "never collapse".
 
-**Which model.** I ran the bakery build on GLM-5.3, which is fast at writing HTML and CSS. It cannot see its own screenshots, so it checked the page by measuring instead: contrast of every text pair (it even sampled the hero photo's pixels behind the headline), header height, overflow and the hamburger at six widths. That is a good fallback, but it is not a look. Check the result by eye before stage 2, or let stage 2 do it.
+**Which model.** I ran the bakery build on GLM-5.3, which is fast at writing HTML and CSS. It cannot see its own screenshots, so it checked the page by measuring instead: contrast of every text pair (it even sampled the hero photo's pixels behind the headline), header height, overflow and the hamburger at six widths. That is a good fallback, but it is not a look. Check the result by eye before stage 2, or let stage 2 do it. On Large 4 with image support, the build can look at its own screenshots.
 
 **The 500px trap.** When I checked the bakery page myself, a 390px screenshot showed the headline running off the edge, the second button cut off and no hamburger. None of it was real. Headless Chrome on macOS will not make its window narrower than 500px, so `--window-size=390` lays the page out at 500px and the screenshot shows only its left 390px. A test page printing `innerWidth` gave 500. At a real 390px the page was fine. The toolbox now takes phone screenshots through `html-page-review/frame.html`, which loads the page in an iframe at the exact width, inside a window that is at least 500px wide:
 
@@ -173,7 +173,7 @@ vibe --agent ux-designer --smart-approve
 ```
 
 ```
-/model mistral-medium-3.5
+/model large-4
 ```
 
 ```
@@ -184,7 +184,7 @@ Vibe will ask for permission to read the skill's `probe.html` and `frame.html`, 
 
 A good review run measures the page with the probe at 390, 768 and 1440px, takes one screenshot per width through `frame.html`, says "Visual pass: done", and writes notes with a width and a concrete fix each. "Visual pass: not done" means the model could not see the screenshots: switch model and run it again. If it calls Chrome with `--window-size=390` directly, stop it; that is the 500px trap again.
 
-Back in `wp-frontend-builder`, on GLM again since this is code, apply a few notes at a time:
+Back in `wp-frontend-builder`, apply a few notes at a time:
 
 ```
 Read index.html and REVIEW.md. Apply review notes 1–3 to index.html. Don't edit REVIEW.md. When done, list per note what you changed.
@@ -222,7 +222,9 @@ What each part prevents, from the [architect-demo runs](https://github.com/image
 
 The agent reports a table of sections and blocks, the gaps no block covers, and what still differs from `index.html`.
 
-**Which model.** Run the conversion on GLM: it is all code, and that is where GLM is fastest. Before you accept the report, switch the same session with `/model mistral-medium-3.5` and ask it to compare the screenshots of `index.html` and the site at 1440px and 390px. Without that switch, "what still differs" comes from measurements only.
+**Which model.** Run the conversion on Mistral Large 4 with image support. A full conversion reads a lot of files, so the 1M context helps, and the same model can then compare the screenshots of `index.html` and the site at 1440px and 390px. Ask for that comparison before you accept the report.
+
+I ran the bakery conversion on GLM 5.3 first. It took a browser screenshot, decided that "images reach me", and reported every section as matching the prototype. Its own screenshots, compared side by side, showed dark, faded hero text on the dark photo, an order form with an extra column and unstyled fields, and three other sections laid out differently. On a text-only model, "what still differs" comes from measurements only, however confident the report sounds.
 
 ## Stage 4: the design pass
 
@@ -236,14 +238,14 @@ Load html-to-block-theme. theme-lindeboom/ does not yet match index.html. Do a d
 3. Order form: labels above the fields, no placeholders as labels.
 ```
 
-One point per difference makes the result easy to check against the screenshots. Expect one or two of these passes. The same model split applies: GLM for the fixes, `/model mistral-medium-3.5` for the before and after comparison.
+One point per difference makes the result easy to check against the screenshots. Expect one or two of these passes. The same model does the fixes and the before and after comparison.
 
 ## What I would tell myself before the first run
 
 - **Start every stage in a fresh session.** The prompts are written to stand alone, and a long session drifts.
 - **Keep `PROMPTS.md` honest.** Write down after each run what went wrong. My skill changes came from those notes, not from planning.
 - **"All checks pass" is not done.** Ask for the screenshots.
-- **Code on a fast model, looks on a model that can see.** In Vibe, check `supports_images` in your model's entry in `~/.vibe/config.toml`. Without it, an agent that "checked" a screenshot or a photo did not.
+- **One model that can see, for every stage.** In Vibe, a model only gets images when its entry in `~/.vibe/config.toml` has `supports_images = true`, whatever the model itself can do. Without it, an agent that "checked" a screenshot or a photo did not. Test it once: ask the agent to describe one of your photos.
 - **Never trust a phone screenshot from a narrow headless window.** Headless Chrome on macOS stops at 500px; use an iframe at the exact width.
 - **Check the starter and the plugin after each run.** `git status` in both, so a fork that ran a tool in the wrong folder does not leave logs in your starter theme.
 
