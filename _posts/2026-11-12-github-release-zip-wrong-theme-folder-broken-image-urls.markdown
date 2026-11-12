@@ -3,14 +3,14 @@ layout: post
 title: "A Flat Release Zip Gave My WordPress Theme a Random Folder Name, and Broke Every Image URL Built From It"
 date: 2026-11-12 20:00:00 +0700
 categories: wordpress devops
-tags: [wordpress, github-actions, block-themes, release, troubleshooting, shared-hosting, phpmyadmin]
+tags: [wordpress, github-actions, block-themes, release, troubleshooting, shared-hosting, webreus, phpmyadmin]
 case_category: devops
 case_status: documented
 ---
 
-I released a block theme from GitHub, uploaded the zip through wp-admin on a client's shared host, and the theme worked. Two days later the home page had three broken images and the console said 404 for each. The files were on the server. The page was asking for them in a folder that no longer existed.
+I released a block theme from GitHub, uploaded the zip through wp-admin on a client's shared host at Webreus.nl (a Dutch host with no SSH on this plan), and the theme worked. A day later the home page had three broken images and the console said 404 for each. The files were on the server. The page was asking for them in a folder that no longer existed.
 
-The cause was one line in a GitHub Actions workflow. Here is the chain, the fix, and how I repaired the page content afterwards.
+The cause was one line in a GitHub Actions workflow. Here is the chain, the fix in the workflow, and how I repaired the page content in phpMyAdmin afterwards.
 
 ## What I saw
 
@@ -63,24 +63,47 @@ unzip -l ecotuin.zip | head
 
 Every path starts with `ecotuin/`. That is the check I would repeat after any change to a release workflow.
 
-## The fix in the database
+## The fix in the database, step by step
 
-The old folder name appeared only in the page content, so one query on the posts table was enough. I did this in phpMyAdmin because the host had no SSH. The order matters:
+The old folder name appeared only in the page content, so one query on the posts table was enough. The host had no SSH, so I used the phpMyAdmin that Webreus provides. Getting into it took one wrong turn, so here is the whole path.
 
-1. **Export the whole database first.** I used the Export tab with the Quick method. I searched the dump for the old folder name before touching anything: it appeared in two rows of the posts table and nowhere else, so no other table needed a change.
-2. **Run the replacement** (table prefix here is `wp_`, yours may differ):
+**1. Find the right phpMyAdmin.** On Webreus each hosting account lives on a numbered server, and each server has its own phpMyAdmin at `https://srvNNNNNN.webreus.net/phpmyadmin/`. I first logged in on the server of another site I manage there. The login failed, because the database user does not exist on that server. The site's own server shows up in DNS:
+
+```bash
+dig +short example.nl
+dig +short -x 203.0.113.10   # the IP from the first command; the answer is srvNNNNNN.webreus.net
+```
+
+The reverse lookup of the site's IP gave the server name. On that server the login worked.
+
+**2. Take the login from `wp-config.php`.** `DB_USER` and `DB_PASSWORD` are the phpMyAdmin credentials, and `DB_NAME` is the database to pick in the left column. `$table_prefix` is the table prefix, which was not the default `wp_` here. Do not paste that file, or a screenshot of it, into a chat or a ticket. The password of this database ended up in a conversation while I worked on this, so I rotated it afterwards.
+
+**3. Export the whole database first.** I used the Export tab with the Quick method and kept the `.sql` file. Then I searched the dump for the old folder name before changing anything:
+
+```bash
+grep -c 'ecotuin-7UDAiHTr2pvX4XAZ' backup.sql
+awk '/^INSERT INTO/{t=$3} /ecotuin-7UDAiHTr2pvX4XAZ/{print t}' backup.sql | sort | uniq -c
+```
+
+The second command prints which table each hit sits in. It showed two lines, both in the posts table, so nothing else needed a change.
+
+**4. Run the replacement** on the SQL tab, with your own prefix:
 
 ```sql
-UPDATE wp_posts
+UPDATE prefix_posts
 SET post_content = REPLACE(post_content, 'ecotuin-7UDAiHTr2pvX4XAZ', 'ecotuin')
 WHERE post_content LIKE '%ecotuin-7UDAiHTr2pvX4XAZ%';
 ```
 
-phpMyAdmin reported 2 rows affected, which matched the two lines in the dump.
+phpMyAdmin reported "2 rows affected", which matched the two lines in the dump. A mismatch there is a reason to stop and look.
 
-3. **Hard-refresh the page.** The images loaded.
+**5. Hard-refresh the page** (Cmd+Shift+R). The hero image, the logo and a third image loaded, and the console showed no more 404s.
 
-A plain `REPLACE` is safe on post content because it is ordinary text. It is not safe on serialized data such as widget settings or some options, where a changed length breaks the value. If you have a shell, `wp search-replace 'old' 'new' --dry-run` handles serialized data correctly and is the better tool.
+If you only have one page to fix, there is a way without the database: open the page in the block editor, switch to the Code editor (Ctrl+Shift+Alt+M), replace the old folder name with the right one, and update. The SQL route is better when revisions or several pages carry the URL, or when you want to be sure nothing is missed.
+
+A plain `REPLACE` is safe on post content because it is ordinary text. It is not safe on serialized data such as widget settings or some options, where a changed length breaks the value. With a shell, `wp search-replace 'old' 'new' --dry-run` handles serialized data correctly and is the better tool.
+
+**A separate host problem I saw at the same time.** In the editor, the media library kept spinning and the console showed `POST /wp-admin/admin-ajax.php` returning 403. A logged-out request got the same 403, and my maintenance mu-plugin can only return 503, so the block sits in front of WordPress, most likely the host's firewall. I asked Webreus and have not confirmed a fix. It has nothing to do with the theme folder, but you may hit it on the same host while fixing this, so I list it here.
 
 ## What to take from it
 
@@ -94,5 +117,6 @@ A plain `REPLACE` is safe on post content because it is ordinary text. It is not
 - **Whether the suffix is random on every upload** or only on the first. I uploaded once.
 - **Installing the zip any other way**, such as `wp theme install` or Composer. I only know the wp-admin upload route.
 - **Other places the old URL could live**, such as theme mods, widgets or serialized options. In this database the dump showed none, but a different site could have them.
+- **The `admin-ajax.php` 403** on this host. I do not know the rule behind it or whether it is fixed.
 
 If your site also had an HTTPS or maintenance-mode problem during the same build, the [maintenance mode mu-plugin write-up]({% post_url 2026-11-11-wordpress-maintenance-mode-mu-plugin-503-logged-in-users %}) and the [Let's Encrypt write-up]({% post_url 2026-11-11-shared-hosting-lets-encrypt-greyed-out-wp-config-http-override-openssl-check %}) come from the same project.
