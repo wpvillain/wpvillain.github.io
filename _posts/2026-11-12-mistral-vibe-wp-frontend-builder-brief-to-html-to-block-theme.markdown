@@ -16,7 +16,7 @@ vibe --agent wp-frontend-builder --smart-approve
 
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
-**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo, and it has not had its first real run yet.
+**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already turned up one fix (see stage 0).
 
 ## Why HTML first
 
@@ -58,6 +58,21 @@ rsync -a ~/code/wp-vibe-toolbox/agents/ ~/.vibe/agents/
 
 ## Stage 0: set up the project
 
+If the site will use photos, put them in place before the run. Create the folder and download the photos into it:
+
+```bash
+mkdir -p ~/code/bakery-demo/images
+```
+
+Aim for about 1600px wide, mostly portrait for cards and a few landscape for the hero and any wide strip. If the photos are not ready yet, write "photos come later" in the prompt instead of "Photos are in …". The skill then lists the photos still needed and tells you that stage 1 waits for them. With no photos at all, write "no photos, use inline SVG drawings".
+
+Then start the agent in `~/code` (the project folder is created from there) and paste the set-up prompt:
+
+```bash
+cd ~/code
+vibe --agent wp-frontend-builder --smart-approve
+```
+
 ```
 Load demo-project-setup. Set up ~/code/bakery-demo for Bakkerij Lindeboom, Utrecht (invented): a family bakery, 12 people, since 1987. Audience: neighbourhood customers and office caterers. Main actions: "Order a cake" and "Visit the shop". Tone: warm, plain Dutch. Sections: header, hero, cakes, workshop, about, order form (name, email, date, cake, message), contact, footer. References: example.com, take the full-bleed photos and the name-only captions; do not copy anything else. Photos are in ~/code/bakery-demo/images. Mode B, local site lindeboom-demo, theme slug lindeboom. Ask before creating a GitHub repository.
 ```
@@ -77,6 +92,8 @@ Three things from the hand-made run are now in the skill:
 **Reference sites need words, not just a URL.** I asked for a model agency site "like jimmodels.com", and the prompt passed the URL on as "reference for the feel". Nobody had opened the site, and the build agent may not be able to fetch it: a JavaScript-heavy agency site often comes back almost empty. The skill now asks what to take from each reference (full-bleed images, a model grid with only the name under each photo, black-and-white page chrome) and states that the name, logo, layout and copy are not copied.
 
 **Never let the agent pick stock photos.** A model asked for Unsplash images makes up photo IDs, which give broken images. You download the photos yourself. The skill reads their sizes with `file images/*.jpg` and tells you when an orientation is missing. In my case all sixteen photos were portrait, while the brief asked for a landscape hero and a landscape campaign strip.
+
+The first real run of the skill added a fourth lesson. My test prompt said "Photos are in ~/code/bakery-demo/images" while that folder did not exist yet. The agent created it empty, went on, and only planned to flag it at the end, so prompt 1 would have been written for photos that were not there. The skill now runs `ls` on the folder before writing anything and, when it is empty, asks whether the photos come later or the page uses drawings.
 
 **Valet details.** `wp valet new` already sets up HTTPS, so `valet secure` is not needed. But if your projects folder is not parked in Valet, the new site gets Valet's own 404 page until you run `valet link` in its folder. Mine is not parked: all my sites are linked one by one.
 
