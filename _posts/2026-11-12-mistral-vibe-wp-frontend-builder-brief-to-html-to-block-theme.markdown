@@ -16,7 +16,7 @@ vibe --agent wp-frontend-builder --smart-approve
 
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
-**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0.
+**What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0 and taught it to look at the photos instead of trusting their shape.
 
 ## Why HTML first
 
@@ -91,7 +91,11 @@ The follow-up run:
 - resizes the photos and reads their sizes, so it knows which are portrait and which landscape
 - fills in `CREDITS.md` from the filenames: the photographer is the name part, the photo ID the last 11 characters before `-unsplash`, so the link is `https://unsplash.com/photos/AoL-mVxprmk`
 - leaves the credit blank for a file that does not follow Unsplash's naming, instead of guessing, and asks you to check names that lost their accents (`fulop-adam` is probably Fülöp Ádám)
-- gives each photo a section by its orientation, fits prompt 1 to the photos you have, and commits them
+- looks at the photos on a numbered contact sheet, one headless Chrome screenshot of all of them, and writes what each one shows into `CREDITS.md`
+- names one photo per section, the rest as alternates, and marks off-brief photos as spare so the build skips them
+- fits prompt 1 to the photos you have, checks that the hero block in prompt 4 suits the hero photo, and commits
+
+Then open the photos it chose yourself before stage 1. The build writes alt text and picks crops from those descriptions.
 
 Then it gives you the command and prompt for stage 1. If you want no photos at all, write "no photos, use inline SVG drawings" in the set-up prompt and skip the follow-up run.
 
@@ -102,6 +106,12 @@ Three things from the hand-made run are now in the skill:
 **Never let the agent pick stock photos.** A model asked for Unsplash images makes up photo IDs, which give broken images. You download the photos yourself, and the follow-up run checks their orientation with `file images/*.jpg`. In my case all sixteen photos were portrait, while the brief asked for a landscape hero and a landscape campaign strip.
 
 The first real run of the skill added a fourth lesson. My test prompt said "Photos are in ~/code/bakery-demo/images" while that folder did not exist yet. The agent created it empty and would have written prompt 1 for photos that were not there. That led to the order above: set up first, then add the photos, then a follow-up run that reads the credits from the filenames, so you don't create folders or type credits by hand.
+
+**An agent that says it checked the photos may not have.** The first follow-up run sorted 21 bakery photos by shape only, which is what the skill said at the time: a landscape photo of two men with a tablet came out as a hero candidate. I connected the browser extension and asked it to look. It built a contact sheet, scrolled through it in four screenshots, reported that it had "inspected every photo", and rewrote the credits. Most of the new descriptions were wrong. The hero it picked, recorded as "bread and butter on a work table", is a row of mint cupcakes. The "hands kneading dough" photo shows heart-shaped palmiers, while the real kneading photo was listed as "pastry on a worktop". The "shop front" is a tray of doughnuts, and the actual patisserie shop front was filed as a cake card. A strawberry tart was marked spare as a "coffee table scene".
+
+It came out when a single screenshot of the whole sheet, made outside that session, was compared with the credits row by row. The likely cause is the slices: across four scrolled screenshots, a description slid onto the neighbouring filename. The skill now builds the sheet so that is hard to do: numbered tiles with the filename under each image, a number-to-filename list, one screenshot of the whole sheet, a description per tile number before the filename is looked up, and a second look at every photo it chooses for a section. If the session cannot show images, it has to write "not checked by eye" in the credits instead of describing photos it has not seen.
+
+The same run showed a gap in the block map. The brief asks for full-bleed photos, and the map gave the hero `aludra/hero-split`, which puts the photo beside the text. The obvious alternative, `aludra/hero-banner`, is text-only: its `block.json` has no image attribute. A full-bleed photo hero is a `core/cover`, listed as a gap Aludra does not cover. The skill now picks the hero block by what the brief asks for and checks it against the chosen hero photo.
 
 **Valet details.** `wp valet new` already sets up HTTPS, so `valet secure` is not needed. But if your projects folder is not parked in Valet, the new site gets Valet's own 404 page until you run `valet link` in its folder. Mine is not parked: all my sites are linked one by one.
 
@@ -167,7 +177,7 @@ On a branch, in a fresh session. The prompt is long because it names every decis
 Load html-to-block-theme and work in Mode B (Aviendha fork + Aludra blocks). Read references/forking-a-starter-theme.md, references/composing-with-aludra.md and references/mobile-navigation.md before writing any file.
 
 Create theme-lindeboom/ as a fork of ~/code/aviendha and build the homepage as one pattern composed from aludra/* blocks. For every section, copy the block's markup from ~/code/aludra/patterns/ and change only the content:
-  - hero: aludra/hero-banner or aludra/hero-split
+  - hero: core/cover with the hero photo full-bleed and the text over it, listed as a gap
   - cakes: aludra/photo-grid, or aludra/carousel (see carousel-portfolio-showcase.php)
   - order form and contact: aludra/contact-section with a Contact Form 7 form, visible labels above each field
 Do not hand-build a section with core/group + CSS when an aludra block fits.
@@ -180,6 +190,7 @@ Checks, one command per call: php -l, phpcs, sentinel with --url, --user and --p
 What each part prevents, from the [architect-demo runs](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md):
 
 - **Naming Mode B up front.** The first conversion slid into a hand-built core-block theme with one Aludra block in it.
+- **The hero as `core/cover`, listed as a gap.** No Aludra block holds a full-bleed photo: `aludra/hero-split` puts it beside the text and `aludra/hero-banner` has no image at all. Naming the gap keeps the agent from forcing the closest block.
 - **Copying markup from Aludra's own patterns.** Static blocks fail validation when their wrapper differs from `save()` by one class. A pattern that already passes is the fastest way to pass.
 - **The design layer in the same run.** The second conversion used Aludra throughout and passed every check, and still looked like the starter theme: orange pill buttons, shadows, dark bands. Only the palette had been ported. Variations first, then `theme.json`, then CSS fixes that, in order of cost.
 - **`overlayMenu mobile` spelled out.** A later run rebuilt the header from the prototype and lost the mobile menu.
