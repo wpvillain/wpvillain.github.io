@@ -3,7 +3,7 @@ layout: post
 title: "WordPress Speed Optimization Guide 2025: Proven Techniques to Achieve Sub-1 Second Load Times"
 date: 2025-11-25 10:00:00 +0100
 categories: wordpress performance
-tags: speed-optimization core-web-vitals lcp cls wordpress-performance
+tags: speed-optimization performance core-web-vitals lcp cls wordpress-performance
 excerpt: "Learn battle-tested WordPress speed optimization techniques that have helped us achieve sub-1 second load times for SME websites. Based on real implementations from 100+ client projects."
 case_category: performance
 case_status: documented
