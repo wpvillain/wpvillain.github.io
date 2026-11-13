@@ -47,7 +47,7 @@ wp user create agent agent@example.com --role=editor
 wp user application-password create agent coding-agent --porcelain
 ```
 
-Give the agent `agent:<password>` as its basic-auth credentials. On a multisite, add `--url=` with the subsite to both commands, and on Trellis run them in the VM with `trellis vm shell --workdir /srv/www/<site>/current -- wp …`. You can also create the password in wp-admin under Users → Profile → Application Passwords.
+Give the agent `agent:<password>` as its basic-auth credentials. On a multisite, add `--url=` with the subsite to both commands, and on Trellis run them in the VM with `trellis vm shell --workdir /srv/www/<site>/current -- wp … --path=web/wp`; the `--path` is needed because Bedrock keeps WordPress core in `web/wp`. You can also create the password in wp-admin under Users → Profile → Application Passwords.
 
 WordPress only offers application passwords over HTTPS, or when `WP_ENVIRONMENT_TYPE` is `local`. On a plain-HTTP dev site, set that first.
 
@@ -125,7 +125,7 @@ wp-ops rsync-package-to-site plugin aludra ~/code/aludra
 cd ~/code/example.com/trellis
 trellis vm shell --workdir /srv/www/example.com/current \
   -- wp user application-password create agent abilities-test --porcelain \
-  --url=http://example.test/
+  --url=http://example.test/ --path=web/wp
 ```
 
 **3. Call the abilities.** Check first that an anonymous call is refused:
@@ -155,7 +155,7 @@ curl -su "$AUTH" "$WP/aludra/check-page/run?input%5Bpage_id%5D=942"
 trellis vm shell --workdir /srv/www/example.com/current -- wp eval '
 $content = get_post( 942 )->post_content;
 echo serialize_blocks( parse_blocks( $content ) ) === $content ? "Match: YES" : "Match: NO";
-' --url=http://example.test/
+' --url=http://example.test/ --path=web/wp
 ```
 
 This doesn't replace opening the page in the editor, but it catches markup that changes shape on its way through the block parser.
@@ -164,9 +164,9 @@ This doesn't replace opening the page in the editor, but it catches markup that 
 
 ```bash
 trellis vm shell --workdir /srv/www/example.com/current \
-  -- wp post delete 942 --force --url=http://example.test/
+  -- wp post delete 942 --force --url=http://example.test/ --path=web/wp
 trellis vm shell --workdir /srv/www/example.com/current \
-  -- wp user application-password delete agent <uuid> --url=http://example.test/
+  -- wp user application-password delete agent <uuid> --url=http://example.test/ --path=web/wp
 ```
 
 One Trellis catch: `trellis vm shell` doesn't pass the command through a shell, so `&&`, pipes and redirects arrive as literal text and fail. Run each command separately, as above, or use `limactl shell <instance> -- bash -c '…'` when you need real chaining.
