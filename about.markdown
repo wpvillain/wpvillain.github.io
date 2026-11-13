@@ -4,45 +4,32 @@ title: about
 permalink: /about/
 ---
 
-WP Villa is a WordPress tutorial and resource site focused on helping SMEs and developers get the most out of WordPress, WooCommerce, and modern web development.
+WP Villain is where I write up the WordPress problems I run into and how I solved them. Most posts start as a real bug, a broken deploy or a slow site on a client project, and end with the commands, config and code that fixed it.
 
-## What We Cover
+## What I Write About
 
-Our tutorials and guides focus on:
+- **[Trellis](/tag/trellis/) and Bedrock**: provisioning, deploying and maintaining WordPress on the Roots stack
+- **[WP-CLI](/tag/wp-cli/)**: scripting, debugging and repairing sites from the command line
+- **[DevOps](/tag/devops/)**: servers, Ansible, Nginx, mail, cron and monitoring
+- **[Block Themes](/tag/block-themes/)**: theme.json, style variations, patterns, templates and the Site Editor
+- **[Speed](/tag/performance/)**: measuring and improving TTFB, caching, images and PHP-FPM
+- **[Security](/tag/security/)**: hardening, malware cleanup and fail2ban
+- **AI coding agents**: what happens when agents like Mistral Vibe build and fix WordPress themes, and the tooling I write to keep them on track
 
-- **WordPress Development** - Theme customization, optimization techniques, and best practices
-- **WooCommerce** - E-commerce setup guides, speed optimization, and payment gateway integrations
-- **WordPress Performance** - Speed optimization, caching strategies, and hosting recommendations
-- **WordPress Security** - Backup solutions, security hardening, and maintenance practices
-- **Site Migration** - Moving WordPress sites safely and efficiently
+## Who Runs WP Villain
 
-## Who Runs WP Villa
+I'm **[Jasper Frumau](https://imagewize.com)**, founder of Imagewize, a WordPress development agency building sites for small and medium-sized businesses since 2009.
 
-WP Villa is maintained by **[Jasper Frumau](https://imagewize.com)**, founder of Imagewize - a WordPress development agency specializing in SME websites since 2009.
+## Open Source
 
-With over 15 years of WordPress experience, we've:
-- Built 100+ custom WordPress and WooCommerce sites
-- Optimized countless slow WordPress sites to achieve sub-1s load times
-- Migrated dozens of sites to modern hosting stacks (Trellis/Bedrock)
-- Developed open source WordPress themes used by developers worldwide
+Most of the code behind these posts is public:
 
-## Open Source Contributions
+- **[wp-ops](https://github.com/imagewize/wp-ops)**: the scripts I use to run, update, scan and back up WordPress sites
+- **[wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox)**: agents, skills and prompt templates for building WordPress block themes with AI coding agents
+- **[Aviendha](https://github.com/imagewize/aviendha)**: a WordPress block theme, used as the base for new client themes
+- **[Aludra](https://github.com/imagewize/aludra)**: a block plugin with sections like carousels, photo grids, comparison tables and contact sections
+- **[Nynaeve](https://github.com/imagewize/nynaeve)**: a Roots Sage theme that combines the block editor with PHP templates
 
-We actively contribute to the WordPress community:
+## Need Help With a Site?
 
-- **[Nynaeve](https://github.com/imagewize/nynaeve)** - A modern Roots Sage hybrid theme combining block editor with classic PHP templating
-- **[Moiraine](https://github.com/imagewize/moiraine)** - A Full Site Editing (FSE) theme built with WordPress patterns
-- **[Callandor](https://github.com/imagewize/callandor)** - WordPress block patterns for rapid site building
-
-## Need Professional Help?
-
-While WP Villa provides free tutorials and guides, if you need hands-on WordPress development, speed optimization, or custom WooCommerce solutions, visit **[Imagewize](https://imagewize.com)** for professional services.
-
-We offer:
-- Custom WordPress development for SMEs
-- WooCommerce store setup and optimization
-- WordPress speed optimization (Target: <1s load times)
-- Premium hosting on Trellis stack (VPS with micro-caching)
-- Ongoing maintenance and support
-
-**[Contact Imagewize](https://imagewize.com/contact-us/)** for a free consultation.
+For WordPress or WooCommerce work on your own site, see **[Imagewize](https://imagewize.com)**.
