@@ -8,7 +8,7 @@ case_category: ai
 case_status: documented
 ---
 
-I build new WordPress block themes in three stages, all in Mistral Vibe with one agent: set up the project, build the design as a single HTML/CSS file, then convert that file into a block theme. Each stage is its own session, started with the same command:
+I build new WordPress block themes in five stages, all in Mistral Vibe: set up the project, build the design as a single HTML/CSS file, review it, convert it into a block theme, and do a design pass until the theme matches the file. One agent does the building; a second one only reviews. Each stage is its own session, and every building stage starts with the same command:
 
 ```bash
 vibe --agent wp-frontend-builder
@@ -18,7 +18,7 @@ vibe --agent wp-frontend-builder
 
 *Updated again the same day, after the bakery design pass: the prompts left over came from shell syntax, not paths, and the fix for those is in the skills, not the config. Also new: screenshots too large for Vibe to show the model, and hover states, which no screenshot shows. See [What still prompts](#what-still-prompts) and [Stage 4](#stage-4-the-design-pass).*
 
-The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
+The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts. The project's `PROMPTS.md` counts six steps, 0 to 5, because it gives applying the review notes its own number; here review and fix share stage 2.
 
 **What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0 and taught it to look at the photos instead of trusting their shape.
 
