@@ -16,6 +16,8 @@ vibe --agent wp-frontend-builder
 
 *Updated November 13, 2026: the first version of this post started every stage with `--smart-approve`. That flag does nothing next to a custom agent, so the bakery runs kept stopping for approval on paths outside the project: `/tmp` screenshots, `~/code/aludra`, `~/code/aviendha`, the local site's WordPress files. The fix is a few lines in `~/.vibe/config.toml`, now under [Fewer approval prompts](#fewer-approval-prompts).*
 
+*Updated again the same day, after the bakery design pass: the prompts left over came from shell syntax, not paths, and the fix for those is in the skills, not the config. Also new: screenshots too large for Vibe to show the model, and hover states, which no screenshot shows. See [What still prompts](#what-still-prompts) and [Stage 4](#stage-4-the-design-pass).*
+
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
 **What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0 and taught it to look at the photos instead of trusting their shape.
@@ -100,7 +102,7 @@ allowlist = [
 What each part is for, and what to watch:
 
 - **`/private/tmp`, not `/tmp`.** On macOS `/tmp` is a link to `/private/tmp`, and Vibe resolves links before it compares, so the grant has to name `/private/tmp`. It then covers `/tmp/…` too. An older `"/private/tmp/*"` entry covers the files but not the folder, so `cd /tmp` still prompts. On Linux, grant `/tmp`.
-- **A grant only clears the path check.** The command still needs its own entry, and once allowed it can do anything it can do in that folder. So allow `sed -n`, never `sed`, or `sed -i` edits any file under `~/code` without asking. The same goes for `magick`: it crops screenshots, but it also writes its output without asking. I leave it off and approve each crop.
+- **A grant only clears the path check.** The command still needs its own entry, and once allowed it can do anything it can do in that folder. So allow `sed -n`, never `sed`, or `sed -i` edits any file under `~/code` without asking. The same goes for `magick`: it crops screenshots, but it also writes its output without asking, so it could overwrite an image in a theme's `assets/`. I allow it anyway, because the skills now name the one crop command the agent should run (see below), and an unnamed crop step was what produced the worst prompts.
 - **Chrome only with `--headless=new` first.** Vibe matches the start of the command, quotes included. A design pass takes a few dozen screenshots, one per width, and that entry covers exactly the way the toolbox writes them. Chrome with a remote-debugging port first still prompts.
 - **Read-only wp-cli only.** `wp post update`, `wp option update`, `wp eval` and `wp db` keep prompting, which is what you want.
 - **Chains are fine, variables and redirects are not.** Vibe 3.1.2 splits a command on `|`, `;` and `&&` and checks each part, so `grep … | head -5` passes when both are allowed. `$X`, `$(…)` and `>` always prompt, and so does `echo ===`, which Vibe reads as shell syntax. `echo ---` passes, so the agent now separates outputs with that.
@@ -108,6 +110,30 @@ What each part is for, and what to watch:
 For one session, `vibe --add-dir ~/code/aludra` makes a folder part of the working directory instead. A project's own `.vibe/config.toml` allowlist *replaces* the global one, so copy the basics into it if you use one. The full list is in the toolbox's [install notes](https://github.com/imagewize/wp-vibe-toolbox/blob/main/docs/install.md).
 
 With this in place, `--auto-approve` (`--yolo`) is not needed, and I would keep it for throwaway sites only.
+
+### What still prompts
+
+With the folders granted, the bakery design pass still stopped five times, and none of those prompts came from paths:
+
+- `python3 -c "import PIL"`, to find a way to slice screenshots
+- a `for` loop with `convert "$f" … "${f%.png}.jpg"`, and a second loop to shrink the slices
+- `node --version` plus `import websocket` probes, to write its own DevTools script and hover over buttons
+- `python3 - <<'EOF'` with a regex, to pull the button rules out of the page's CSS
+
+The config cannot fix these. Vibe asks for every loop, every `${…}` expansion and every heredoc (`<<` counts as a redirection), whatever the allowlist says. And `python3` or `node` are not read-only commands: the script reads, but the interpreter can write or delete anything, so `python3 *` on the allowlist means any script runs unasked. I keep both off.
+
+What fixes them is a named command in the skill. An agent that is not told how to do a job improvises, and the improvisation is what prompts. The toolbox now gives one allowlisted command for each job:
+
+```bash
+# slice a full-page screenshot into numbered tiles, scaled and converted in one step
+magick /tmp/shots/site-1440.png -crop 1440x900 +repage -resize 1100x -quality 82 /tmp/shots/seg/site-1440-%02d.jpg
+# a frame.html phone shot is 600px wide with the page in the left 390px: crop that first
+magick /tmp/shots/site-390.png -crop 390x+0+0 +repage -crop 390x844 +repage -quality 82 /tmp/shots/seg/site-390-%02d.jpg
+# the hover rules WordPress generates from theme.json
+curl -s https://lindeboom-demo.test/ | grep -o ':hover[^}]*}'
+```
+
+`magick`, `curl` and `grep` are on the allowlist, so these run without a prompt. A session started before a skill change still improvises; tell it in the chat once ("no python3, node, heredocs or loops this session") and it usually holds.
 
 ## Stage 0: set up the project
 
@@ -271,6 +297,7 @@ What each part prevents, from the [architect-demo runs](https://github.com/image
 - **The design layer in the same run.** The second conversion used Aludra throughout and passed every check, and still looked like the starter theme: orange pill buttons, shadows, dark bands. Only the palette had been ported. Variations first, then `theme.json`, then CSS fixes that, in order of cost.
 - **`overlayMenu mobile` spelled out.** A later run rebuilt the header from the prototype and lost the mobile menu.
 - **Screenshots.** [Pattern validation]({% post_url 2026-10-30-bedrock-wp-cli-yml-and-pattern-validate-block-pattern-files %}) passes on a page that looks nothing like the source. Only a side-by-side comparison at both widths tells you whether the conversion worked.
+- **Large screenshots need slicing and scaling.** A full-page screenshot is about 9,000px tall, and a 1440px-wide image did not come through inline in Vibe: the model saw nothing. The `magick` command above cuts it into 1100px-wide tiles the model can read.
 - **"One command per call" and `--user`/`--pass` for sentinel.** One check per call keeps each result readable and keeps the agent from wrapping checks in shell variables or redirects, which always prompt. A bare `npm run validate` prompts for a login and hangs the agent.
 
 The agent reports a table of sections and blocks, the gaps no block covers, and what still differs from `index.html`.
@@ -293,6 +320,20 @@ Load html-to-block-theme. theme-lindeboom/ does not yet match index.html. Do a d
 
 One point per difference makes the result easy to check against the screenshots. Expect one or two of these passes. The same model does the fixes and the before and after comparison.
 
+**Hover states are not in any screenshot.** On the bakery theme every section looked right, and the primary buttons did nothing on hover. The design darkens the cream button from `#efe1c3` to `#e3d2ac`; the theme kept it cream. The cause was one level of nesting in `theme.json`:
+
+```json
+":hover": { "background": "#E3D2AC" }
+```
+
+That is valid JSON, and WordPress ignores it. Colours go under `color`, also inside `:hover`:
+
+```json
+":hover": { "color": { "background": "var(--wp--preset--color--primary-accent)" } }
+```
+
+The generated CSS showed it straight away: `.wp-block-button__link:hover{color: …}` and no `background-color`. So the design pass now compares hover and focus rules from the CSS, element by element: `grep -n -e ':hover' -e ':focus' index.html` for the prototype, the `curl … | grep -o ':hover[^}]*}'` above for what `theme.json` produced, and the same grep on the theme's `style.css` for the design layer. A `theme.json` hover that is missing from the curl output did not apply. Hover over one button by hand at the end; that takes seconds and is the only real check of the result.
+
 ## What I would tell myself before the first run
 
 - **Start every stage in a fresh session.** The prompts are written to stand alone, and a long session drifts.
@@ -300,6 +341,8 @@ One point per difference makes the result easy to check against the screenshots.
 - **"All checks pass" is not done.** Ask for the screenshots.
 - **One model that can see, for every stage.** In Vibe, a model only gets images when its entry in `~/.vibe/config.toml` has `supports_images = true`, whatever the model itself can do. Without it, an agent that "checked" a screenshot or a photo did not. Test it once: ask the agent to describe one of your photos.
 - **Never trust a phone screenshot from a narrow headless window.** Headless Chrome on macOS stops at 500px; use an iframe at the exact width.
+- **Screenshots don't show hover or focus.** Compare those rules from the CSS, and hover over one button yourself.
+- **When the agent improvises, the skill is missing a command.** Each prompt for a loop, a heredoc or `python3` pointed at a step no skill had named. Name the command in the skill rather than allowing the interpreter.
 - **Grant the folders before the first run, not one prompt at a time.** `~/code`, the Valet sites folder and `/private/tmp` cover almost every prompt in this workflow. `--smart-approve` won't do it for a custom agent.
 - **Check the starter and the plugin after each run.** `git status` in both, so a fork that ran a tool in the wrong folder does not leave logs in your starter theme.
 
