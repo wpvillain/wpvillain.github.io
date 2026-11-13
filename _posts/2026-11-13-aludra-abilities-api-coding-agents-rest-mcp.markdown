@@ -108,6 +108,69 @@ OpenCode, running Moonshot's Kimi K2.7 Code, synced the plugin to the demo site,
 
 Mistral Vibe did the same on its own and went a step further on verification. It fetched the page back through `/wp/v2/pages` to confirm that the new copy and link were there, that the `is-aludra-scheme-tint` and `is-style-light` classes were applied, and that none of the original strings remained. `compose-page` returned no warnings, and it confirmed afterwards that the test page and application password were gone.
 
+### The test loop on Trellis
+
+All three agents followed the same loop against a local [Trellis](https://roots.io/trellis/) VM running Bedrock. Here it is with my paths swapped for placeholders, so you can run it yourself. `example.com` is the Trellis site key and `example.test` its dev host; on a multisite, point `--url` at the subsite.
+
+**1. Sync the plugin to the site.** Test the working copy, not a release. I use `rsync-package-to-site` from [wp-ops](https://github.com/imagewize/wp-ops), which copies the same files a release zip would contain:
+
+```bash
+export SITE_ROOT=~/code/example.com/site/web/app
+wp-ops rsync-package-to-site plugin aludra ~/code/aludra
+```
+
+**2. Create a temporary application password** inside the VM:
+
+```bash
+cd ~/code/example.com/trellis
+trellis vm shell --workdir /srv/www/example.com/current \
+  -- wp user application-password create agent abilities-test --porcelain \
+  --url=http://example.test/
+```
+
+**3. Call the abilities.** Check first that an anonymous call is refused:
+
+```bash
+export WP='http://example.test/wp-json/wp-abilities/v1/abilities'
+export AUTH='agent:<app-password>'
+
+curl -s -o /dev/null -w '%{http_code}\n' "$WP/aludra/list-patterns/run"   # 401
+curl -su "$AUTH" "$WP/aludra/list-patterns/run?input%5Bkind%5D=section"
+curl -su "$AUTH" "$WP/aludra/get-pattern/run?input%5Bslug%5D=aludra/section-about"
+curl -su "$AUTH" "$WP/aludra/list-blocks/run"
+
+curl -su "$AUTH" -X POST "$WP/aludra/compose-page/run" \
+  -H 'Content-Type: application/json' --data @payload.json
+# → {"page_id":942,"status":"draft","edit_url":"...","link":"...","warnings":[]}
+
+curl -su "$AUTH" "$WP/aludra/check-page/run?input%5Bpage_id%5D=942"
+# → {"page_id":942,"blocks":14,"ok":true,"issues":[]}
+```
+
+`payload.json` holds the same `{"input": {...}}` body as the `compose-page` example above. Keeping it in a file saves you from escaping apostrophes in the copy inside a shell string.
+
+**4. Check the round trip.** If parsing and re-serializing the saved content gives back the same bytes, the markup survived intact:
+
+```bash
+trellis vm shell --workdir /srv/www/example.com/current -- wp eval '
+$content = get_post( 942 )->post_content;
+echo serialize_blocks( parse_blocks( $content ) ) === $content ? "Match: YES" : "Match: NO";
+' --url=http://example.test/
+```
+
+This doesn't replace opening the page in the editor, but it catches markup that changes shape on its way through the block parser.
+
+**5. Clean up** the test page and the password:
+
+```bash
+trellis vm shell --workdir /srv/www/example.com/current \
+  -- wp post delete 942 --force --url=http://example.test/
+trellis vm shell --workdir /srv/www/example.com/current \
+  -- wp user application-password delete agent <uuid> --url=http://example.test/
+```
+
+One Trellis catch: `trellis vm shell` doesn't pass the command through a shell, so `&&`, pipes and redirects arrive as literal text and fail. Run each command separately, as above, or use `limactl shell <instance> -- bash -c '…'` when you need real chaining.
+
 Three agents from three vendors, and none of them needed to know how an Aludra block serializes. That is the point: the interface is small enough, and the schemas explicit enough, that the choice of model matters much less.
 
 Two catches came up along the way. One is the HTTPS-or-`local` rule for application passwords, covered above. The other is that `check-page` is a structural check only. It can't prove each block matches its `save()` output, because only the block editor can. Pages built purely with `compose-page` stay valid because the pattern markup is never rewritten, but hand-written markup isn't covered.
