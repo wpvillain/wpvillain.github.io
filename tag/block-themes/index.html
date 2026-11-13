@@ -1,0 +1,27 @@
+---
+layout: default
+title: "WordPress Block Theme Tutorials"
+---
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: block-themes</p>
+        <h2>Block Themes</h2>
+      </div>
+      <p class="archive-count">{{ site.tags["block-themes"].size }} case{% unless site.tags["block-themes"].size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">Building and debugging WordPress block themes: theme.json, style variations, patterns, templates and the Site Editor.</p>
+
+    {%- if site.tags["block-themes"].size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags["block-themes"] %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No block theme posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>

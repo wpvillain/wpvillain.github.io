@@ -1,0 +1,27 @@
+---
+layout: default
+title: "WordPress DevOps Tutorials"
+---
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: devops</p>
+        <h2>WordPress DevOps</h2>
+      </div>
+      <p class="archive-count">{{ site.tags["devops"].size }} case{% unless site.tags["devops"].size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">Servers, Ansible, Nginx, deploys and the plumbing behind WordPress sites: provisioning, configuration, monitoring and fixing things when they break.</p>
+
+    {%- if site.tags["devops"].size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags["devops"] %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No DevOps posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>

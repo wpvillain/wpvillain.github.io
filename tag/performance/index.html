@@ -1,0 +1,27 @@
+---
+layout: default
+title: "WordPress Performance Tutorials"
+---
+
+<section class="archive">
+  <div class="wrap">
+    <div class="archive-head">
+      <div>
+        <p class="eyebrow">Filed under: performance</p>
+        <h2>WordPress Performance</h2>
+      </div>
+      <p class="archive-count">{{ site.tags["performance"].size }} case{% unless site.tags["performance"].size == 1 %}s{% endunless %} on file</p>
+    </div>
+    <p class="archive-intro">Making WordPress faster and measuring it: TTFB, caching headers, image formats, autoloaded options and PHP-FPM tuning.</p>
+
+    {%- if site.tags["performance"].size > 0 %}
+    <ul class="case-list">
+      {%- for post in site.tags["performance"] %}
+      <li>{% include case-card.html post=post %}</li>
+      {%- endfor %}
+    </ul>
+    {%- else %}
+    <p class="case-empty">No performance posts yet. Check back soon.</p>
+    {%- endif %}
+  </div>
+</section>
