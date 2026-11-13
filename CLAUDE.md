@@ -30,7 +30,7 @@ The site is automatically built and deployed via GitHub Actions on pushes to the
 - Includes `jekyll-feed` plugin for RSS/Atom feeds
 - Includes `jekyll-seo-tag` plugin for SEO optimization
 - Jekyll version pinned to ~> 4.4.1
-- Custom navigation in `_includes/header.html` includes tag links for WooCommerce and Speed (wordpress-speed-optimization)
+- Custom navigation in `_includes/header.html` links to tag archives in `tag/<name>/index.html`: Trellis, WP-CLI, DevOps, Block Themes, Speed (the `performance` tag) and Security. A new nav item needs its own tag archive page.
 
 ### Content Guidelines
 - Blog posts should be placed in `_posts/` with filename format: `YYYY-MM-DD-title.markdown`
