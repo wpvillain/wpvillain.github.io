@@ -3,7 +3,7 @@ layout: post
 title: "WordPress Mobile Menu Overlay Styling and the Headless Chrome Trap"
 date: 2026-09-23 10:00:00 +0700
 categories: wordpress css devops testing
-tags: [wordpress, gutenberg, block-theme, mobile-menu, overlay, css, headless-chrome, playwright, testing]
+tags: [wordpress, gutenberg, block-themes, mobile-menu, overlay, css, headless-chrome, playwright, testing]
 case_category: devops
 case_status: shipped
 ---

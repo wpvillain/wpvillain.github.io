@@ -3,7 +3,7 @@ layout: post
 title: "Creating WordPress Pages from Block Markup with WP-CLI on Trellis: VM First, Production Second, and the .test URLs That Follow You"
 date: 2026-10-28 23:40:00 +0700
 categories: wordpress wp-cli trellis
-tags: [wordpress, wp-cli, trellis, bedrock, gutenberg, block-patterns, lima, deployment]
+tags: [wordpress, wp-cli, trellis, bedrock, gutenberg, block-patterns, block-themes, lima, deployment]
 case_category: development
 case_status: documented
 ---
