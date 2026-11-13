@@ -11,8 +11,10 @@ case_status: documented
 I build new WordPress block themes in three stages, all in Mistral Vibe with one agent: set up the project, build the design as a single HTML/CSS file, then convert that file into a block theme. Each stage is its own session, started with the same command:
 
 ```bash
-vibe --agent wp-frontend-builder --smart-approve
+vibe --agent wp-frontend-builder
 ```
+
+*Updated November 13, 2026: the first version of this post started every stage with `--smart-approve`. That flag does nothing next to a custom agent, so the bakery runs kept stopping for approval on paths outside the project: `/tmp` screenshots, `~/code/aludra`, `~/code/aviendha`, the local site's WordPress files. The fix is a few lines in `~/.vibe/config.toml`, now under [Fewer approval prompts](#fewer-approval-prompts).*
 
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts.
 
@@ -54,7 +56,58 @@ Then copy the agent profiles to where Vibe looks for them, and repeat this after
 rsync -a ~/code/wp-vibe-toolbox/agents/ ~/.vibe/agents/
 ```
 
-`--agent` replaces Vibe's default agent, so a `default_agent = "smart-approve"` in your config no longer applies. That is why every command in this post passes `--smart-approve` again: it classifies each tool call and only asks for approval on the risky ones.
+### Fewer approval prompts
+
+`--agent` replaces Vibe's default agent, so a `default_agent = "smart-approve"` in your config no longer applies. Adding `--smart-approve` does not bring it back either. Smart approve is an agent of its own: Vibe runs its classifier only while the active agent is `smart-approve`, so `vibe --agent wp-frontend-builder --smart-approve` runs the builder with ordinary prompts (checked with Vibe 3.1.2). The toolbox agents need an allowlist instead.
+
+Most prompts in the bakery runs did not come from risky commands. They came from paths. A command that names a path outside the working directory prompts for that path even when the command itself is allowed, and this workflow lives outside the project folder all the time:
+
+- screenshots go to `/tmp` and are read back for every visual check
+- the conversion forks `~/code/aviendha` and copies block markup from `~/code/aludra/patterns/`
+- the review loads `probe.html` and `frame.html` from the toolbox folder
+- the agent greps the local site's WordPress core and plugin files
+
+Grant those folders once in `~/.vibe/config.toml`, in both the shell and the `read_file` allowlist, with absolute paths, and allow the handful of commands that kept prompting after that:
+
+```toml
+[tools.bash]
+allowlist = [
+    "vibe-path:directory_recursive:/Users/you/code",
+    "vibe-path:directory_recursive:/Users/you/.config/valet/Sites",
+    "vibe-path:directory_recursive:/Users/you/Desktop",
+    "vibe-path:directory_recursive:/private/tmp",
+    "sed -n",
+    "\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless=new",
+    "wp option get",
+    "wp option list",
+    "wp post list",
+    "wp post get",
+    "wp plugin list",
+    "wp theme list",
+    "wp --info",
+    # … plus the read-only basics: ls, cat, grep, head, git status, git diff, …
+]
+
+[tools.read_file]
+allowlist = [
+    "vibe-path:directory_recursive:/Users/you/code",
+    "vibe-path:directory_recursive:/Users/you/.config/valet/Sites",
+    "vibe-path:directory_recursive:/Users/you/Desktop",
+    "vibe-path:directory_recursive:/private/tmp",
+]
+```
+
+What each part is for, and what to watch:
+
+- **`/private/tmp`, not `/tmp`.** On macOS `/tmp` is a link to `/private/tmp`, and Vibe resolves links before it compares, so the grant has to name `/private/tmp`. It then covers `/tmp/…` too. An older `"/private/tmp/*"` entry covers the files but not the folder, so `cd /tmp` still prompts. On Linux, grant `/tmp`.
+- **A grant only clears the path check.** The command still needs its own entry, and once allowed it can do anything it can do in that folder. So allow `sed -n`, never `sed`, or `sed -i` edits any file under `~/code` without asking. The same goes for `magick`: it crops screenshots, but it also writes its output without asking. I leave it off and approve each crop.
+- **Chrome only with `--headless=new` first.** Vibe matches the start of the command, quotes included. A design pass takes a few dozen screenshots, one per width, and that entry covers exactly the way the toolbox writes them. Chrome with a remote-debugging port first still prompts.
+- **Read-only wp-cli only.** `wp post update`, `wp option update`, `wp eval` and `wp db` keep prompting, which is what you want.
+- **Chains are fine, variables and redirects are not.** Vibe 3.1.2 splits a command on `|`, `;` and `&&` and checks each part, so `grep … | head -5` passes when both are allowed. `$X`, `$(…)` and `>` always prompt, and so does `echo ===`, which Vibe reads as shell syntax. `echo ---` passes, so the agent now separates outputs with that.
+
+For one session, `vibe --add-dir ~/code/aludra` makes a folder part of the working directory instead. A project's own `.vibe/config.toml` allowlist *replaces* the global one, so copy the basics into it if you use one. The full list is in the toolbox's [install notes](https://github.com/imagewize/wp-vibe-toolbox/blob/main/docs/install.md).
+
+With this in place, `--auto-approve` (`--yolo`) is not needed, and I would keep it for throwaway sites only.
 
 ## Stage 0: set up the project
 
@@ -62,7 +115,7 @@ Start the agent in `~/code`, where the project folder will be created, and paste
 
 ```bash
 cd ~/code
-vibe --agent wp-frontend-builder --smart-approve
+vibe --agent wp-frontend-builder
 ```
 
 ```
@@ -169,7 +222,7 @@ The second agent reviews the page and writes numbered notes. This stage is a loo
 
 ```bash
 cd ~/code/bakery-demo
-vibe --agent ux-designer --smart-approve
+vibe --agent ux-designer
 ```
 
 ```
@@ -180,7 +233,7 @@ vibe --agent ux-designer --smart-approve
 Load html-page-review and review index.html against the brief in README.md.
 ```
 
-Vibe will ask for permission to read the skill's `probe.html` and `frame.html`, because they live in the toolbox folder, outside the project. They are your own files and it only reads and runs them: "Allow for remainder of this session" is fine.
+The skill's `probe.html` and `frame.html` live in the toolbox folder, outside the project. With the `~/code` and `/private/tmp` grants from [Fewer approval prompts](#fewer-approval-prompts) the review runs without stopping; without them, Vibe asks for each file and each screenshot. They are your own files and it only reads and runs them, so "Allow for remainder of this session" is fine.
 
 A good review run measures the page with the probe at 390, 768 and 1440px, takes one screenshot per width through `frame.html`, says "Visual pass: done", and writes notes with a width and a concrete fix each. "Visual pass: not done" means the model could not see the screenshots: switch model and run it again. If it calls Chrome with `--window-size=390` directly, stop it; that is the 500px trap again.
 
@@ -218,7 +271,7 @@ What each part prevents, from the [architect-demo runs](https://github.com/image
 - **The design layer in the same run.** The second conversion used Aludra throughout and passed every check, and still looked like the starter theme: orange pill buttons, shadows, dark bands. Only the palette had been ported. Variations first, then `theme.json`, then CSS fixes that, in order of cost.
 - **`overlayMenu mobile` spelled out.** A later run rebuilt the header from the prototype and lost the mobile menu.
 - **Screenshots.** [Pattern validation]({% post_url 2026-10-30-bedrock-wp-cli-yml-and-pattern-validate-block-pattern-files %}) passes on a page that looks nothing like the source. Only a side-by-side comparison at both widths tells you whether the conversion worked.
-- **"One command per call" and `--user`/`--pass` for sentinel.** Vibe asks for approval on chained commands even when each part is allowed, and a bare `npm run validate` prompts for a login and hangs the agent.
+- **"One command per call" and `--user`/`--pass` for sentinel.** One check per call keeps each result readable and keeps the agent from wrapping checks in shell variables or redirects, which always prompt. A bare `npm run validate` prompts for a login and hangs the agent.
 
 The agent reports a table of sections and blocks, the gaps no block covers, and what still differs from `index.html`.
 
@@ -247,6 +300,7 @@ One point per difference makes the result easy to check against the screenshots.
 - **"All checks pass" is not done.** Ask for the screenshots.
 - **One model that can see, for every stage.** In Vibe, a model only gets images when its entry in `~/.vibe/config.toml` has `supports_images = true`, whatever the model itself can do. Without it, an agent that "checked" a screenshot or a photo did not. Test it once: ask the agent to describe one of your photos.
 - **Never trust a phone screenshot from a narrow headless window.** Headless Chrome on macOS stops at 500px; use an iframe at the exact width.
+- **Grant the folders before the first run, not one prompt at a time.** `~/code`, the Valet sites folder and `/private/tmp` cover almost every prompt in this workflow. `--smart-approve` won't do it for a custom agent.
 - **Check the starter and the plugin after each run.** `git status` in both, so a fork that ran a tool in the wrong folder does not leave logs in your starter theme.
 
 The agent, the skills and the prompt templates are public in [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox); the prompts for each stage are also in its [agents README](https://github.com/imagewize/wp-vibe-toolbox/blob/main/agents/README.md#running-the-agents). The full run log, including the block theme it produced, is in [architect-demo](https://github.com/imagewize/architect-demo). For which Mistral model to use for which of these stages, see [my model routing post]({% post_url 2026-11-06-mistral-vibe-model-routing-block-theme-patterns-elayne %}).
