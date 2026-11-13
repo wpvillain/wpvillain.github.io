@@ -1,6 +1,7 @@
 ---
 layout: post
-title: "Debugging PHP-FPM Memory Exhaustion on WordPress with WooCommerce and Trellis"
+title: "PHP-FPM Memory Exhaustion on WooCommerce: 5 Causes and Fixes"
+description: "WooCommerce on Trellis kept throwing critical errors. The 5 causes: a 40M memory limit, PHP-FPM worker bloat, Action Scheduler, autoload bloat and XMLRPC."
 date: 2025-11-24 10:00:00 +0700
 categories: wordpress php-fpm trellis woocommerce performance
 tags: [wordpress, php, php-fpm, memory, woocommerce, trellis, nginx, debugging, performance, server]
