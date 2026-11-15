@@ -102,7 +102,7 @@ Bigger cleanups went into a `.sql` file first, so the statements could be read b
 
 About 85 calls. `wp eval` runs PHP inside a loaded WordPress, which answers questions no command covers:
 
-- **Does mail work after a provision?** `wp eval 'var_dump( wp_mail( "you@example.com", "Mail test", "ok" ) );'` after a Trellis upgrade, once on development and once on production.
+- **Does mail work after an msmtp upgrade?** `wp eval` with a `wp_mail()` call after upgrading msmtp on a Trellis server, once on development and once on production. A bare `var_dump( wp_mail( … ) )` only says whether mail was handed off; [testing mail for real](#testing-mail-for-real) below shows a version that also reports why a send failed.
 - **What does a plugin function return for this theme?** Call it directly and echo the result, on each multisite subsite in turn with `--url`.
 - **What is in the global styles?** Read the user global styles post through `WP_Theme_JSON_Resolver::get_user_global_styles_post_id()` and decode its JSON.
 
@@ -137,6 +137,54 @@ About 100 calls, almost all reads. What is installed and active before and after
 `wp cache flush` after direct database writes (about 20). `wp media import` to upload a featured image. `wp post update --post_status=draft` and back to `publish` to test a page while it was offline. `wp config get` and `wp db export`/`import` around migrations. `wp i18n make-pot` locally, to rebuild a plugin's `.pot` file. A handful of `wp user`, `wp menu` and `wc` calls.
 
 Two flags appear on nearly every command above: `--path=web/wp`, because Bedrock keeps WordPress in `web/wp` (or a [`wp-cli.yml`](/bedrock-wp-cli-yml-and-pattern-validate-block-pattern-files/) that sets it), and `--url=` on multisite, because without it WP-CLI acts on the main site.
+
+## Testing mail for real
+
+`wp_mail()` returns `true` when PHPMailer accepted the message, not when it arrived. So a bare `var_dump( wp_mail( … ) )` proves less than it looks like it does. A better test captures the failure reason and then checks where the message ended up.
+
+On a Trellis server, PHP hands mail to `msmtp`, which relays through the SMTP server set in `group_vars/all/mail.yml`:
+
+```yaml
+mail_smtp_server: smtp-relay.example.com:587
+mail_hostname: example.com
+mail_user: smtp_user
+mail_password: "{% raw %}{{ vault_mail_password }}{% endraw %}"
+```
+
+On development the same setting points at Mailpit instead, in `group_vars/development/mail.yml`, so nothing leaves the VM:
+
+```yaml
+php_sendmail_path: "{% raw %}{{ mailpit_install_dir }}{% endraw %}/mailpit sendmail"
+```
+
+Trellis writes that `sendmail_path` into both the php-fpm and the php-cli `php.ini`, so a `wp eval` test takes the same route as a page request, unless a plugin overrides mail with its own SMTP settings. That is worth checking before trusting the test: `wp plugin list --status=active` and look for an SMTP or mail plugin.
+
+Send a message and print the error if it fails:
+
+```bash
+ssh web@example.com 'cd /srv/www/example.com/current && wp eval '"'"'
+add_action( "wp_mail_failed", function ( $e ) { echo "FAILED: ", $e->get_error_message(), "\n"; } );
+var_dump( wp_mail( "you@example.com", "Mail test from " . home_url(), "Sent " . gmdate( "c" ) ) );
+'"'"' --path=web/wp'
+```
+
+This sends a real email, so it is a write in the sense that matters: send it to an inbox you own, and do it on purpose. On development, run it through `trellis vm shell --workdir /srv/www/example.com/current -- wp eval …` and read the result in Mailpit.
+
+Then check three things:
+
+- **The relay's log.** Your SMTP provider's dashboard shows delivered, deferred or blocked. `msmtp` only knows the relay accepted the message, so this is the best proof.
+- **The headers of the received message.** `Authentication-Results` should show `spf=pass`, `dkim=pass` and `dmarc=pass` for your domain. A message that arrives in spam with a failing line is the usual real problem, and the fix is a DNS record at the provider, not WordPress.
+- **The sender address.** Some relays reject or rewrite a `From` address they have not verified. `wp_mail()` defaults to `wordpress@` plus the site's host, so a failing test with `FAILED:` output often comes down to that address.
+
+Check the DNS records from the same terminal:
+
+```bash
+dig +short TXT example.com | grep -i spf
+dig +short TXT mail._domainkey.example.com
+dig +short TXT _dmarc.example.com
+```
+
+The DKIM selector (`mail` above) is whatever your provider tells you to publish.
 
 ## What this means for wp-ops
 
