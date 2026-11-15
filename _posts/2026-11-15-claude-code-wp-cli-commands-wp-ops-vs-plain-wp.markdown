@@ -140,7 +140,7 @@ Two flags appear on nearly every command above: `--path=web/wp`, because Bedrock
 
 ## What this means for wp-ops
 
-Remote WP-CLI is something many MCP servers already offer, and plain `ssh` does the same job. The count shows it: wp-ops' `wp_cli` tool was mostly a shortcut for reads and single meta writes on production, used because I had told the agent to, and on development it was skipped in favour of `trellis vm shell`. `wp` on its own is a fine tool. The tool stays for now, with its read-only check fixed so reads go through.
+Remote WP-CLI is something many MCP servers already offer, and plain `ssh` does the same job. The count shows it: wp-ops' `wp_cli` tool was mostly a shortcut for reads and single meta writes on production, used because I had told the agent to, and on development it was skipped in favour of `trellis vm shell`. `wp` on its own is a fine tool. So I removed the tool in wp-ops 5.47.0. Plain `wp` replaces it, and the rule it enforced stays: I approve any `wp` command that writes or reads credentials before it runs, whether it goes through `ssh` or `trellis vm shell`, and reads and `--dry-run` previews need no approval.
 
 The parts that nothing else does are the ones tied to Trellis: pulling and pushing a database with the URLs rewritten and a backup first ([refreshing local WordPress from production](/refresh-local-wordpress-from-production-wp-ops/)), publishing a post and verifying that its blocks, JSON-LD and links survive the live render, and syncing a theme to a demo site. Those are what wp-ops now leads with. The generic tools stay, labelled as generic.
 
