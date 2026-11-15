@@ -98,6 +98,39 @@ wp db query "SELECT COUNT(*) FROM wp_posts WHERE post_content LIKE '%.test%'" --
 
 Bigger cleanups went into a `.sql` file first, so the statements could be read before they ran, and were followed by `wp cache flush`.
 
+The shapes those questions took, with `example.com` standing in for the real site:
+
+```bash
+# Which plugin leftovers are still in the options table? Escape the underscores:
+# in LIKE, an unescaped _ matches any single character.
+wp db query "SELECT option_name FROM wp_options WHERE option_name LIKE '\\_yoast\\_wpseo\\_%'" \
+  --skip-column-names --path=web/wp
+
+# How much post meta do they hold? Count before deleting anything.
+wp db query "SELECT COUNT(*) FROM wp_postmeta WHERE meta_key LIKE '\\_imagify\\_%'" \
+  --skip-column-names --path=web/wp
+
+# Is a removed plugin's table still there?
+wp db query "SHOW TABLES LIKE '%gf%'" --skip-column-names --path=web/wp
+
+# Published posts on subsite 13 of a multisite network: its own table prefix, no --url needed.
+wp db query "SELECT COUNT(*) FROM wp_13_posts WHERE post_type = 'post' AND post_status = 'publish'" \
+  --skip-column-names --path=web/wp
+```
+
+A cleanup that deletes rows goes in a file, gets read, and runs with a database export taken first:
+
+```bash
+wp db export before-cleanup.sql --path=web/wp
+cat cleanup.sql
+# DELETE FROM wp_postmeta WHERE meta_key LIKE '\_imagify\_%';
+# DELETE FROM wp_options WHERE option_name LIKE '\_transient\_%';
+wp db query < cleanup.sql --path=web/wp
+wp cache flush --path=web/wp
+```
+
+`wp db query` runs whatever SQL it is given, `DELETE` included, so it is a write whenever the statement is not a `SELECT` or `SHOW`.
+
 ### One line of PHP: `wp eval`
 
 About 85 calls. `wp eval` runs PHP inside a loaded WordPress, which answers questions no command covers:
@@ -112,6 +145,29 @@ More than half of the `eval` calls through the MCP tool read global styles or ap
 
 About 25 calls. Once an `eval` one-liner grew past a few statements, it moved into a file, such as a script that syncs a theme's palette into the saved global styles. One snag: `wp eval-file script.php --apply` fails, because WP-CLI rejects flags it does not know for `eval-file`. Pass `apply` as a plain positional argument instead, and read it from `$args` in the script.
 
+```bash
+# Without the argument the script only reports what it would change.
+wp eval-file sync-palette.php --path=web/wp
+wp eval-file sync-palette.php apply --path=web/wp
+```
+
+```php
+<?php
+// sync-palette.php
+$apply = in_array( 'apply', $args, true );
+
+// ... compare the theme palette with the saved one, collect the differences ...
+
+if ( ! $apply ) {
+    WP_CLI::log( 'Dry run. Pass "apply" to save.' );
+    return;
+}
+// ... write the saved global styles ...
+WP_CLI::success( 'Palette synced.' );
+```
+
+A script that previews first and writes only when told to is the same dry-run habit as `search-replace`, built by hand.
+
 ### Settings: `wp option get`, `option update`, `option patch`
 
 About 60 calls. `page_on_front` to confirm which page is the front page, SEO plugin settings, WooCommerce feature switches. `option patch` changes one key inside a serialized option array without rewriting the whole option, which is what you want for a plugin's settings array. `admin_email_lifespan` set into the future stops the "is this admin email still correct" screen on a demo site. The [autoloaded options post](/wordpress-site-health-autoloaded-options-wp-cli/) covers `option set-autoload`, which came up three times.
@@ -125,6 +181,35 @@ wp search-replace 'demo.example.test' 'demo.example.com' 'wp_21_*' \
   --all-tables-with-prefix --precise --dry-run --report-changed-only \
   --url=https://demo.example.com/subsite/ --path=web/wp
 ```
+
+Run it for real by dropping `--dry-run`, then check the rows it should have changed are gone:
+
+```bash
+wp search-replace 'demo.example.test' 'demo.example.com' 'wp_21_*' \
+  --all-tables-with-prefix --precise --report-changed-only \
+  --url=https://demo.example.com/subsite/ --path=web/wp
+
+wp db query "SELECT COUNT(*) FROM wp_21_posts WHERE post_content LIKE '%demo.example.test%'" \
+  --skip-column-names --path=web/wp
+```
+
+The same habit for the other jobs it was used for:
+
+```bash
+# http to https on a whole single site; leave guid alone, it is a permanent identifier
+wp search-replace 'http://example.com' 'https://example.com' \
+  --all-tables --precise --skip-columns=guid --dry-run --path=web/wp
+
+# a whole network after a domain change
+wp search-replace 'example.test' 'example.com' \
+  --network --precise --report-changed-only --dry-run --path=web/wp
+
+# write a rewritten dump instead of touching the database, for a push to another server
+wp search-replace 'example.test' 'example.com' --all-tables --precise \
+  --export=example-for-production.sql --path=web/wp
+```
+
+`--precise` matters on these sites because block markup and plugin settings are serialized, and the faster default replacement can break the string lengths in them. A dry run that reports zero changes on a table you expected to change usually means the table prefix pattern or `--url` is wrong.
 
 The table pattern limits it to one multisite subsite. The full story of search-replace on Bedrock is in [changing a WordPress domain with wp search-replace](/wp-search-replace-wordpress-url-domain-https-bedrock-paths/).
 
