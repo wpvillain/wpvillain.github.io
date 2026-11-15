@@ -34,6 +34,16 @@ On production the MCP tool was used about three times as often as plain `ssh …
 
 The other wp-ops tools were used far less: `publish_post` 46, `ssh_command` 29, `verify_post` 24, `db_backup` 23, `scp_file` 16. The audits, scanners and monitors together came to about 20 of the 557 MCP calls.
 
+## Why the tool got used at all
+
+My first guess was that Claude Code reached for the MCP tool because plain `wp` over `ssh` kept getting blocked. The transcripts say otherwise. Refusals were rare on both routes: 5 of about 150 `ssh … wp` calls (3 by Claude Code's auto mode safety check, 2 by me), 2 of about 220 `trellis vm shell` calls, and 6 `wp_cli` calls, about the same rate. After a refused `ssh` call, Claude Code switched to the MCP tool exactly once.
+
+The real reason was my own instructions. Every project where the tool was used had a line in its `CLAUDE.md` or `AGENTS.md` saying to prefer the wp-ops `wp_cli` tool over raw `ssh` and `wp`. The plugin and theme repos that only documented `trellis vm shell -- wp` got plain `wp`, every time. The agent did what the project file said.
+
+The tool also had friction of its own. Its read-only check, which lets reads through and asks for confirmation on writes, refused 35 calls. Some were real writes, as intended. But 20 were reads: `wp db query "SELECT …"` (SQL can write, so `db query` always asks), a read with `--url=` placed before the command (which threw off the check), and `wp wc product list`. Another 17 calls failed because the command went in as one string instead of a list of words.
+
+So I changed the project files: plain `wp` is fine, and the `wp_cli` tool is optional.
+
 ## Why plain wp won on development
 
 My development sites run in a Lima VM that Trellis manages, so a `wp` on the Mac sees no database at all. Every development command has to go through the VM:
@@ -49,7 +59,7 @@ That works fine on its own, and it does more than the MCP tool can, because the 
 - **A check outside WordPress**: run `wp post update`, then `curl` the page and grep the rendered HTML.
 - **A file as input**: SQL from a file for `wp db query`, or a PHP script for `wp eval-file`.
 
-On production the trade-off flips. The MCP tool saves the SSH string, the site path and the `--path=web/wp`, and a single read like `wp post get 4621 --field=post_content` needs nothing else. When a production job needed a pipe or a file, Claude Code went back to `ssh`.
+On production the MCP tool saves the SSH string, the site path and the `--path=web/wp`, and a single read like `wp post get 4621 --field=post_content` needs nothing else. But that saving is small, and it only won there because the project files said to use it. When a production job needed a pipe or a file, Claude Code went back to `ssh` anyway.
 
 ## The commands, and what they were for
 
@@ -130,8 +140,8 @@ Two flags appear on nearly every command above: `--path=web/wp`, because Bedrock
 
 ## What this means for wp-ops
 
-Remote WP-CLI is something many MCP servers already offer, and plain `ssh` does the same job. The count shows it: wp-ops' `wp_cli` tool was mostly a shortcut for reads and single meta writes on production, and on development it was skipped in favour of `trellis vm shell`.
+Remote WP-CLI is something many MCP servers already offer, and plain `ssh` does the same job. The count shows it: wp-ops' `wp_cli` tool was mostly a shortcut for reads and single meta writes on production, used because I had told the agent to, and on development it was skipped in favour of `trellis vm shell`. `wp` on its own is a fine tool. The tool stays for now, with its read-only check fixed so reads go through.
 
 The parts that nothing else does are the ones tied to Trellis: pulling and pushing a database with the URLs rewritten and a backup first ([refreshing local WordPress from production](/refresh-local-wordpress-from-production-wp-ops/)), publishing a post and verifying that its blocks, JSON-LD and links survive the live render, and syncing a theme to a demo site. Those are what wp-ops now leads with. The generic tools stay, labelled as generic.
 
-If you use Claude Code with WordPress, the transcripts are worth a count of your own. What I thought my agent did and what it actually ran were not the same.
+If you use Claude Code with WordPress, the transcripts are worth a count of your own, and so is your `CLAUDE.md`. What I thought my agent did and what it actually ran were not the same, and the difference came from a line I wrote months ago.
