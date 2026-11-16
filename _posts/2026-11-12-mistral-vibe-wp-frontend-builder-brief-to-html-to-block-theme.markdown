@@ -18,6 +18,8 @@ vibe --agent wp-frontend-builder
 
 *Updated again the same day, after the bakery design pass: the prompts left over came from shell syntax, not paths, and the fix for those is in the skills, not the config. Also new: screenshots too large for Vibe to show the model, and hover states, which no screenshot shows. See [What still prompts](#what-still-prompts) and [Stage 4](#stage-4-the-design-pass).*
 
+*Updated November 16, 2026: Mistral Vibe was renamed **Windfinder** today, and the skills package `wp-vibe-toolbox` is now [windfinder](https://github.com/imagewize/windfinder) (v1.22.0). Everything below was written before the rename — read "Vibe" as Windfinder and `wp-vibe-toolbox` as windfinder.*
+
 The agent and the skills it loads come from my public [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox). This post walks through the stages, the prompt for each, and the mistakes that shaped those prompts. The project's `PROMPTS.md` counts six steps, 0 to 5, because it gives applying the review notes its own number; here review and fix share stage 2.
 
 **What is and is not tested:** the HTML-to-block-theme stages ran end to end on [architect-demo](https://github.com/imagewize/architect-demo), an architecture studio site I built as a test case, over about fifteen runs. Its [`PROMPTS.md`](https://github.com/imagewize/architect-demo/blob/main/PROMPTS.md) records every prompt and what went wrong; the lessons from it are in the skills. The set-up skill (`demo-project-setup`) is new: I wrote it today, after doing the same set-up by hand for a model agency demo. Its first real run, the bakery example below, already changed the order of stage 0 and taught it to look at the photos instead of trusting their shape.
