@@ -2,7 +2,7 @@
 layout: post
 title: "My ~/.vibe/config.toml After Months of Daily Vibe: The Scratchpad Allowlist Fix and Every Default I Changed"
 seo_title: "Mistral Vibe config.toml: scratchpad allowlist + permission setup"
-description: "Vibe prompted on every shell command that touched my scratchpad, so I found where the scratchpad really lives, allowlisted it with vibe-path entries, and diffed my whole config.toml against Mistral's configuration reference."
+description: "Vibe prompted on every shell command that touched my scratchpad, so I found where the scratchpad really lives, allowlisted it with vibe-path entries, diffed my whole config.toml against Mistral's configuration reference, and raised the read/write byte caps after an 80 KB single-file HTML sheet refused the 64 KB write limit."
 date: 2026-11-16 09:00:00 +0700
 categories: vibe ai devops
 tags: [vibe, mistral, ai, ai-agents, config, permissions, allowlist, scratchpad, cli, smart-approve, mcp]
@@ -81,12 +81,30 @@ denylist = [
     "**/.env.test", "**/*.pem", "**/id_rsa*", "**/.ssh/**", "**/.aws/**", "**/.kube/**",
     "**/*credentials*", "**/*secret*", "**/*apikey*", "**/*api-key*",
 ]
-max_read_bytes = 64000
+max_read_bytes = 200000
 ```
 - `bash` is `permission = "ask"`, with an allowlist of about seventy command *prefixes*. The reference notes the allowlist replaces the default list, so mine re-adds the read-only defaults explicitly (`ls`, `cat`, `grep`, `git status`, `git diff`, `gh pr view`, ...) plus the commands my workflow actually uses (`wp option get`, `wp plugin list`, `npx phpcs`, `vendor/bin/phpcs`, `php -l`, `jq`, `node …/measure.mjs`, `python3 -m http.server 8765`).
 - The `denylist` blocks the things I never want auto-approved: `sudo`, `rm -rf` and its flag permutations, `git push --force` / `-f`, `git reset --hard`, `git clean -fd`, `git branch -D`, `sed -i`, `dd if=`, `chmod -R`, `shutdown`, `reboot`, interactive shells (`bash -i`, `tmux`, `screen`) and editors (`vim`, `nano`, `emacs`).
 - `denylist_standalone` closes the sidestep: bare `python`, `python3`, `bash`, `sh`, `nohup`, `su` are refused as standalone commands, so the agent can't route around the allowlist with `python3 -c`; it has to use an allowlisted wrapper (`jq` for JSON, `php -l` for lint only). That lesson came out of the bakery demo build — see [that post]({% post_url 2026-11-13-mistral-vibe-large-4-bakery-demo-block-theme-lessons %}), lesson 5.
-- `[tools.bash]` also sets `default_timeout = 120` (six chained `magick` slices once got killed at the 30s default) and `max_output_bytes = 16000`; `[tools.grep]` has `exclude_patterns` for `node_modules/`, `.git/`, `dist/` and friends plus `codeignore_file = ".vibeignore"`; `[tools.write_file]` sets `create_parent_dirs = true`.
+- `[tools.bash]` also sets `default_timeout = 120` (six chained `magick` slices once got killed at the 30s default) and `max_output_bytes = 16000`; `[tools.grep]` has `exclude_patterns` for `node_modules/`, `.git/`, `dist/` and friends plus `codeignore_file = ".vibeignore"`; `[tools.write_file]` sets `create_parent_dirs = true` and `max_write_bytes = 200000` (more on that next).
+
+## The 64 KB caps, and the 80 KB sheet that ran into them
+
+The single-file exercise sheets I build for the Cambridge practice site are deliberately self-contained — inline CSS, inline JS, no build step — so one HTML file lands around **80 KB** the moment the sheet has five or six sections. `write_file` refused it outright: `Content exceeds 64000 bytes limit`. That limit is not a sandbox law, it is a per-tool setting in my own `config.toml` — `max_write_bytes = 64000` under `[tools.write_file]`, with a matching `max_read_bytes = 64000` under `[tools.read_file]` (so reading the finished 80 KB sheet back would have truncated at 64 KB too).
+
+The fallback I used before touching the config is worth knowing: `bash` heredocs. Write the head with `cat >`, append the rest in ~20 KB `cat >>` chunks (quoted `<<'EOF'` so nothing expands), then verify with `wc -c` and `tail`. It works from any session, managed or not — but it is a workaround you should not need on your own machine, and splitting an 80 KB hand-authored file into chunks is exactly where content gets lost.
+
+So the two lines I changed, after the usual `config.toml.bak`:
+
+```toml
+[tools.write_file]
+max_write_bytes = 200000
+
+[tools.read_file]
+max_read_bytes = 200000
+```
+
+200 KB covers any single-file artifact in these projects with headroom to spare; if I ever hand the agent a monorepo lockfile to write whole, the number goes up again. Same as the allowlist changes above, `/reload` applies it — no restart needed — but the sheet I was already building that session still went out in heredoc chunks, because the write happened before the config change.
 
 ## Agent, classifier model, and the model presets
 

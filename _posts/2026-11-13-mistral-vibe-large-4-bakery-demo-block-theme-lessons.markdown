@@ -11,6 +11,8 @@ case_status: documented
 
 Bakkerij Lindeboom does not exist. It is a demo site, like my earlier [architect demo](https://github.com/imagewize/architect-demo): an invented family bakery in Utrecht with a written brief, built to test my workflow on something other than an architecture studio. I gave it to a European agent and a European model, Mistral Vibe running Mistral Large 4, and let it go from the brief to an HTML/CSS prototype and then to a WordPress block theme built on Aviendha and Aludra. After two days the homepage matches the prototype to the pixel on most of what I measured, the order form still has a bug, and the rest of the site does not exist yet. Along the way, 22 pull requests went into the [wp-vibe-toolbox](https://github.com/imagewize/wp-vibe-toolbox), version 1.17 to 1.21.
 
+*Note, November 16, 2026: this draft was written before the Mistral Vibe → Windfinder rename. "Vibe" below is Windfinder, and the toolbox is now [windfinder](https://github.com/imagewize/windfinder).*
+
 This post is about those pull requests: what the run broke, and what I changed so the next run doesn't. How the stages work, with the prompt for each, is in [the earlier post]({% post_url 2026-11-12-mistral-vibe-wp-frontend-builder-brief-to-html-to-block-theme %}). The whole project is public: [bakery-demo](https://github.com/imagewize/bakery-demo), with every prompt, its result and what I checked afterwards in [`PROMPTS.md`](https://github.com/imagewize/bakery-demo/blob/main/PROMPTS.md).
 
 ## Why a European stack
