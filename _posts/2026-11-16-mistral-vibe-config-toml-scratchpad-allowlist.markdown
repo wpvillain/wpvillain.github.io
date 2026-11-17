@@ -105,6 +105,8 @@ So both keys came back out again (with the usual `config.toml.bak`), and the dur
 
 Reading big files back is the softer problem it first looked like: `read_file` truncates a single call at ~64 KB, but it pages with `offset`/`limit` and hands back the offset to continue from, so the finished 80 KB sheet reads back whole in two calls.
 
+The durable cure turned out not to be config at all — it is teaching the agent the cap exists *before* it hits it. The Cambridge repo's `AGENTS.md` now carries a "Writing Sheets Larger Than 64 KB" section: chunked `cat >` / `cat >>` heredocs of about 20 KB, split only at section boundaries (never inside a question or a `<script>` block), `wc -c` and `tail` verification on the assembled file, and the generator-script variant for repetitive sheets. An `AGENTS.md` is injected into the agent's context for the directory it lives in, which makes it the right home for a project-specific tool quirk like this — the next session plans the chunked write from the start instead of improvising after the failure.
+
 ## Agent, classifier model, and the model presets
 
 Against the reference defaults:
