@@ -2,7 +2,7 @@
 layout: post
 title: "My ~/.vibe/config.toml After Months of Daily Vibe: The Scratchpad Allowlist Fix and Every Default I Changed"
 seo_title: "Mistral Vibe config.toml: scratchpad allowlist + permission setup"
-description: "Vibe prompted on every shell command that touched my scratchpad, so I found where the scratchpad really lives, allowlisted it with vibe-path entries, diffed my whole config.toml against Mistral's configuration reference, and raised the read/write byte caps after an 80 KB single-file HTML sheet refused the 64 KB write limit."
+description: "Vibe prompted on every shell command that touched my scratchpad, so I found where the scratchpad really lives, allowlisted it with vibe-path entries, diffed my whole config.toml against Mistral's configuration reference, and learned the 64 KB read/write caps the hard way: the keys I first raised to land an 80 KB single-file HTML sheet are accepted by the schema but ignored at runtime."
 date: 2026-11-16 09:00:00 +0700
 categories: vibe ai devops
 tags: [vibe, mistral, ai, ai-agents, config, permissions, allowlist, scratchpad, cli, smart-approve, mcp]
@@ -81,20 +81,15 @@ denylist = [
     "**/.env.test", "**/*.pem", "**/id_rsa*", "**/.ssh/**", "**/.aws/**", "**/.kube/**",
     "**/*credentials*", "**/*secret*", "**/*apikey*", "**/*api-key*",
 ]
-max_read_bytes = 200000
 ```
 - `bash` is `permission = "ask"`, with an allowlist of about seventy command *prefixes*. The reference notes the allowlist replaces the default list, so mine re-adds the read-only defaults explicitly (`ls`, `cat`, `grep`, `git status`, `git diff`, `gh pr view`, ...) plus the commands my workflow actually uses (`wp option get`, `wp plugin list`, `npx phpcs`, `vendor/bin/phpcs`, `php -l`, `jq`, `node …/measure.mjs`, `python3 -m http.server 8765`).
 - The `denylist` blocks the things I never want auto-approved: `sudo`, `rm -rf` and its flag permutations, `git push --force` / `-f`, `git reset --hard`, `git clean -fd`, `git branch -D`, `sed -i`, `dd if=`, `chmod -R`, `shutdown`, `reboot`, interactive shells (`bash -i`, `tmux`, `screen`) and editors (`vim`, `nano`, `emacs`).
 - `denylist_standalone` closes the sidestep: bare `python`, `python3`, `bash`, `sh`, `nohup`, `su` are refused as standalone commands, so the agent can't route around the allowlist with `python3 -c`; it has to use an allowlisted wrapper (`jq` for JSON, `php -l` for lint only). That lesson came out of the bakery demo build — see [that post]({% post_url 2026-11-13-mistral-vibe-large-4-bakery-demo-block-theme-lessons %}), lesson 5.
-- `[tools.bash]` also sets `default_timeout = 120` (six chained `magick` slices once got killed at the 30s default) and `max_output_bytes = 16000`; `[tools.grep]` has `exclude_patterns` for `node_modules/`, `.git/`, `dist/` and friends plus `codeignore_file = ".vibeignore"`; `[tools.write_file]` sets `create_parent_dirs = true` and `max_write_bytes = 200000` (more on that next).
+- `[tools.bash]` also sets `default_timeout = 120` (six chained `magick` slices once got killed at the 30s default) and `max_output_bytes = 16000`; `[tools.grep]` has `exclude_patterns` for `node_modules/`, `.git/`, `dist/` and friends plus `codeignore_file = ".vibeignore"`; `[tools.write_file]` sets `create_parent_dirs = true` (the byte-cap keys I briefly added to it are the subject of the next section — they turned out to have no effect).
 
 ## The 64 KB caps, and the 80 KB sheet that ran into them
 
-The single-file exercise sheets I build for the Cambridge practice site are deliberately self-contained — inline CSS, inline JS, no build step — so one HTML file lands around **80 KB** the moment the sheet has five or six sections. `write_file` refused it outright: `Content exceeds 64000 bytes limit`. That limit is not a sandbox law, it is a per-tool setting in my own `config.toml` — `max_write_bytes = 64000` under `[tools.write_file]`, with a matching `max_read_bytes = 64000` under `[tools.read_file]` (so reading the finished 80 KB sheet back would have truncated at 64 KB too).
-
-The fallback I used before touching the config is worth knowing: `bash` heredocs. Write the head with `cat >`, append the rest in ~20 KB `cat >>` chunks (quoted `<<'EOF'` so nothing expands), then verify with `wc -c` and `tail`. It works from any session, managed or not — but it is a workaround you should not need on your own machine, and splitting an 80 KB hand-authored file into chunks is exactly where content gets lost.
-
-So the two lines I changed, after the usual `config.toml.bak`:
+The single-file exercise sheets I build for the Cambridge practice site are deliberately self-contained — inline CSS, inline JS, no build step — so one HTML file lands around **80 KB** the moment the sheet has five or six sections. `write_file` refused it outright: `Content exceeds 64000 bytes limit`. The first version of this post called that limit a per-tool setting in my own `config.toml` and "fixed" it by raising the caps:
 
 ```toml
 [tools.write_file]
@@ -104,7 +99,11 @@ max_write_bytes = 200000
 max_read_bytes = 200000
 ```
 
-200 KB covers any single-file artifact in these projects with headroom to spare; if I ever hand the agent a monorepo lockfile to write whole, the number goes up again. Same as the allowlist changes above, `/reload` applies it — no restart needed — but the sheet I was already building that session still went out in heredoc chunks, because the write happened before the config change.
+That diagnosis was wrong, and Vibe said so itself. The current version (3.1.2) still accepts both keys — `vibe config schema` even lists them — but the runtime ignores them, and a startup warning spells it out: *"Settings in your config.toml that Vibe ignores: `tools.write_file.max_write_bytes` has no effect; `tools.read_file.max_read_bytes` has no effect. Remove them, or fix the spelling."* I reproduced it with the 200 KB values still in place: a 450 KB write failed with the identical `Content exceeds 64000 bytes limit`, and reading a finished 128 KB sheet back truncated at ~64 KB per call. The caps are hardcoded in the harness's file tools; the config lines were a placebo. The sheet that session got out because of the heredoc chunks underneath, not because of the config change.
+
+So both keys came back out again (with the usual `config.toml.bak`), and the durable way to land an 80 KB single file is the fallback I had already been using: `bash` heredocs. Write the head with `cat >`, append the rest in ~20 KB `cat >>` chunks (quoted `<<'EOF'` so nothing expands), then verify with `wc -c` and `tail`. It works from any session, managed or not. When the sheet's sections are repetitive there is a neater variant: have the agent write a small generator script — comfortably under the cap — and run it to emit the big file whole, so no chunk can get lost in manual splitting.
+
+Reading big files back is the softer problem it first looked like: `read_file` truncates a single call at ~64 KB, but it pages with `offset`/`limit` and hands back the offset to continue from, so the finished 80 KB sheet reads back whole in two calls.
 
 ## Agent, classifier model, and the model presets
 
@@ -127,7 +126,7 @@ Three servers are declared in `config.toml` — [wp-ops](https://github.com/imag
 
 ## What the reference says I should still clean up
 
-Diffing my file against the configuration reference surfaced one wart: `displayed_workdir`, `context_warnings`, `include_model_info`, and `include_prompt_detail` are listed there as **deprecated** — "Vibe still accepts them in existing files, but they have no effect." They sit in my config as leftovers and each one earns a startup warning. Deleting those four lines is the next cleanup. (`applied_migrations = ["bash_read_only_defaults_v1"]` is not one of them — that is Vibe's own bookkeeping for a migration it ran on my bash tool settings.)
+Diffing my file against the configuration reference surfaced one wart: `displayed_workdir`, `context_warnings`, `include_model_info`, and `include_prompt_detail` are listed there as **deprecated** — "Vibe still accepts them in existing files, but they have no effect." They sat in my config as leftovers and each one earned a startup warning — they have now left the file too, same `config.toml.bak` routine as ever. (The two `max_write_bytes` / `max_read_bytes` keys from the previous section went the same way — `vibe config schema` knows them, but the runtime warned me off them.) (`applied_migrations = ["bash_read_only_defaults_v1"]` is not one of them — that is Vibe's own bookkeeping for a migration it ran on my bash tool settings.)
 
 ## Habits around the file
 
