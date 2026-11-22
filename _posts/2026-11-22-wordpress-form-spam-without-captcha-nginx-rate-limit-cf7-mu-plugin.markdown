@@ -49,7 +49,7 @@ What this layer **cannot** do: stop low-and-slow spam (one submission every 31 s
 
 ## Layer 2 — invisible behavioral checks: timing trap + JS token
 
-`site/web/app/mu-plugins/cf7-spam-guard.php`. On form render it injects two hidden fields via `wpcf7_form_hidden_fields` — an HMAC-signed server timestamp and an empty token that a tiny footer script fills in only if JavaScript runs. On submit, the `wpcf7_spam` filter flags the submission when the signature is invalid, the render→submit time is under 3 seconds (bots submit near-instantly), or the JS token is empty/unknown (the bot never executed JS, or replayed a token):
+`site/web/app/mu-plugins/cf7-spam-guard.php`. The form ships two **empty** hidden fields (`iw_spam_ts`, `iw_spam_js`) via `wpcf7_form_hidden_fields`; a footer script then fetches per-visitor tokens from a small REST endpoint and fills them in — only if JavaScript runs. On submit, the `wpcf7_spam` filter flags the submission when the timestamp signature is invalid, the fetch→submit time is under 3 seconds (bots submit near-instantly), or the JS token is empty/unknown (the bot never executed JS, or replayed a token):
 
 ```php
 const IW_CF7_SPAM_GUARD_BLOCK = true;   // false = log-only
@@ -58,32 +58,45 @@ const IW_CF7_SPAM_GUARD_MIN_SECONDS = 3;
 // secret from env('IW_CF7_GUARD_SECRET'), falling back to AUTH_KEY
 function iw_cf7_guard_secret(): string { /* ... */ }
 
-// issue once per page render: signed timestamp + single-use JS token
-function iw_cf7_guard_state(bool $issue = false): ?array {
-    static $tokens = null;
-    if ($issue && $tokens === null) {
-        $ts = time();
-        $js = wp_generate_password(32, false, false);
-        set_transient('iw_cf7_js_' . $js, $ts, 600);   // 10 min TTL
-        $tokens = ['ts' => $ts . '.' . hash_hmac('sha256', (string) $ts, iw_cf7_guard_secret()), 'js' => $js];
-    }
-    return $tokens;
+// mint a fresh signed timestamp + single-use JS token (transient, 10 min TTL)
+function iw_cf7_guard_issue(): array {
+    $ts = time();
+    $js = wp_generate_password(32, false, false);
+    set_transient('iw_cf7_js_' . $js, $ts, 600);
+    return ['ts' => $ts . '.' . hash_hmac('sha256', (string) $ts, iw_cf7_guard_secret()), 'js' => $js];
 }
 
+// per-visitor tokens over REST; never stored in the (page-cached) HTML
+add_action('rest_api_init', function () {
+    register_rest_route('iw-cf7/v1', '/token', [
+        'methods' => 'GET',
+        'permission_callback' => '__return_true',
+        'callback' => function () {
+            $r = new WP_REST_Response(iw_cf7_guard_issue());
+            $r->header('Cache-Control', 'no-store, max-age=0');
+            return $r;
+        },
+    ]);
+});
+
+// hidden fields ship empty (cache-safe); the script below fills them, i.e. only if JS runs
 add_filter('wpcf7_form_hidden_fields', function (array $hidden) {
-    $t = iw_cf7_guard_state(true);
-    $hidden['iw_spam_ts'] = $t['ts'];
-    $hidden['iw_spam_js'] = ''; // filled only by the footer script, i.e. only if JS runs
+    $hidden['iw_spam_ts'] = '';
+    $hidden['iw_spam_js'] = '';
+    $GLOBALS['iw_cf7_guard_form_rendered'] = true;
     return $hidden;
 });
 
 add_action('wp_footer', function () {
-    $t = iw_cf7_guard_state(false);
-    if ($t === null || !class_exists('WPCF7_ContactForm')) return;
-    $token = wp_json_encode($t['js']);
+    if (empty($GLOBALS['iw_cf7_guard_form_rendered'])) return;
+    $url = wp_json_encode(esc_url_raw(rest_url('iw-cf7/v1/token')));
     ?><script>
-    document.querySelectorAll('input[name="iw_spam_js"]')
-        .forEach(el => el.value = <?php echo $token; ?>);
+    fetch(<?php echo $url; ?>, {cache: 'no-store', credentials: 'same-origin'})
+        .then(r => r.json())
+        .then(t => ['ts', 'js'].forEach(k =>
+            document.querySelectorAll('input[name="iw_spam_' + k + '"]')
+                .forEach(el => el.value = t[k])))
+        .catch(() => {});
     </script><?php
 });
 
@@ -114,7 +127,9 @@ add_filter('wpcf7_spam', function (bool $spam, WPCF7_Submission $sub) {
 
 Using `wpcf7_spam` (not `wpcf7_validate`) means a flagged bot still sees the normal "message sent" response — it never learns which check it failed. It lives in `mu-plugins` so a theme switch can't disable it.
 
-**Why the field names being public doesn't break this.** This post ships the tag names `iw_spam_ts` / `iw_spam_js` in the HTML of every page with a form, so assume bots know them. What they can't do is forge the values: the timestamp is HMAC-signed with a server secret, so an old "safe-looking" timestamp fails the signature check, and the JS token is a random per-render value held server-side for 10 minutes and deleted on first use — a scraped token works exactly once. The input ships empty and only the inline script sets it, so a bot that doesn't execute JavaScript (most of them) can't fill it at all. The residual hole is a headless browser that renders the page, runs JS, waits 3+ seconds and submits once per token — that bar is deliberately as high as we can raise it without a third-party service, and the honeypot, rate limits and Flamingo review catch what's left.
+**Why the field names being public doesn't break this.** This post ships the tag names `iw_spam_ts` / `iw_spam_js` in the HTML of every page with a form, so assume bots know them. What they can't do is forge the values: the timestamp is HMAC-signed with a server secret, so an old "safe-looking" timestamp fails the signature check, and the JS token is a random per-visitor value held server-side for 10 minutes and deleted on first use — a scraped token works exactly once. The inputs ship empty and only the fetch-and-fill script sets them, so a bot that doesn't execute JavaScript (most of them) can't fill them at all. The residual hole is a headless browser that fetches a token, waits 3+ seconds and submits once per token — that bar is deliberately as high as we can raise it without a third-party service, and the honeypot, rate limits and Flamingo review catch what's left.
+
+**Why the tokens come from a REST endpoint, not the page render.** The first version baked the signed timestamp and JS token into the HTML at render time — and that broke the homepage form, because these pages are served from the nginx FastCGI page cache: every visitor got the *same* token, and since the token is single-use, the first person to submit consumed it and everyone after got `no_js_token`. So the hidden fields now render empty (cache-safe) and the footer script fetches fresh per-visitor tokens from `GET /wp-json/iw-cf7/v1/token` (`Cache-Control: no-store`; `/wp-json/` is already in `skip_cache_uri`). Side effect worth knowing: that token route is not under the `cf7_post` rate-limit zone (which only matches `/wp-json/contact-form-7/`), so it can be hammered — harmless, since minting a token doesn't let you submit (single-use, TTL, timing check still apply), but you can add a `limit_req` on it if the logs show abuse.
 
 We rolled it out **log-only first** (`IW_CF7_SPAM_GUARD_BLOCK = false`), let it record verdicts for days alongside the old CAPTCHA, compared catch rates against Flamingo's spam folder, saw no false positives on real leads, then flipped the constant and deleted the `[captchac]`/`[captchar]` tags from the form. Log-only mode is the right default for any rollout of this kind.
 
@@ -134,6 +149,6 @@ Constraints first: this site must not send visitor data to US third-party servic
 
 - Blocked submissions: `grep cf7-spam-guard` in the PHP-FPM error log (each line has the reason, form ID, and mode).
 - Caught spam and false positives: Flamingo → Inbound messages / Spam.
-- Two housekeeping items after removing RSC: drop `wp-plugin/really-simple-captcha` from `composer.json`, and note that `/contact.*` is still excluded from the FastCGI page cache (`skip_cache_uri`) — that exclusion existed because the CAPTCHA image had to be fresh per page load. Keep the exclusion anyway: with a cached page the `iw_spam_ts` timestamp would freeze at cache time and the timing check would measure against the wrong baseline.
+- Two housekeeping items after removing RSC: drop `wp-plugin/really-simple-captcha` from `composer.json`, and drop `/contact.*` from `skip_cache_uri` — that exclusion existed only because the CAPTCHA image had to be fresh per page load. It's safe to remove now: the spam-guard tokens are no longer baked into the cached HTML, they're fetched per visitor from the REST endpoint (see above), so the contact page can be full-page cached again.
 
 The short version: rate-limit the volume at nginx (POST-only!), catch the non-humans with timing and a JS token in a mu-plugin, keep a honeypot for the fill-everything bots, and log everything in Flamingo so the day you ask "is this working?" you have numbers, not vibes.
