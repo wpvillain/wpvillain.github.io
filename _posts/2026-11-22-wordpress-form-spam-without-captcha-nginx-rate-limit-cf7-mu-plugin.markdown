@@ -49,23 +49,41 @@ What this layer **cannot** do: stop low-and-slow spam (one submission every 31 s
 
 ## Layer 2 — invisible behavioral checks: timing trap + JS token
 
-`site/web/app/mu-plugins/cf7-spam-guard.php` (about 60 lines). On form render it injects two hidden fields via `wpcf7_form_hidden_fields` — a server timestamp and an empty token that a tiny footer script fills in only if JavaScript runs. On submit, the `wpcf7_spam` filter flags the submission when the render→submit time is under 3 seconds (bots submit near-instantly) or the JS token is empty (the bot never executed JS):
+`site/web/app/mu-plugins/cf7-spam-guard.php`. On form render it injects two hidden fields via `wpcf7_form_hidden_fields` — an HMAC-signed server timestamp and an empty token that a tiny footer script fills in only if JavaScript runs. On submit, the `wpcf7_spam` filter flags the submission when the signature is invalid, the render→submit time is under 3 seconds (bots submit near-instantly), or the JS token is empty/unknown (the bot never executed JS, or replayed a token):
 
 ```php
 const IW_CF7_SPAM_GUARD_BLOCK = true;   // false = log-only
 const IW_CF7_SPAM_GUARD_MIN_SECONDS = 3;
 
+// secret from env('IW_CF7_GUARD_SECRET'), falling back to AUTH_KEY
+function iw_cf7_guard_secret(): string { /* ... */ }
+
+// issue once per page render: signed timestamp + single-use JS token
+function iw_cf7_guard_state(bool $issue = false): ?array {
+    static $tokens = null;
+    if ($issue && $tokens === null) {
+        $ts = time();
+        $js = wp_generate_password(32, false, false);
+        set_transient('iw_cf7_js_' . $js, $ts, 600);   // 10 min TTL
+        $tokens = ['ts' => $ts . '.' . hash_hmac('sha256', (string) $ts, iw_cf7_guard_secret()), 'js' => $js];
+    }
+    return $tokens;
+}
+
 add_filter('wpcf7_form_hidden_fields', function (array $hidden) {
-    $hidden['iw_spam_ts'] = (string) time();
-    $hidden['iw_spam_js'] = '';
+    $t = iw_cf7_guard_state(true);
+    $hidden['iw_spam_ts'] = $t['ts'];
+    $hidden['iw_spam_js'] = ''; // filled only by the footer script, i.e. only if JS runs
     return $hidden;
 });
 
 add_action('wp_footer', function () {
-    if (!class_exists('WPCF7_ContactForm')) return;
+    $t = iw_cf7_guard_state(false);
+    if ($t === null || !class_exists('WPCF7_ContactForm')) return;
+    $token = wp_json_encode($t['js']);
     ?><script>
     document.querySelectorAll('input[name="iw_spam_js"]')
-        .forEach(el => el.value = 'js-ok');
+        .forEach(el => el.value = <?php echo $token; ?>);
     </script><?php
 });
 
@@ -73,11 +91,20 @@ add_filter('wpcf7_spam', function (bool $spam, WPCF7_Submission $sub) {
     if ($spam) return $spam;
     $posted = $sub->get_posted_data();
     $reasons = [];
-    $ts = (int) ($posted['iw_spam_ts'] ?? 0);
-    if ($ts > 0 && (time() - $ts) < IW_CF7_SPAM_GUARD_MIN_SECONDS) {
+    [$ts, $sig] = array_pad(explode('.', (string) ($posted['iw_spam_ts'] ?? ''), 2), 2, '');
+    $ts = (int) $ts;
+    if ($ts <= 0 || !hash_equals(hash_hmac('sha256', (string) $ts, iw_cf7_guard_secret()), $sig)) {
+        $reasons[] = 'bad_timestamp';          // forged/missing timestamp
+    } elseif (time() - $ts < IW_CF7_SPAM_GUARD_MIN_SECONDS) {
         $reasons[] = 'fast_submit(' . (time() - $ts) . 's)';
     }
-    if (empty($posted['iw_spam_js'])) $reasons[] = 'no_js_token';
+    $js = (string) ($posted['iw_spam_js'] ?? '');
+    $key = 'iw_cf7_js_' . $js;
+    if ($js === '' || get_transient($key) === false) {
+        $reasons[] = 'no_js_token';
+    } else {
+        delete_transient($key);                 // single use: no replay
+    }
     if (!$reasons) return $spam;
     error_log('[cf7-spam-guard] reasons=' . implode(',', $reasons)
         . ' mode=' . (IW_CF7_SPAM_GUARD_BLOCK ? 'block' : 'log-only'));
@@ -86,6 +113,8 @@ add_filter('wpcf7_spam', function (bool $spam, WPCF7_Submission $sub) {
 ```
 
 Using `wpcf7_spam` (not `wpcf7_validate`) means a flagged bot still sees the normal "message sent" response — it never learns which check it failed. It lives in `mu-plugins` so a theme switch can't disable it.
+
+**Why the field names being public doesn't break this.** This post ships the tag names `iw_spam_ts` / `iw_spam_js` in the HTML of every page with a form, so assume bots know them. What they can't do is forge the values: the timestamp is HMAC-signed with a server secret, so an old "safe-looking" timestamp fails the signature check, and the JS token is a random per-render value held server-side for 10 minutes and deleted on first use — a scraped token works exactly once. The input ships empty and only the inline script sets it, so a bot that doesn't execute JavaScript (most of them) can't fill it at all. The residual hole is a headless browser that renders the page, runs JS, waits 3+ seconds and submits once per token — that bar is deliberately as high as we can raise it without a third-party service, and the honeypot, rate limits and Flamingo review catch what's left.
 
 We rolled it out **log-only first** (`IW_CF7_SPAM_GUARD_BLOCK = false`), let it record verdicts for days alongside the old CAPTCHA, compared catch rates against Flamingo's spam folder, saw no false positives on real leads, then flipped the constant and deleted the `[captchac]`/`[captchar]` tags from the form. Log-only mode is the right default for any rollout of this kind.
 
