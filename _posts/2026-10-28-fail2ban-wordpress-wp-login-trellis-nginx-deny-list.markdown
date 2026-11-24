@@ -62,12 +62,14 @@ sudo fail2ban-regex /srv/www/example.com/logs/access.log \
 
 Keep an exemption list as a safety valve. `ip_whitelist` feeds fail2ban's `ignoreip`:
 
+{% raw %}
 ```yaml
 ip_whitelist:
   - 127.0.0.0/8
   - "{{ ipify_public_ip | default('') }}"   # the machine you provision from
   - 203.0.113.0/24                           # office network
 ```
+{% endraw %}
 
 I still exempt a VPN range, because one ban landed during a two-factor reset. An exemption list does not replace a correct filter.
 
