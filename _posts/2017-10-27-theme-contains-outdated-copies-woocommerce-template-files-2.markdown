@@ -40,7 +40,6 @@ This page won't be updated at this moment though. That is because of the custom 
 So only update if the files that need updating do not have any custom code, which will be rare if the file in question is part of the theme. Two, if there is custom, only update the functionality that is outdated or even causing (fatal) errors.
 <h2>Removing the Warning</h2>
 If you do want the warning not to be mentioned anymore, add the correct block with the file version number. In this case the block would be:
-<div>
 
 ```
 /**
@@ -63,4 +62,3 @@ If you do want the warning not to be mentioned anymore, add the correct block wi
 
 As you can see the version was 2.0.0 at the time of the writing of this blog post. Of course other files have other version numbers.
 
-</div>

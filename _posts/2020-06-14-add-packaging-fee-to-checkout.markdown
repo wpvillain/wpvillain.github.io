@@ -9,48 +9,25 @@ tags: [checkout, packaging, woocommerce, wordpress]
 
 <p>To add a packaging fee for your WooCommerce products on checkout you have many options. You could work with custom fields, additional pricing calculations, but in this post we will use hard coded actions instead.</p>
 
-
-
 <h2 class="wp-block-heading">WooCommerce Cart Calculate Fee with Add Fee</h2>
 
-
-
 <p>can use the following code</p>
-
-
-
 
 ```php
 add_action('woocommerce_cart_calculate_fees', function() { if (is_admin() && !defined('DOING_AJAX')) { return; } WC()->cart->add_fee(__('Packaging Fee' 'txtdomain'), 5); });
 ```
 
-
-
-
 <p>This is a fixed price and not based on the price or cart total nor connected to shipping. Just a once off fee. Other options including this one can be found at <a href="https://awhitepixel.com/blog/woocommerce-checkout-add-custom-fees/">White Pixel</a>.</p>
-
-
 
 <p>On the action and cart / recurring cart fees you can also check the <a href="https://docs.woocommerce.com/document/subscriptions/develop/recurring-cart-fees/">WooCommerce documentation</a>:</p>
 
-
-
 <p><em>Unlike cart items, cart fees are non-persistent, this means third-party plugins which add fees need to be constantly hooked into the cart calculations, adding their fees each time the cart totals are calculated.</em></p>
-
-
 
 <p><em>To do that WooCommerce provides the <code>woocommerce_cart_calculate_fees</code> hook, which third parties can use to add their fees.</em></p>
 
-
-
 <h2 class="wp-block-heading">Standard Cart / Checkout Surcharge incl Country Filter</h2>
 
-
-
 <p>Also see <a href="https://docs.woocommerce.com/document/add-a-surcharge-to-cart-and-checkout-uses-fees-api/">cart and checkout surcharge document</a> where a similar snippet is used among others:</p>
-
-
-
 
 ```php
 /**
@@ -70,17 +47,9 @@ endif;
 }
 ```
 
-
-
-
 <p>Do realize they also filter by country in this snippet. They do not just add a general surcharge fee for all locations.</p>
 
-
-
 <p>WooCommerce also shared a percentage charge per transaction:</p>
-
-
-
 
 ```php
 /**
@@ -98,15 +67,8 @@ $woocommerce->cart->add_fee( 'Surcharge', $surcharge, true, '' );
 }
 ```
 
-
-
-
 <p>which is related to one of the snippets provided by White Pixel.</p>
 
-
-
 <h2 class="wp-block-heading">Gotchas</h2>
-
-
 
 <p>You do have to remember that this option does not allow you do adjust the fee in the backend and so it is not a flexible fee. You could work with a custom field as well perhaps, but that will not be added to this post just yet.</p>

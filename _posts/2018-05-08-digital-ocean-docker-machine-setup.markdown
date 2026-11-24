@@ -9,24 +9,13 @@ tags: [devops, digital, docker, machine, ocean, setup, wordpress]
 
 <p>To do a Digital Ocean Docker Machine Setup&nbsp; Docker Machine makes your live really easy. Here is how your can provision and deploy with your docker-machine.</p>
 
-
-
 <h2 class="wp-block-heading">FYI</h2>
-
-
 
 <p>If you have the Docker Client (Engine) installed on your Mac, Linux Box or PC you should have docker-machine available already. See more information on this <a href="https://docs.docker.com/machine/install-machine/">at Docker</a>.</p>
 
-
-
 <h2 class="wp-block-heading">Trials on Existing Droplet</h2>
 
-
-
 <p>Without a driver for an already existing host - Digital Ocean Docker setup I tried the following:</p>
-
-
-
 
 ```bash
 docker-machine env larastudio
@@ -35,13 +24,7 @@ You can attempt to regenerate them using 'docker-machine regenerate-certs [name]
 Be advised that this will trigger a Docker daemon restart which might stop running containers.
 ```
 
-
-
-
 <p>So once I checked the setup one I was told the certs could not be checked. So I tried regerating them.&lt;pre&gt;</p>
-
-
-
 
 ```
 jasper@~/code/domain.com/laradock $ docker-machine regenerate-certs larastudio
@@ -51,25 +34,13 @@ Waiting for SSH to be available...
 Too many retries waiting for SSH to be available. Last error: Maximum number of retries (60) exceeded
 ```
 
-
-
-
 <p>Then did a:</p>
-
-
-
 
 ```bash
 docker-machine -D env larastudio
 ```
 
-
-
-
 <p>for a more detailed report. I got more errors</p>
-
-
-
 
 ```
 Getting to WaitForSSH function...
@@ -101,25 +72,13 @@ output  : usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spe
            [user@]hostname [command]
 ```
 
-
-
-
 <p>Then I found a <a href="https://forums.docker.com/t/how-can-docker-machine-add-an-exist-docker-host/7683">thread</a> with a more detailed command that seemed to be better.</p>
-
-
-
 
 ```bash
 docker-machine create --driver generic --generic-ip-address xxx.xxx.xx.xxx --generic-ssh-user root larastudio
 ```
 
-
-
-
 <p>and it was able to connect, but I got a</p>
-
-
-
 
 ```
 Running pre-create checks...
@@ -143,13 +102,7 @@ err : exit status 255
 output :
 ```
 
-
-
-
 <p>Update: Read in <a href="https://www.digitalocean.com/community/questions/how-can-i-attach-docker-machine-to-an-existing-droplet-created-with-another-docker-machine">this Digital Ocean thread</a> that you can do it, but you need to be more specific about the ssh user and ssh key you use as well as having port 2376 open. Command I needed was:</p>
-
-
-
 
 ```bash
 docker-machine create \
@@ -161,33 +114,17 @@ docker-machine create \
         MACHINE_NAME
 ```
 
-
-
-
 <p>&nbsp;</p>
-
-
 
 <h2 class="wp-block-heading">Provisioning New Droplet</h2>
 
-
-
 <p>Then I realized it was not working on a machine that was already up and running with Docker. So I did a:</p>
-
-
-
 
 ```bash
 docker-machine create --driver digitalocean --digitalocean-access-token 1111111 domain-docker
 ```
 
-
-
-
 <p>and that worked:</p>
-
-
-
 
 ```
 Running pre-create checks...
@@ -209,171 +146,88 @@ Docker is up and running!
 To see how to connect your Docker Client to the Docker Engine running on this virtual machine, run: docker-machine env smart48-docker
 ```
 
-
-
-
 <p>But I did not use enough parameters so I got a 1GB Droplet at the NYC zone. So I did a</p>
-
-
-
 
 ```bash
 docker-machine create --driver digitalocean -h
 ```
 
-
-
-
 <p>to see all options. And I saw I could use</p>
-
-
 
 <ul class="wp-block-list">
 <li>--digitalocean-region "ams2"</li>
 
-
-
 <li>--digitalocean-ipv6</li>
-
-
 
 <li>--digitalocean-size "s-1vcpu-1gb"</li>
 </ul>
 
-
-
 <p>among others. So I did a</p>
-
-
-
 
 ```bash
 docker-machine create --driver digitalocean --digitalocean-region "ams2" --digitalocean-ipv6 --digitalocean-monitoring --digitalocean-access-token 1111111 domain-docker
 ```
 
-
-
-
 <p>and that worked even better.</p>
-
-
 
 <h2 class="wp-block-heading">Working on the Remote Machine</h2>
 
-
-
 <p>Then to do work on that machine you can do</p>
-
-
-
 
 ```
 eval $(docker-machine env machine-name)
 ```
 
-
-
-
 <p>and start running <em>docker-compose</em> and <em>docker</em> commands on the remote server. FYI docker-compose did not get installed on the remote for some reason. So that you can only use locally.</p>
-
-
 
 <h2 class="wp-block-heading">Docker Machine Envs</h2>
 
-
-
 <p>To check what envs are being used you can do a</p>
-
-
-
 
 ```
 env | grep DOCKER
 ```
 
-
-
-
 <p>You will then see how things are setup. This so you know where you are working or what you are working on. And these details you can use to remove them or <a href="https://docs.docker.com/machine/get-started/#unset-environment-variables-in-the-current-shell">unset</a> them. You can check your envs to unset with</p>
-
-
-
 
 ```bash
 docker-machine env -u
 ```
 
-
-
-
 <p>To return to localhost for docker you can do a</p>
-
-
-
 
 ```
 eval $(docker-machine env -u)
 ```
 
-
-
-
 <h2 class="wp-block-heading">SSH Remote Machine</h2>
 
-
-
 <p>You can also ssh into the box using</p>
-
-
-
 
 ```bash
 docker-machine ssh box
 ```
 
-
-
-
 <p>And as stated you can access the machine that way. FYIs, ssh-ing as root does no longer seems to work and as stated docker-compose is not installed on the DO Droplet.</p>
 
-
-
 <div style="height:32px" aria-hidden="true" class="wp-block-spacer"></div>
-
-
 
 <div class="wp-block-group has-tertiary-background-color has-background" style="border-left-color:#10b981;border-left-width:4px;padding-top:1.5rem;padding-right:1.5rem;padding-bottom:1.5rem;padding-left:1.5rem">
 <h3 class="wp-block-heading">Done Managing Your Own Server?</h3>
 
-
-
 <p>We run production WordPress and WooCommerce stacks on Hetzner using Trellis — Nginx, PHP 8.3, Redis, automated deployments, and Bedrock structure. No shared hosting, no page builders, no surprises.</p>
-
-
 
 <ul class="wp-block-list">
 <li>Trellis + Bedrock on Hetzner EU (Frankfurt / Helsinki)</li>
 
-
-
 <li>Nginx + FastCGI caching + Redis object cache</li>
 
-
-
 <li>Automated deployments via Ansible, SSL via Let's Encrypt</li>
-
-
 
 <li>From €49/month — or €65/hour for one-off server work</li>
 </ul>
 
-
-
 <div class="wp-block-buttons">
 <div class="wp-block-button"><a class="wp-block-button__link has-base-color has-primary-background-color has-text-color has-background wp-element-button" href="https://imagewize.com/contact/?service=trellis-hosting" style="border-radius:8px">Get a Quote</a></div>
 
-
-
 <div class="wp-block-button is-style-outline"><a class="wp-block-button__link wp-element-button" href="https://imagewize.com/services/managed-wordpress-hosting/" style="border-radius:8px">View Trellis Hosting</a></div>
-</div>
-</div>

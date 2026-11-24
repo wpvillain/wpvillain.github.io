@@ -18,7 +18,6 @@ Although again this may not be the ideal setup we have used:
 <p class="p1"><span class="s1">to setup a virtualhost for our LEMP test server running the Zend Framework. </span></p>
 <p class="p1"><span class="s1">Normally you will see this kind of contents there:</span></p>
 
-
 ```nginx
 server {
 
@@ -68,13 +67,11 @@ server {
 <h2 class="p1"><span class="s1">General Nginx Configuration</span></h2>
 <p class="p1"><span class="s1">In the general <a href="https://www.nginx.com/resources/wiki/start/topics/examples/full/" target="_blank">Nginx configuration file</a>:</span></p>
 
-
 ```
 /etc/nginx/nginx.conf
 ```
 
 <p class="p1"><span class="s1">this file is mentioned for setting up dealing with virtual hosts:</span></p>
-
 
 ```nginx
 ##
@@ -95,7 +92,6 @@ server {
 <h2 class="p1"><span class="s1">Sites-Enabled</span></h2>
 <p class="p1"><span class="s1">With multiple hosts you are better of creating multiple inside sites-enabled:</span></p>
 
-
 ```
 /etc/nginx/sites-enabled/
 ```
@@ -105,13 +101,11 @@ server {
 <h2 class="p1"><span class="s1">Default.conf</span></h2>
 <p class="p1"><span class="s1">So, in that file:</span></p>
 
-
 ```
 /etc/nginx/conf.d/default.conf
 ```
 
 <p class="p1"><span class="s1">we have made the following configuration:</span></p>
-
 
 ```nginx
 server {

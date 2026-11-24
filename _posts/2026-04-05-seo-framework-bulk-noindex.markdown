@@ -9,28 +9,15 @@ tags: [bulk, framework, noindex, seo, wordpress]
 
 <p>Sometimes you realize you need to prune your blogs. This as you are trying to focus on a specific field or fields . You sometimes need to get rid of posts that are not related to your core work. With the SEO Framework you can go through your posts and do this manually post by post. That works if there are not too many posts. </p>
 
-
-
 <h2 class="wp-block-heading">WP CLI </h2>
-
-
 
 <p>But this can be a lot of work. Easier is to do this with WordPress CLI . You of course first need to backup your site and then use the cli tool You also may have to double check once work is done because most commands if you search for a specific keyword in the post and noindex you get some false positives. </p>
 
-
-
 <h2 class="wp-block-heading">WP Eval</h2>
-
-
 
 <p>The script we use is the following here below. At the end of the day it runs a backup when you do a live run and then users <code>wp eval</code> to run a database query on the server to updated posts to noindex based on keyword you use. Here first two examples of the eval usage if you would not use my script. Keep in mind we add <code>--path</code> only because we work with Trellis &amp; Bedrock.</p>
 
-
-
 <p>First the example to do a dry run to see what we got:</p>
-
-
-
 
 ```bash
 # Dry run — count posts                                                                                                      
@@ -46,13 +33,7 @@ tags: [bulk, framework, noindex, seo, wordpress]
   ' --path=web/wp
 ```
 
-
-
-
 <p>and for a live run</p>
-
-
-
 
 ```bash
 # Live — noindex them
@@ -71,17 +52,9 @@ tags: [bulk, framework, noindex, seo, wordpress]
   ' --path=web/wp
 ```
 
-
-
-
 <h2 class="wp-block-heading">Automation with Commands</h2>
 
-
-
 <p>And here is the actual script. It does the same as the <code>wp eval</code> examples above but in an easier way. When I wanted to <code>noindex</code> Vue posts I just ran:</p>
-
-
-
 
 ```
 ./tools/scripts/bulk-noindex-category.sh --run --search="vue"   
@@ -112,17 +85,9 @@ Next steps:
 ==========================================
 ```
 
-
-
-
 <h2 class="wp-block-heading">Full Script</h2>
 
-
-
 <p>Here the full script below. Check it. Adjust it to your liking. Use it at your own risk. Do backup before usage just in case. Works really well for me. Hope it helps others.</p>
-
-
-
 
 ```bash
 #!/bin/bash

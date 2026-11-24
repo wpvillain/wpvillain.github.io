@@ -41,7 +41,6 @@ The group <em>all</em> with common variables alone has:
  	<li>users.yml</li>
 </ul>
 to updateMail.yml has the mail details so your Trellis server can send out email. Something like:
-<div>
 
 ```
 # Documentation: https://roots.io/trellis/docs/mail/
@@ -54,7 +53,6 @@ mail_password: "{{ vault_mail_password }}" # Define this variable in group_vars/
 
 when you are using Sendgrid.
 
-</div>
 Main has the main vars including some of your own custom ones.I made sure all customizations to PHP settings are added to <em>group_vars/all/main.yml</em>:
 
 ```
@@ -65,13 +63,11 @@ php_post_max_size: 128M
 ```
 
 In vault.yml the vault mail password is stored. That is needed for sending out email which is mainly set up in mail.yml. Under users.yml you add the server users and the keys used for which we normally use our own Github ones:
-<div>
 
 ```
 https://github.com/jasperf.keys
 ```
 
-</div>
 Though users.yml is not hard to set up and admin for admin_user is correct most of the time you do need to make sure all is well and no changes were made.
 <h2>Staging and Production</h2>
 Then staging and development have two files each that need updating:
