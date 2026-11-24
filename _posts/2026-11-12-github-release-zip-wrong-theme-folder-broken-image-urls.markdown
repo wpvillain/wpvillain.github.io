@@ -16,10 +16,12 @@ The cause was one line in a GitHub Actions workflow. Here is the chain, the fix 
 
 I went back through the history to find out why a theme I had released many times behaved like this only now. The answer is in the first commit. The theme was created from a starter theme through GitHub's template repository feature, and the workflow came with it, unchanged since then:
 
+{% raw %}
 ```yaml
 - name: Zip Folder
   run: zip -r ${{ github.event.repository.name }}.zip . -x@.distignore
 ```
+{% endraw %}
 
 `git log` on the workflow file shows two commits in the new repo: the initial one with exactly that line, and the fix from this week. The starter theme's own repo has the same line, and so do several of my other theme and plugin repos. Only one of them already wrapped its files in a folder, because its WordPress.org review asked for a clean zip.
 
@@ -83,6 +85,7 @@ and the page showed the alt text where the hero photo should have been. A reques
 
 Wrap the files in one folder named after the repository, so the zip's top level is the theme folder:
 
+{% raw %}
 ```yaml
 - name: Zip Folder
   env:
@@ -93,6 +96,7 @@ Wrap the files in one folder named after the repository, so the zip's top level 
     unzip -q "$RUNNER_TEMP/flat.zip" -d "$RUNNER_TEMP/pkg/$NAME"
     (cd "$RUNNER_TEMP/pkg" && zip -qr "$GITHUB_WORKSPACE/$NAME.zip" "$NAME")
 ```
+{% endraw %}
 
 It builds the same file list as before (the `.distignore` still applies), then re-zips it inside `$NAME/`. I checked it by listing the released zip, not just by trusting the YAML:
 
