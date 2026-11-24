@@ -14,7 +14,7 @@ I wrote some code a month ago that finally crashed a production WordPress site t
 
 During an extensive PHP-FPM memory debugging session, I was trying to suppress some harmless WooCommerce database warnings. These warnings occur when WooCommerce tries to add database indexes that already exist:
 
-```
+```text
 WordPress database error Duplicate key name 'session_expiry'
 ```
 
@@ -53,7 +53,7 @@ Can you spot the bug?
 
 The `query` filter runs on **every** database query WordPress makes. When you call `$wpdb->query()` inside the `query` filter, it triggers the same filter again:
 
-```
+```text
 1. WordPress runs ALTER TABLE query
 2. 'query' filter intercepts it
 3. Filter calls $wpdb->query($query)
@@ -66,7 +66,7 @@ The `query` filter runs on **every** database query WordPress makes. When you ca
 
 The error message was:
 
-```
+```text
 PHP Fatal error: Uncaught Error: Maximum call stack size of 8339456 bytes
 (zend.max_allowed_stack_size - zend.reserved_stack_size) reached.
 Infinite recursion? in /wp-includes/class-wpdb.php:2412

@@ -146,7 +146,7 @@ cd ~/code
 vibe --agent wp-frontend-builder
 ```
 
-```
+```text
 Load demo-project-setup. Set up ~/code/bakery-demo for Bakkerij Lindeboom, Utrecht (invented): a family bakery, 12 people, since 1987. Audience: neighbourhood customers and office caterers. Main actions: "Order a cake" and "Visit the shop". Tone: warm, plain Dutch. Sections: header, hero, cakes, workshop, about, order form (name, email, date, cake, message), contact, footer. References: example.com, take the full-bleed photos and the name-only captions; do not copy anything else. Photos come later. Mode B, local site lindeboom-demo, theme slug lindeboom. Ask before creating a GitHub repository.
 ```
 
@@ -163,7 +163,7 @@ It does not build. It ends with the list of photos to download and the prompt fo
 
 **Then add the photos.** Download them from Unsplash into `~/code/bakery-demo/images` and keep Unsplash's own filenames, such as `rafaella-mendes-diniz-AoL-mVxprmk-unsplash.jpg`. Start a fresh session in the project folder and paste:
 
-```
+```text
 Load demo-project-setup. Photos added to images/: fill in CREDITS.md, fit prompt 1 to the photos and commit.
 ```
 
@@ -212,7 +212,7 @@ The site then runs my working copy of Aludra. A block fix shows on the next page
 
 A fresh session, then paste prompt 1 from `PROMPTS.md`. Shortened:
 
-```
+```text
 Build the homepage for a family bakery as one self-contained index.html with embedded CSS.
 
 Brief: (name, audience, main actions, tone, references with what to take from each)
@@ -253,11 +253,11 @@ cd ~/code/bakery-demo
 vibe --agent ux-designer
 ```
 
-```
+```text
 /model large-4
 ```
 
-```
+```text
 Load html-page-review and review index.html against the brief in README.md.
 ```
 
@@ -267,7 +267,7 @@ A good review run measures the page with the probe at 390, 768 and 1440px, takes
 
 Back in `wp-frontend-builder`, apply a few notes at a time:
 
-```
+```text
 Read index.html and REVIEW.md. Apply review notes 1-3 to index.html. Don't edit REVIEW.md. When done, list per note what you changed.
 ```
 
@@ -277,7 +277,7 @@ Commit after each round you like, and `git restore index.html` the ones you don'
 
 On a branch, in a fresh session. The prompt is long because it names every decision the agent got wrong on the architect site. These are the parts that matter:
 
-```
+```text
 Load html-to-block-theme and work in Mode B (Aviendha fork + Aludra blocks). Read references/forking-a-starter-theme.md, references/composing-with-aludra.md and references/mobile-navigation.md before writing any file.
 
 Create theme-lindeboom/ as a fork of ~/code/aviendha and build the homepage as one pattern composed from aludra/* blocks. For every section, copy the block's markup from ~/code/aludra/patterns/ and change only the content:
@@ -312,7 +312,7 @@ I ran the bakery conversion on GLM 5.3 first. It took a browser screenshot, deci
 
 The report and your own screenshots become a numbered list for one more run on the same branch, so its diff shows only the design changes:
 
-```
+```text
 Load html-to-block-theme. theme-lindeboom/ does not yet match index.html. Do a design pass so https://lindeboom-demo.test matches index.html, without changing which blocks are used except where noted.
 
 1. Buttons square, ink background, accent on hover, no shadow.

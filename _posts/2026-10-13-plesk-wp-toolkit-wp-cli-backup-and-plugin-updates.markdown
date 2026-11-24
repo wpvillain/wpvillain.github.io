@@ -26,7 +26,7 @@ What a plugin update changes is the database (migrations, new options) and the p
 
 In Plesk, open the site in WP Toolkit and click **WP-CLI**. You get a single command field with `wp` already filled in, so you type everything after it. There's no shell, so no pipes, `gzip` or `ls`. That's fine, because `wp db export` does the whole job:
 
-```
+```bash
 db export ../site-pre-updates-2026-10-13.sql
 ```
 
@@ -34,7 +34,7 @@ The `../` matters. It writes the dump one level **above the web root**, so it ca
 
 Expected output:
 
-```
+```text
 Success: Exported to '../site-pre-updates-2026-10-13.sql'.
 
 WARNING: option --ssl-verify-server-cert is disabled, because of an insecure passwordless login.
@@ -72,19 +72,19 @@ Mine was 13.7 MB with 35 tables and ended with `-- Dump completed on 2026-10-13 
 
 Back in the WP-CLI console, run three read-only commands:
 
-```
+```bash
 plugin list --fields=name,status,version,update_version
 ```
-```
+```bash
 theme list --fields=name,status,version,update_version
 ```
-```
+```bash
 core check-update
 ```
 
 Paste the output into your notes. That list is your file-level rollback. For anything from wordpress.org, going back is one command:
 
-```
+```bash
 plugin install <slug> --version=<old-version> --force
 ```
 
@@ -116,10 +116,10 @@ The result is a set of batches:
 
 Batch 1 in the WP-CLI console:
 
-```
+```bash
 theme update twentytwentyfive twentytwentyfour twentytwentyone twentytwentythree twentytwentytwo
 ```
-```
+```bash
 plugin update wp-crontrol duplicate-page svg-support wp-mail-smtp custom-post-type-ui google-site-kit updraftplus
 ```
 
@@ -139,7 +139,7 @@ A 200 status with no "critical error" is the minimum. Then check what this site 
 
 After batch 1, the admin still said **20 updates** and listed WP Crontrol at its old version. WP-CLI said otherwise:
 
-```
+```bash
 plugin list --fields=name,version,update_version
 ```
 
@@ -158,7 +158,7 @@ When the updates are done, or if they're postponed, delete the server-side dump:
 
 ## The checklist
 
-```
+```text
 1. WP Toolkit -> WP-CLI:  db export ../site-pre-updates-YYYY-MM-DD.sql
 2. FTP: download the dump, keep it out of git
 3. Verify: size, CREATE TABLE count, "Dump completed" footer

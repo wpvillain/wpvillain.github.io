@@ -79,7 +79,7 @@ wp option get adminhash
 
 On the site above, that gave me:
 
-```
+```text
 admin_email:     jasper@example.com
 new_admin_email: hallo@example.com
 adminhash:       array ( 'hash' => 'a2bd4e6c...', 'newemail' => 'hallo@example.com' )
@@ -139,7 +139,7 @@ wp option update admin_email hallo@example.com
 
 No confirmation, no token, no waiting. I verified this on a sandbox — the value changes immediately and no `adminhash` is created:
 
-```
+```console
 $ wp option update admin_email direct-test@example.com
 Success: Updated 'admin_email' option.
 $ wp option get adminhash
@@ -156,7 +156,7 @@ This is the part that will bite you, and it's the reason the two commands above 
 
 Writing `admin_email` directly changes the live address. It does **not** touch `new_admin_email` or `adminhash`. If a pending change was already sitting there, it survives untouched:
 
-```
+```console
 $ wp option update new_admin_email pending@example.com   # pending change exists
 $ wp option update admin_email forced@example.com        # force the live value
 
@@ -212,7 +212,7 @@ Order matters slightly, and not in the direction you'd guess. Cancel *then* set 
 
 I went into this believing the confirmation flow was an admin-UI thing — that WP-CLI wrote options "raw" and bypassed it. That's wrong, and I only found out by testing it:
 
-```
+```console
 $ wp option update new_admin_email trap-test@example.com
 Success: Updated 'new_admin_email' option.
 $ wp option get adminhash

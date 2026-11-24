@@ -15,20 +15,20 @@ Over the past weekend, I spent considerable time debugging persistent memory exh
 
 The site was experiencing intermittent failures with WordPress's generic error message:
 
-```
+```text
 There has been a critical error on this website.
 ```
 
 PHP-FPM logs showed:
 
-```
+```text
 [pool wordpress] seems busy (you may need to increase pm.start_servers)
 [pool wordpress] server reached pm.max_children setting (30)
 ```
 
 Error logs revealed memory exhaustion:
 
-```
+```text
 PHP Fatal error: Allowed memory size of 536870912 bytes exhausted
 ```
 
@@ -53,7 +53,7 @@ ps aux | grep 'php-fpm: pool' | awk '{sum+=$6} END {print sum/1024" MB"}'
 
 Workers were showing alarming memory usage:
 
-```
+```text
 817.754 MB - PID 56823
 687.953 MB - PID 56841
 177.629 MB - PID 56833
@@ -65,7 +65,7 @@ Some workers had ballooned to 800MB+ while others stayed healthy at ~150MB.
 
 On a 4GB server running the full LEMP stack:
 
-```
+```text
 Available RAM: ~3.5GB (after system/services)
 30 workers x ~200MB each = 6GB theoretical max
 Safe worker count: 3500MB / 200MB = ~17-18 workers
@@ -103,7 +103,7 @@ Config::define('WP_MAX_MEMORY_LIMIT', '512M');
 
 PHP-FPM workers don't release memory between requests. Over time, they accumulate:
 
-```
+```text
 Request 1:   150 MB
 Request 50:  250 MB
 Request 100: 350 MB
@@ -131,7 +131,7 @@ trellis provision --tags wordpress-setup production
 
 WooCommerce uses Action Scheduler for background tasks. I noticed the async runner was constantly spawning AJAX requests:
 
-```
+```text
 POST /wp-admin/admin-ajax.php?action=as_async_request_queue_runner
 ```
 
@@ -203,7 +203,7 @@ wp cache flush
 
 The final piece of the puzzle came from Xdebug profiling. Error logs showed:
 
-```
+```text
 [23-Nov-2025 04:43:10] worker 77 exited on signal 9 (SIGKILL)
 request: "POST /xmlrpc.php"
 IP: 103.42.58.162
