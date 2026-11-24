@@ -11,14 +11,14 @@ Taking care of the Zend Framework NGINX virtualhost configuration  can be daunt
 <h2>Virtualhost Location</h2>
 Although again this may not be the ideal setup we have used:
 
-```
+```text
 /etc/nginx/conf.d/default.conf
 ```
 
 <p class="p1"><span class="s1">to setup a virtualhost for our LEMP test server running the Zend Framework. </span></p>
 <p class="p1"><span class="s1">Normally you will see this kind of contents there:</span></p>
 
-```nginx
+```php
 server {
 
   listen 80;
@@ -67,13 +67,13 @@ server {
 <h2 class="p1"><span class="s1">General Nginx Configuration</span></h2>
 <p class="p1"><span class="s1">In the general <a href="https://www.nginx.com/resources/wiki/start/topics/examples/full/" target="_blank">Nginx configuration file</a>:</span></p>
 
-```
+```text
 /etc/nginx/nginx.conf
 ```
 
 <p class="p1"><span class="s1">this file is mentioned for setting up dealing with virtual hosts:</span></p>
 
-```nginx
+```text
 ##
 
  # Virtual Host Configs
@@ -92,7 +92,7 @@ server {
 <h2 class="p1"><span class="s1">Sites-Enabled</span></h2>
 <p class="p1"><span class="s1">With multiple hosts you are better of creating multiple inside sites-enabled:</span></p>
 
-```
+```text
 /etc/nginx/sites-enabled/
 ```
 
@@ -101,13 +101,13 @@ server {
 <h2 class="p1"><span class="s1">Default.conf</span></h2>
 <p class="p1"><span class="s1">So, in that file:</span></p>
 
-```
+```text
 /etc/nginx/conf.d/default.conf
 ```
 
 <p class="p1"><span class="s1">we have made the following configuration:</span></p>
 
-```nginx
+```php
 server {
 
   listen 443 ssl;
@@ -210,13 +210,13 @@ I will discuss some of the elements of this configuration here below.
 <h2>Webroot Location</h2>
 It is one of our very first Nginx setups on a VPS and we are not completely satisfied yet. But as root we have now:
 
-```
+```text
 root /usr/share/nginx/app/ZendSkeletonApplication/public;
 ```
 
 We are considering moving all to:
 
-```
+```text
 /var/www/domain.com/public
 ```
 
@@ -257,7 +257,7 @@ I wrote about that earlier <a href="https://imagewize.com/lets-encrypt-and-zend-
 <h2>phpMyAdmin</h2>
 As you can see we also have added a location for phpMyAdmin:
 
-```nginx
+```php
 location /phpmyadmin {
 
         root /usr/share/;

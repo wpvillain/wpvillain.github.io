@@ -16,7 +16,7 @@ I first rename the current Trellis folder to trellis-old and git clone the lates
 </ul>
 That way I can keep the old copy and have the latest so I can copy over changes I need. I also put <em>trellis-old</em> on the <em>.gitignore</em> list with some other directories and files:
 
-```
+```text
 .DS_Store
 database-backups/
 trellis-old/
@@ -42,7 +42,7 @@ The group <em>all</em> with common variables alone has:
 </ul>
 to updateMail.yml has the mail details so your Trellis server can send out email. Something like:
 
-```
+```text
 # Documentation: https://roots.io/trellis/docs/mail/
 mail_smtp_server: smtp.sendgrid.net:587
 mail_admin: admin@domain.com
@@ -55,7 +55,7 @@ when you are using Sendgrid.
 
 Main has the main vars including some of your own custom ones.I made sure all customizations to PHP settings are added to <em>group_vars/all/main.yml</em>:
 
-```
+```text
 php_max_execution_time: 300
 php_max_input_vars: 1000
 php_memory_limit: 256M
@@ -64,7 +64,7 @@ php_post_max_size: 128M
 
 In vault.yml the vault mail password is stored. That is needed for sending out email which is mainly set up in mail.yml. Under users.yml you add the server users and the keys used for which we normally use our own Github ones:
 
-```
+```text
 https://github.com/jasperf.keys
 ```
 
@@ -81,7 +81,7 @@ These files do not change much in Trellis, but they contain major details on you
 <h2>Hosts</h2>
 Host files for staging and production need their ips updated so they have the ones you added before. This is pretty easy to do and as these files hardly every change you can overwrite them. Example staging hosting file:
 
-```
+```text
 # Add each host to the [staging] group and to a "type" group such as [web] or [db].
 # List each machine only once per [group], even if it will host multiple sites.
 [staging]

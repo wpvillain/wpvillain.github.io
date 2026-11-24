@@ -11,7 +11,7 @@ Often when you upgrade WooCommerce you get the error <em>Your theme contains out
 <h2>Check System Status Page</h2>
 The error message Y<em>our theme contains outdated copies of some WooCommerce template files</em> will also indicate you should check the system status page where they will show you what pages are outdated. Here the full error message:
 
-```
+```text
 Your theme (Ianua) contains outdated copies of some WooCommerce template files. These files may need updating to ensure they are compatible with the current version of WooCommerce. You can see which files are affected from the system status page. If in doubt, check with the author of the theme.
 ```
 
@@ -19,7 +19,6 @@ NB They also refer to&nbsp;<a href="https://docs.woocommerce.com/document/templa
 <h2>Outdated Templates</h2>
 At the bottom of the system status page they will show you what templates are outdated.
 
-<img class="alignnone size-large wp-image-7387" src="https://wooaid.com/wp-content/uploads/2017/10/Outdated-Templates-1024x233.png" alt="Outdated Templates" width="980" height="223">
 
 If you are the author of the theme it will be up to you to update the files in question. If you bought the theme from another developer you should ask them for an update and then overwrite the theme according to their instructions.
 <h2>Updating Theme Caveats</h2>
@@ -31,7 +30,7 @@ https://gist.github.com/jasperf/69d0a74a6132e8b4bd2ae794a7f0bac4
 
 A custom <a href="https://codex.wordpress.org/Class_Reference/WP_Query" target="_blank" rel="noopener noreferrer">WP_Query</a> was created to load the products. This so additional html could be added for all the page elements with ease. This page was on the list of pages needing an update according to WooCommerce. It stated
 
-```
+```text
 ianua/archive-product.php version - is out of date. The core version is 2.0.0,
 ```
 
@@ -41,7 +40,7 @@ So only update if the files that need updating do not have any custom code, whic
 <h2>Removing the Warning</h2>
 If you do want the warning not to be mentioned anymore, add the correct block with the file version number. In this case the block would be:
 
-```
+```php
 /**
 * The Template for displaying product archives, including the main shop page which is a post type archive
 *

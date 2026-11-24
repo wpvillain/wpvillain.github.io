@@ -27,13 +27,13 @@ tags: [page, product, products, similar, single, woocommerce, wordpress]
 
 <p>The Plugin <a href="https://wordpress.org/plugins/woocommerce-cross-sell-products-display/">WooCommerce Cross Sell Products</a> Display allows the display of cross-sell products using a shortcode on single product pages or pretty much anywhere you would need them shown. It basically uses this code to get the cross-sell ids:</p>
 
-```
+```php
 $crosssells = get_post_meta( $product_id, '_crosssell_ids', true);
 ```
 
 <p>There is even a carousel options for upsells, cross-sells and related products. Example shortcode here below:</p>
 
-```
+```text
 [wcsp_cross_sell orderby=”rand” order=”ASC” product_num=”5″ display_columns=”3″ title=”Some title..” product_id=”Product ID” class=”class-1 class-2 class-3″]
 ```
 
@@ -41,7 +41,7 @@ $crosssells = get_post_meta( $product_id, '_crosssell_ids', true);
 
 <p>If you need to load the shortcode in an advanced custom field as you want to easily load cross-sell on product pages  <a href="https://support.advancedcustomfields.com/forums/topic/shortcodes-in-text-field/">you can do so as well</a>. You can simply use the following code in your template:</p>
 
-```
+```text
 do_shortcode( get_field('FIELDNAME') );
 ```
 

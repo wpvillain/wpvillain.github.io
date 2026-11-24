@@ -25,7 +25,7 @@ git checkout k8 --
 
 <p>may be needed to switch to new branch locally due to error</p>
 
-```
+```text
 fatal: 'k8' could be both a local file and a tracking branch.
 Please use -- (and optionally --no-guess) to disambiguate
 ```

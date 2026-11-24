@@ -56,7 +56,7 @@ tags: [bulk, framework, noindex, seo, wordpress]
 
 <p>And here is the actual script. It does the same as the <code>wp eval</code> examples above but in an easier way. When I wanted to <code>noindex</code> Vue posts I just ran:</p>
 
-```
+```text
 ./tools/scripts/bulk-noindex-category.sh --run --search="vue"   
 ==========================================
 Bulk Noindex - imagewize.com

@@ -13,7 +13,7 @@ tags: [currency, load, next, switcher, wordpress, wpml]
 
 <p>There is a general method you can tweak:</p>
 
-```
+```text
 woocommerce_default_catalog_orderby
 ```
 

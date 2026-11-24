@@ -26,7 +26,7 @@ Be advised that this will trigger a Docker daemon restart which might stop runni
 
 <p>So once I checked the setup one I was told the certs could not be checked. So I tried regerating them.&lt;pre&gt;</p>
 
-```
+```text
 jasper@~/code/domain.com/laradock $ docker-machine regenerate-certs larastudio
 Regenerate TLS machine certs? Warning: this is irreversible. (y/n): y
 Regenerating TLS certificates
@@ -42,7 +42,7 @@ docker-machine -D env larastudio
 
 <p>for a more detailed report. I got more errors</p>
 
-```
+```text
 Getting to WaitForSSH function...
 (larastudio) Calling .GetSSHHostname
 (larastudio) Calling .GetSSHPort
@@ -80,7 +80,7 @@ docker-machine create --driver generic --generic-ip-address xxx.xxx.xx.xxx --gen
 
 <p>and it was able to connect, but I got a</p>
 
-```
+```text
 Running pre-create checks...
 Creating machine...
 (larastudio) No SSH key specified. Assuming an existing key at the default location.
@@ -126,7 +126,7 @@ docker-machine create --driver digitalocean --digitalocean-access-token 1111111 
 
 <p>and that worked:</p>
 
-```
+```text
 Running pre-create checks...
 Creating machine...
 (smart48-docker) Creating SSH key...
@@ -174,7 +174,7 @@ docker-machine create --driver digitalocean --digitalocean-region "ams2" --digit
 
 <p>Then to do work on that machine you can do</p>
 
-```
+```bash
 eval $(docker-machine env machine-name)
 ```
 
@@ -184,7 +184,7 @@ eval $(docker-machine env machine-name)
 
 <p>To check what envs are being used you can do a</p>
 
-```
+```text
 env | grep DOCKER
 ```
 
@@ -196,7 +196,7 @@ docker-machine env -u
 
 <p>To return to localhost for docker you can do a</p>
 
-```
+```bash
 eval $(docker-machine env -u)
 ```
 
