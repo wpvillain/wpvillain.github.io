@@ -42,6 +42,7 @@ The group <em>all</em> with common variables alone has:
 </ul>
 to updateMail.yml has the mail details so your Trellis server can send out email. Something like:
 
+{% raw %}
 ```text
 # Documentation: https://roots.io/trellis/docs/mail/
 mail_smtp_server: smtp.sendgrid.net:587
@@ -50,6 +51,7 @@ mail_hostname: domain.com
 mail_user: user
 mail_password: "{{ vault_mail_password }}" # Define this variable in group_vars/all/vault.yml
 ```
+{% endraw %}
 
 when you are using Sendgrid.
 
