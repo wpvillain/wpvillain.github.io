@@ -89,7 +89,7 @@ allowlist = [
     "wp plugin list",
     "wp theme list",
     "wp --info",
-    # … plus the read-only basics: ls, cat, grep, head, git status, git diff, …
+    # ... plus the read-only basics: ls, cat, grep, head, git status, git diff, ...
 ]
 
 [tools.read_file]
@@ -268,7 +268,7 @@ A good review run measures the page with the probe at 390, 768 and 1440px, takes
 Back in `wp-frontend-builder`, apply a few notes at a time:
 
 ```
-Read index.html and REVIEW.md. Apply review notes 1–3 to index.html. Don't edit REVIEW.md. When done, list per note what you changed.
+Read index.html and REVIEW.md. Apply review notes 1-3 to index.html. Don't edit REVIEW.md. When done, list per note what you changed.
 ```
 
 Commit after each round you like, and `git restore index.html` the ones you don't. Small rounds keep the diff readable.

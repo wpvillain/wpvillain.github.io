@@ -73,7 +73,7 @@ Never trust the settings screen. Ask the database:
 
 ```bash
 wp option get admin_email
-wp option get new_admin_email   # errors if not set — that's the healthy case
+wp option get new_admin_email   # errors if not set -- that's the healthy case
 wp option get adminhash
 ```
 
@@ -82,7 +82,7 @@ On the site above, that gave me:
 ```
 admin_email:     jasper@example.com
 new_admin_email: hallo@example.com
-adminhash:       array ( 'hash' => 'a2bd4e6c…', 'newemail' => 'hallo@example.com' )
+adminhash:       array ( 'hash' => 'a2bd4e6c...', 'newemail' => 'hallo@example.com' )
 ```
 
 Sixteen days of "done." A one-liner for a fleet:
@@ -165,7 +165,7 @@ forced@example.com          <- changed
 $ wp option get new_admin_email
 pending@example.com         <- survived
 $ wp option get adminhash
-array ( 'hash' => 'd8f404f5…', 'newemail' => 'pending@example.com' )   <- survived
+array ( 'hash' => 'd8f404f5...', 'newemail' => 'pending@example.com' )   <- survived
 ```
 
 Now look at what redeems that token, in `wp-admin/options.php`:
@@ -243,7 +243,7 @@ The exact same pattern guards a user changing **their own** email, which is wher
 
 ```bash
 wp user meta get 5 _new_email
-# array( 'hash' => '…', 'newemail' => 'new@example.com' )
+# array( 'hash' => '...', 'newemail' => 'new@example.com' )
 
 wp user meta delete 5 _new_email    # = the "Cancel" link on profile.php
 ```

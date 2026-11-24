@@ -159,13 +159,13 @@ When the updates are done, or if they're postponed, delete the server-side dump:
 ## The checklist
 
 ```
-1. WP Toolkit → WP-CLI:  db export ../site-pre-updates-YYYY-MM-DD.sql
+1. WP Toolkit -> WP-CLI:  db export ../site-pre-updates-YYYY-MM-DD.sql
 2. FTP: download the dump, keep it out of git
 3. Verify: size, CREATE TABLE count, "Dump completed" footer
-4. WP-CLI: plugin list / theme list / core check-update → save as rollback reference
+4. WP-CLI: plugin list / theme list / core check-update -> save as rollback reference
 5. Archive paid plugin folders (File Manager) before updating them
 6. Grep the theme for plugin hooks; sort updates into risk batches
-7. Per batch: update → flush cache → curl check → plugin list to confirm
+7. Per batch: update -> flush cache -> curl check -> plugin list to confirm
 8. Ask before major or billable updates
 9. Delete the server-side dump
 ```

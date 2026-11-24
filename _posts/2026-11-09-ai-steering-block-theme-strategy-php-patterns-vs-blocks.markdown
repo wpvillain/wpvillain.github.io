@@ -67,7 +67,7 @@ const TEMPLATE = [
 	ROW( 'Architecture', 'system.engine', 'Environments & Delivery', [
 		CELL(
 			'Git-Native, Zero Server',
-			'Push a branch, get a URL. Build, release and health check run on our edge — nothing to patch.'
+			'Push a branch, get a URL. Build, release and health check run on our edge -- nothing to patch.'
 		),
 ...
 ```

@@ -36,7 +36,7 @@ I ruled it out step by step:
 // In the browser console, check what script actually loaded:
 Array.from(document.querySelectorAll('script[src*="my-block"]'))
   .map(s => s.src);
-// → ".../my-block/index.js?ver=<content-hash>"
+// -> ".../my-block/index.js?ver=<content-hash>"
 ```
 
 The `?ver=` query string turned out to be a webpack content hash, and it matched what was in the freshly-built `index.asset.php`. So the current JavaScript really was loading. I went further and flushed every cache I could find — object cache, transients, PHP opcache — then hard-reloaded the editor. Still three cards, not four.
@@ -58,7 +58,7 @@ const blocks = wp.data.select('core/block-editor').getBlocks();
 const analyzer = blocks.find(b => b.name === 'my-plugin/my-block');
 const serialized = wp.blocks.serialize(analyzer);
 serialized.match(/card-label">[A-Za-z ]*</g);
-// → ["card-label\">One<", "card-label\">Two<", "card-label\">Three<", "card-label\">Four<"]
+// -> ["card-label\">One<", "card-label\">Two<", "card-label\">Three<", "card-label\">Four<"]
 ```
 
 Four cards, right there in the console. Serializing the in-memory block state manually, through the real `wp.blocks.serialize()` function, produced exactly the output the new code should. Deployed code: correct. Loaded JS: correct. The editor's own block state: also correct.
@@ -86,7 +86,7 @@ const result = await wp.apiFetch({
 });
 
 result.content.raw.match(/card-label">[A-Za-z ]*</g);
-// → all four cards, confirmed in the response
+// -> all four cards, confirmed in the response
 ```
 
 Because it runs inside the same authenticated `wp-admin` tab, it reuses the existing REST nonce for free — `wp.apiFetch` is already loaded on every block editor screen, no extra setup required.

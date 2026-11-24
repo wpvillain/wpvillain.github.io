@@ -141,10 +141,10 @@ curl -su "$AUTH" "$WP/aludra/list-blocks/run"
 
 curl -su "$AUTH" -X POST "$WP/aludra/compose-page/run" \
   -H 'Content-Type: application/json' --data @payload.json
-# → {"page_id":942,"status":"draft","edit_url":"...","link":"...","warnings":[]}
+# -> {"page_id":942,"status":"draft","edit_url":"...","link":"...","warnings":[]}
 
 curl -su "$AUTH" "$WP/aludra/check-page/run?input%5Bpage_id%5D=942"
-# → {"page_id":942,"blocks":14,"ok":true,"issues":[]}
+# -> {"page_id":942,"blocks":14,"ok":true,"issues":[]}
 ```
 
 `payload.json` holds the same `{"input": {...}}` body as the `compose-page` example above. Keeping it in a file saves you from escaping apostrophes in the copy inside a shell string.

@@ -93,12 +93,12 @@ add_action('init', function () {
  *
  * editor.jsx templates use these as the initial url attribute on core/image blocks
  * so icons display correctly in the editor. The imagewize/theme-icon binding handles
- * correct resolution on the frontend — these localized values are editor-only fallbacks.
+ * correct resolution on the frontend -- these localized values are editor-only fallbacks.
  *
  * Add an entry here whenever a new block imports SVG icons via core/image.
  */
 add_action('enqueue_block_editor_assets', function () {
-    // Keys are the icon paths (matching binding args.path) → current Vite asset URL.
+    // Keys are the icon paths (matching binding args.path) -> current Vite asset URL.
     // Add an entry here whenever a new block uses imagewize/theme-icon bindings.
     $icon_paths = [
         // icon-grid block

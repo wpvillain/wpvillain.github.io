@@ -34,7 +34,7 @@ $crosssells = get_post_meta( $product_id, '_crosssell_ids', true);
 <p>There is even a carousel options for upsells, cross-sells and related products. Example shortcode here below:</p>
 
 ```text
-[wcsp_cross_sell orderby=”rand” order=”ASC” product_num=”5″ display_columns=”3″ title=”Some title..” product_id=”Product ID” class=”class-1 class-2 class-3″]
+[wcsp_cross_sell orderby="rand" order="ASC" product_num="5" display_columns="3" title="Some title.." product_id="Product ID" class="class-1 class-2 class-3"]
 ```
 
 <h2 class="wp-block-heading">Advanced Field Integration</h2>

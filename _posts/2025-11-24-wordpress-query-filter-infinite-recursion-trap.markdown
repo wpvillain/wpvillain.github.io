@@ -36,7 +36,7 @@ add_filter('query', function ($query) {
         $suppress_errors = $wpdb->suppress_errors();
         $wpdb->suppress_errors(true);
 
-        $result = $wpdb->query($query);  // ← THE BUG
+        $result = $wpdb->query($query);  // <- THE BUG
 
         $wpdb->suppress_errors($suppress_errors);
 

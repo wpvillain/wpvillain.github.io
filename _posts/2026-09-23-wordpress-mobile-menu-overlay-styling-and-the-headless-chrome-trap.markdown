@@ -50,7 +50,7 @@ In our case, the lie was the opposite direction: the screenshot showed an overfl
 Playwright's `viewport: { width, height }` parameter, by contrast, is exact — pass 390 and it renders at 390, every time. And because `node_modules/playwright` already exists (pulled in by [wp-pattern-sentinel](https://github.com/imagewize/wp-pattern-sentinel)), there's no extra install step:
 
 ```js
-const { chromium } = require('/Users/…/ecotuin/node_modules/playwright');
+const { chromium } = require('/Users/.../ecotuin/node_modules/playwright');
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 390, height: 700 } });
 await page.goto('https://ecotuin.test/', { waitUntil: 'networkidle' });

@@ -560,7 +560,7 @@ button:focus-visible,
 .page-body strong{ color:var(--paper); }
 
 /* ---------- syntax highlighting (Rouge) ---------- */
-.highlight .c, .highlight .c1, .highlight .cm, .highlight .cs{ color:var(--muted-dim); font-style:italic; }
+.highlight .c, .highlight .c1, .highlight .cm, .highlight .cs, .highlight .cd{ color:var(--muted-dim); font-style:italic; }
 .highlight .cp{ color:var(--sky); }
 .highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .ow{ color:var(--amber); }
 .highlight .kt{ color:var(--sky); }

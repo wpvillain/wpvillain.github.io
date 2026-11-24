@@ -94,7 +94,7 @@ I keep this as a script checked into the project, so both I and any coding agent
 
 ```bash
 #!/usr/bin/env bash
-# sharedhost-ftp.sh — curl wrapper for a shared host's FTP,
+# sharedhost-ftp.sh -- curl wrapper for a shared host's FTP,
 # forcing explicit FTP over TLS, password decoded at runtime.
 
 set -euo pipefail
@@ -137,7 +137,7 @@ scripts/sharedhost-ftp.sh "ftp://ftp.sharedhost.example/public_html/wp-content/m
 scripts/sharedhost-ftp.sh -o /tmp/wp-config.php \
   "ftp://ftp.sharedhost.example/public_html/wp-config.php"
 
-# upload one file (a deploy — same care as any production write)
+# upload one file (a deploy -- same care as any production write)
 scripts/sharedhost-ftp.sh -T the-mu-plugin.php \
   "ftp://ftp.sharedhost.example/public_html/wp-content/mu-plugins/"
 ```

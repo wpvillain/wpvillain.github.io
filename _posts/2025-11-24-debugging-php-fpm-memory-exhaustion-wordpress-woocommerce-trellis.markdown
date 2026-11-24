@@ -67,7 +67,7 @@ On a 4GB server running the full LEMP stack:
 
 ```
 Available RAM: ~3.5GB (after system/services)
-30 workers × ~200MB each = 6GB theoretical max
+30 workers x ~200MB each = 6GB theoretical max
 Safe worker count: 3500MB / 200MB = ~17-18 workers
 ```
 
@@ -80,7 +80,7 @@ The first discovery was surprising. WordPress has its **own internal memory limi
 ```bash
 # Check WordPress memory limits
 wp eval 'echo "WP_MEMORY_LIMIT: " . WP_MEMORY_LIMIT . "\n";'
-# Output: WP_MEMORY_LIMIT: 40M  ← WAY too low!
+# Output: WP_MEMORY_LIMIT: 40M  <- WAY too low!
 ```
 
 WordPress was capping itself at 40MB regardless of PHP's 512MB limit. With WooCommerce + Acorn (Laravel for WordPress), each request needs 150-250MB.
@@ -107,7 +107,7 @@ PHP-FPM workers don't release memory between requests. Over time, they accumulat
 Request 1:   150 MB
 Request 50:  250 MB
 Request 100: 350 MB
-Request 200: 500+ MB  ← Danger zone!
+Request 200: 500+ MB  <- Danger zone!
 ```
 
 The `pm.max_requests` setting forces workers to recycle after N requests. But on a low-traffic site (~80 requests/hour spread across 15 workers), workers were only handling ~5 requests/hour each. They'd accumulate memory for 20+ hours before recycling.
@@ -118,7 +118,7 @@ Reduce `pm.max_requests` aggressively:
 
 ```yaml
 # trellis/group_vars/production/main.yml
-php_fpm_pm_max_requests: 25  # Reduced from 500 → 200 → 100 → 25
+php_fpm_pm_max_requests: 25  # Reduced from 500 -> 200 -> 100 -> 25
 ```
 
 Apply with:

@@ -131,11 +131,11 @@ Nynaeve's own `composer.json` `require` (acorn, `illuminate/*`, acf-composer, et
 Before the Packagist switch, we ran the full local equivalent of the new build-before → build-after sequence by hand against the Trellis VM:
 
 ```bash
-composer update imagewize/nynaeve --with-dependencies   # in site/ — pulled from GitHub, dev-main
-npm install && npm run build                              # in the theme dir — built clean
-composer install ...                                       # in the theme dir — own vendor/autoload.php
-wp cache flush && wp theme status nynaeve                  # → Status: Active, Version: 3.1.0
-curl http://imagewize.test/                                 # → 200, correct <title>
+composer update imagewize/nynaeve --with-dependencies   # in site/ -- pulled from GitHub, dev-main
+npm install && npm run build                              # in the theme dir -- built clean
+composer install ...                                       # in the theme dir -- own vendor/autoload.php
+wp cache flush && wp theme status nynaeve                  # -> Status: Active, Version: 3.1.0
+curl http://imagewize.test/                                 # -> 200, correct <title>
 ```
 
 After switching to Packagist, the re-check was static rather than a full VM run — same installed theme, just a different resolution path: `composer validate` passes, `composer.lock`/`installed.json` agree on `v3.1.0` resolved via Packagist's GitHub zipball dist, no `.git/` present (confirming dist, not VCS), and `style.css` still reports `3.1.0`.

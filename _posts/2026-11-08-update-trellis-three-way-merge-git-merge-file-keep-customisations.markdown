@@ -92,7 +92,7 @@ Merged cleanly (23)
 Added (4)
 Deleted (unchanged locally) (4)
 Already up to date (e.g. cherry-picked before) (3)
-CONFLICTS — resolve the <<<<<<< markers (1):
+CONFLICTS -- resolve the <<<<<<< markers (1):
   roles/php/defaults/main.yml (1 conflict(s))
 ```
 

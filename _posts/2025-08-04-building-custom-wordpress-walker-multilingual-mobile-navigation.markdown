@@ -62,7 +62,7 @@ private function get_language_button_text() {
         case 'en':
             return array('back' => 'Back', 'close' => 'Close');
         case 'de':
-            return array('back' => 'Zurück', 'close' => 'Schließen');
+            return array('back' => 'Zurueck', 'close' => 'Schliessen');
         default:
             return array('back' => 'Terug', 'close' => 'Sluiten');
     }
@@ -81,7 +81,7 @@ public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
         $classes = $item->classes ? $item->classes : array();
         $has_submenu = in_array('has-mega-menu', $classes) ? 'has-submenu' : '';
         $data_target = in_array('has-mega-menu', $classes) ? 'data-target="expertise"' : '';
-        $arrow = $has_submenu ? '<span class="nav-arrow">›</span>' : '';
+        $arrow = $has_submenu ? '<span class="nav-arrow">></span>' : '';
         
         // Store expertise parent ID for submenu processing
         if (in_array('has-mega-menu', $classes)) {
@@ -180,21 +180,21 @@ private function get_mobile_cta_button() {
         case 'en':
             if (!empty($header_btn_en)) {
                 $button_html = '<a href="' . $header_btn_en['url'] . '" class="mobile-cta-btn">';
-                $button_html .= $header_btn_en['title'] . ' <span class="cta-arrow">→</span>';
+                $button_html .= $header_btn_en['title'] . ' <span class="cta-arrow">-></span>';
                 $button_html .= '</a>';
             }
             break;
         case 'de':
             if (!empty($header_btn_de)) {
                 $button_html = '<a href="' . $header_btn_de['url'] . '" class="mobile-cta-btn">';
-                $button_html .= $header_btn_de['title'] . ' <span class="cta-arrow">→</span>';
+                $button_html .= $header_btn_de['title'] . ' <span class="cta-arrow">-></span>';
                 $button_html .= '</a>';
             }
             break;
         default:
             if (!empty($header_btn)) {
                 $button_html = '<a href="' . $header_btn['url'] . '" class="mobile-cta-btn">';
-                $button_html .= $header_btn['title'] . ' <span class="cta-arrow">→</span>';
+                $button_html .= $header_btn['title'] . ' <span class="cta-arrow">-></span>';
                 $button_html .= '</a>';
             }
             break;
@@ -216,8 +216,8 @@ private function get_fallback_expertise_structure() {
         case 'en':
             $html .= '<div class="nav-category">';
             $html .= '<h3>Digitalisation</h3>';
-            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">›</span></a>';
-            $html .= '<a href="#" class="nav-item">Digital Channel <span class="nav-arrow">›</span></a>';
+            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">></span></a>';
+            $html .= '<a href="#" class="nav-item">Digital Channel <span class="nav-arrow">></span></a>';
             $html .= '</div>';
             // ... more categories
             break;
@@ -225,14 +225,14 @@ private function get_fallback_expertise_structure() {
         case 'de':
             $html .= '<div class="nav-category">';
             $html .= '<h3>Digitalisierung</h3>';
-            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">›</span></a>';
+            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">></span></a>';
             // ... more items
             break;
             
         default: // Dutch
             $html .= '<div class="nav-category">';
             $html .= '<h3>Digitaliseren</h3>';
-            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">›</span></a>';
+            $html .= '<a href="#" class="nav-item">Scan to BIM <span class="nav-arrow">></span></a>';
             // ... more items
             break;
     }

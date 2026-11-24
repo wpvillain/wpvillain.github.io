@@ -20,7 +20,7 @@ tags: [bulk, framework, noindex, seo, wordpress]
 <p>First the example to do a dry run to see what we got:</p>
 
 ```bash
-# Dry run — count posts                                                                                                      
+# Dry run -- count posts                                                                                                      
   wp eval '       
   $posts = get_posts(array(                                                                                                    
     "s" => "laravel",
@@ -36,7 +36,7 @@ tags: [bulk, framework, noindex, seo, wordpress]
 <p>and for a live run</p>
 
 ```bash
-# Live — noindex them
+# Live -- noindex them
   wp eval '                                                                                                                    
   $posts = get_posts(array(
     "s" => "laravel",
@@ -67,7 +67,7 @@ Method: keyword search for "vue"
 
 [1/3] Backing up database...
 Success: Exported to '/tmp/backup-before-noindex-20260405_113624.sql'.
-✓ Backup saved to /tmp/backup-before-noindex-20260405_113624.sql on production server
+[OK] Backup saved to /tmp/backup-before-noindex-20260405_113624.sql on production server
 
 [2/3] Processing posts...
 
@@ -156,7 +156,7 @@ if [ "$DRY_RUN" = false ]; then
   BACKUP_FILE="${BACKUP_DIR}/backup-before-noindex-${DATE}.sql"
   echo "[1/3] Backing up database..."
   ssh "$SSH_USER" "cd ${WP_DIR} && wp db export ${BACKUP_FILE} --path=${WP_PATH}"
-  echo "✓ Backup saved to ${BACKUP_FILE} on production server"
+  echo "[OK] Backup saved to ${BACKUP_FILE} on production server"
   echo ""
 else
   echo "[1/3] Skipping backup (dry run)"

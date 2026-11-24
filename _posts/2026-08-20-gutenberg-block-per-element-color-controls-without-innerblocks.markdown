@@ -18,8 +18,8 @@ What follows is the pattern I landed on, why InnerBlocks — the obvious alterna
 
 ```jsx
 <div { ...blockProps }>
-  <RichText tagName={ NumberTagName } value={ number } /* … */ />
-  <RichText tagName="div" value={ caption } /* … */ />
+  <RichText tagName={ NumberTagName } value={ number } /* ... */ />
+  <RichText tagName="div" value={ caption } /* ... */ />
 </div>
 ```
 
@@ -76,7 +76,7 @@ Gutenberg validates a block by re-running its `save()` function against whatever
 // edit.js
 const numberProps = getStatColorProps( 'stat-rail__num', numberColor, customNumberColor );
 
-// save.jsx — same call, same file
+// save.jsx -- same call, same file
 const numberProps = getStatColorProps( 'stat-rail__num', numberColor, customNumberColor );
 ```
 

@@ -39,7 +39,7 @@ add_filter( 'wpseo_robots', function( $robots ) {
 
 	$expiry_date = get_post_meta( get_the_ID(), '_post_expiry_date', true );
 	if ( $expiry_date ) {
-		$tz  = wp_timezone();                                    // Settings → General
+		$tz  = wp_timezone();                                    // Settings -> General
 		$now = new DateTime( 'now', $tz );
 		$exp = new DateTime( $expiry_date . ' 00:00:00', $tz ); // Midnight, local time
 		if ( $exp < $now ) {

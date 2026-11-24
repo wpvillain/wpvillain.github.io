@@ -58,7 +58,7 @@ The script below exports every SVG in a folder, or the files you name, as a JPG 
 ```bash
 #!/usr/bin/env bash
 #
-# svg-to-jpg.sh — Export design SVGs to JPG (raster previews).
+# svg-to-jpg.sh -- Export design SVGs to JPG (raster previews).
 #
 # Renders each .svg next to its source as a .jpg at the SVG's native size,
 # flattened on white at quality 90. Uses librsvg (rsvg-convert) for accurate
