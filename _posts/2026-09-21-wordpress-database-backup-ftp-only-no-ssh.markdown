@@ -8,9 +8,9 @@ case_category: devops
 case_status: documented
 ---
 
-{% raw %}
 You have FTP access to a WordPress site, a password for `wp-config.php`, and nothing else — no SSH, no CPanel, no Plesk, no phpMyAdmin. The database needs a backup right now. This is the DIY PHP script method that works when every other door is locked.
 
+{% raw %}
 **Scope note:** this backs up the *database* only — posts, options, users, terms, everything in MySQL. It does not touch `wp-content/uploads`, themes, or plugin files. If you need a full-site backup, use FTP to also download those directories; the database is just the part you can't grab as a folder copy.
 
 ## The Constraints

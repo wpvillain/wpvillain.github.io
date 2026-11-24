@@ -8,9 +8,9 @@ case_category: devops
 case_status: documented
 ---
 
-{% raw %}
 The command reads like a haiku, but it solves a problem that bites everybody at least once:
 
+{% raw %}
 ```bash
 PASS=$(openssl rand -base64 16) && wp user update admin --user_pass="$PASS" && echo "New password: $PASS"
 ```

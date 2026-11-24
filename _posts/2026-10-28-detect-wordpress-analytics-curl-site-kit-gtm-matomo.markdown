@@ -8,9 +8,9 @@ case_category: devops
 case_status: documented
 ---
 
-{% raw %}
 When you take over a WordPress site, one of the first questions is what tracking it already has. The answer is rarely in the handover notes, and the admin screens only show what a plugin knows about itself. The page source shows what visitors actually get, and `curl` plus `grep` reads it in a second.
 
+{% raw %}
 ## Site Kit
 
 Google's Site Kit plugin leaves meta tags in the head:

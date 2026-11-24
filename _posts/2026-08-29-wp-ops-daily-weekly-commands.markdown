@@ -8,9 +8,9 @@ case_category: devops
 case_status: shipped
 ---
 
-{% raw %}
 For a long time, my daily WordPress ops routine lived in shell history. Pull a database, sync some uploads, eyeball a security log, glance at a client site's traffic — each one a slightly-different `ssh` one-liner or `ansible-playbook` invocation I'd half-remember and then grep my own history for. Multiply that by a dozen client sites on Trellis, each with its own site key, and "half-remember" starts costing real minutes every single day.
 
+{% raw %}
 The fix wasn't a better memory. It was collapsing everything into one catalog: [wp-ops](https://github.com/imagewize/wp-ops), a single CLI that wraps the Ansible playbooks, WP-CLI scripts, and shell utilities I'd built up over time into one binary with real `--help`, search, and shell completions. Here's the actual loop I run against it — daily and weekly — and what each command is doing underneath.
 
 ## Why one binary instead of a folder of scripts

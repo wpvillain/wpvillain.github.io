@@ -8,9 +8,9 @@ case_category: devops
 case_status: shipped
 ---
 
-{% raw %}
 Every few weeks my local copies drift from production far enough that I stop trusting them: stale content, missing uploads, a plugin version that no longer matches. The fix is to replace the local databases with fresh production copies. The part that bit me once is doing it *half* right: importing a production dump but not rewriting the URLs, so every link on `example.test` quietly points at `example.com`.
 
+{% raw %}
 This post is the checklist I now follow, written down after refreshing three sites in one sitting (a main site, a multisite demo network and a small marketing site, all on Trellis with a Lima VM).
 
 ## Pick the command that does the whole job

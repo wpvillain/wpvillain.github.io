@@ -8,9 +8,9 @@ case_category: development
 case_status: documented
 ---
 
-{% raw %}
 Some WordPress sites show promotional blocks for gambling operators, and those blocks must not be shown to younger visitors. The requirement was a modal on the first visit that asks for an age range, remembers the answer, and hides the blocks when the visitor should not see them.
 
+{% raw %}
 I built it as a small script, a modal template and a stylesheet. This post explains how it works and where it stops being enough. The full script is below. The modal template (`footer.php`) and the stylesheet are in [the wp-ops repository at the commit that last held them](https://github.com/imagewize/wp-ops/tree/ef8c3c2/docs/wordpress-utilities/age-verification).
 
 One limit first: this is a **self-declared** age gate. It records what the visitor clicks. It does not verify anything, and a visitor can click the wrong button, clear the cookie or disable JavaScript. If your jurisdiction requires real age verification, this is not it.

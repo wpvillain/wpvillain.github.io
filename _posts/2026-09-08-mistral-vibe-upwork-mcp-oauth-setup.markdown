@@ -8,9 +8,9 @@ case_category: ai
 case_status: shipped
 ---
 
-{% raw %}
 If you've tried to connect Mistral Vibe to the Upwork MCP server and hit a wall, you've probably read the [official documentation on MCP servers](https://docs.mistral.ai/vibe/code/cli/mcp-servers) and come away confused. It states:
 
+{% raw %}
 > Known limitation: the CLI does not yet support MCP servers that require OAuth authentication. Use the stdio or http transport with an API key or other static credential.
 
 That statement is **out of date**. OAuth is fully implemented and working in Vibe today. The confusion stems from stale docs and a config gap that's easy to miss. Here's how to get the Upwork MCP server connected with OAuth in Vibe, what the docs get wrong, and why the fix is simpler than you think.

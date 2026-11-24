@@ -8,9 +8,9 @@ case_category: devops
 case_status: shipped
 ---
 
-{% raw %}
 [Aludra](https://wordpress.org/plugins/aludra/), my block library plugin, lives on GitHub. Pull requests, tags and the release zip all happen there. WordPress.org only understands Subversion, though, so every release needs a second trip: copy the right files into an SVN checkout, tag them, commit. This post is how I do that now, with a small staging script, written down after shipping 2.39.0 and losing one commit to a capital letter.
 
+{% raw %}
 ## The WordPress.org SVN layout
 
 Every plugin on WordPress.org gets a repository at `https://plugins.svn.wordpress.org/<slug>` with three top-level folders:

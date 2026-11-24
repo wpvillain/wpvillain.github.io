@@ -8,9 +8,9 @@ case_category: devops
 case_status: shipped
 ---
 
-{% raw %}
 If you've ever styled a WordPress block theme's mobile navigation overlay and wondered why your 375px-wide screenshot shows a hamburger clipped off-screen while the live site works fine, this one's for you. A recent fix for the Ecotuin theme — matching the light header's mobile overlay to the approved v3e design — turned into a lesson about viewport testing, CTA placement in `core/navigation`, and a Chrome flag that silently lies to you.
 
+{% raw %}
 ## The Visual Problem
 
 Issue #9 was straightforward on the surface: on phones, the light header's mobile menu overlay rendered with core's default unstyled look — white background, black text, right-aligned links, no dividers — none of which matched the rest of the site's chalk-and-ivy palette. The design called for a `base` (chalk) background, `secondary` (ivy-green) Roggenkamp typography, left-aligned links with rule-coloured (`border-light`) dividers between them, and a full-width Contact CTA button below the links.
