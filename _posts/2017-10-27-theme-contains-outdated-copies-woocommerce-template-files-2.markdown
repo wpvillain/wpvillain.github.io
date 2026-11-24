@@ -10,7 +10,11 @@ tags: [contains, copies, outdated, theme, woocommerce, wordpress]
 Often when you upgrade WooCommerce you get the error <em>Your theme contains outdated copies of some WooCommerce template files</em>. Ianua in this case. How to resolve this issue? Well. let's work things out shall we?
 <h2>Check System Status Page</h2>
 The error message Y<em>our theme contains outdated copies of some WooCommerce template files</em> will also indicate you should check the system status page where they will show you what pages are outdated. Here the full error message:
-<pre>Your theme (Ianua) contains outdated copies of some WooCommerce template files. These files may need updating to ensure they are compatible with the current version of WooCommerce. You can see which files are affected from the system status page. If in doubt, check with the author of the theme.</pre>
+
+```
+Your theme (Ianua) contains outdated copies of some WooCommerce template files. These files may need updating to ensure they are compatible with the current version of WooCommerce. You can see which files are affected from the system status page. If in doubt, check with the author of the theme.
+```
+
 NB They also refer to&nbsp;<a href="https://docs.woocommerce.com/document/template-structure/" target="_blank" rel="noopener noreferrer">https://docs.woocommerce.com/document/template-structure/</a> to learn more about the WooCommerce template structure
 <h2>Outdated Templates</h2>
 At the bottom of the system status page they will show you what templates are outdated.
@@ -26,14 +30,20 @@ If we check ianua/archive-product.php for example we will see that we added the 
 https://gist.github.com/jasperf/69d0a74a6132e8b4bd2ae794a7f0bac4
 
 A custom <a href="https://codex.wordpress.org/Class_Reference/WP_Query" target="_blank" rel="noopener noreferrer">WP_Query</a> was created to load the products. This so additional html could be added for all the page elements with ease. This page was on the list of pages needing an update according to WooCommerce. It stated
-<pre>ianua/archive-product.php version - is out of date. The core version is 2.0.0,</pre>
+
+```
+ianua/archive-product.php version - is out of date. The core version is 2.0.0,
+```
+
 This page won't be updated at this moment though. That is because of the custom code for one. It also is not using any WooCommerce functionality that no longer works. If the latter would have been the case we would have had to update the outdated code.
 
 So only update if the files that need updating do not have any custom code, which will be rare if the file in question is part of the theme. Two, if there is custom, only update the functionality that is outdated or even causing (fatal) errors.
 <h2>Removing the Warning</h2>
 If you do want the warning not to be mentioned anymore, add the correct block with the file version number. In this case the block would be:
 <div>
-<pre>/**
+
+```
+/**
 * The Template for displaying product archives, including the main shop page which is a post type archive
 *
 * This template can be overridden by copying it to yourtheme/woocommerce/archive-product.php.
@@ -44,11 +54,13 @@ If you do want the warning not to be mentioned anymore, add the correct block wi
 * happen. When this occurs the version of the template file will be bumped and
 * the readme will list any important changes.
 *
-* @see &nbsp;&nbsp;&nbsp;&nbsp; https://docs.woocommerce.com/document/template-structure/
-* @author &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WooThemes
-* @package &nbsp;&nbsp;&nbsp;&nbsp;WooCommerce/Templates
+* @see      https://docs.woocommerce.com/document/template-structure/
+* @author      WooThemes
+* @package     WooCommerce/Templates
 * @version 2.0.0
-*/</pre>
+*/
+```
+
 As you can see the version was 2.0.0 at the time of the writing of this blog post. Of course other files have other version numbers.
 
 </div>

@@ -47,7 +47,11 @@ tags: [page, product, products, similar, single, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code>$crosssells = get_post_meta( $product_id, '_crosssell_ids', true);</code></pre>
+
+```
+$crosssells = get_post_meta( $product_id, '_crosssell_ids', true);
+```
+
 
 
 
@@ -55,7 +59,11 @@ tags: [page, product, products, similar, single, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code>&#91;wcsp_cross_sell orderby=”rand” order=”ASC” product_num=”5″ display_columns=”3″ title=”Some title..” product_id=”Product ID” class=”class-1 class-2 class-3″]</code></pre>
+
+```
+[wcsp_cross_sell orderby=”rand” order=”ASC” product_num=”5″ display_columns=”3″ title=”Some title..” product_id=”Product ID” class=”class-1 class-2 class-3″]
+```
+
 
 
 
@@ -67,8 +75,11 @@ tags: [page, product, products, similar, single, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code>do_shortcode( get_field('FIELDNAME') );
-</code></pre>
+
+```
+do_shortcode( get_field('FIELDNAME') );
+```
+
 
 
 
@@ -76,7 +87,11 @@ tags: [page, product, products, similar, single, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code><code>add_filter('acf/format_value/type=textarea', 'do_shortcode');</code></code></pre>
+
+```php
+add_filter('acf/format_value/type=textarea', 'do_shortcode');
+```
+
 
 
 

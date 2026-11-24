@@ -15,4 +15,8 @@ tags: [composer, devops, package, specific, update, wordpress]
 
 
 
-<pre class="wp-block-preformatted">composer require ctf0/media-manager:3.4.0</pre>
+
+```bash
+composer require ctf0/media-manager:3.4.0
+```
+

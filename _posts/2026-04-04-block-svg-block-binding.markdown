@@ -73,7 +73,9 @@ tags: [binding, block, wordpress]
 
 
 
-<pre class="wp-block-code"><code>/**
+
+```php
+/**
  * Register block bindings source for theme SVG icons.
  *
  * Instead of storing hashed Vite asset URLs in post_content (which break on every
@@ -87,14 +89,14 @@ tags: [binding, block, wordpress]
  * Paths are relative to resources/images/icons/ (e.g. 'icon-link.svg', 'elayne/icon-fse.svg').
  */
 add_action('init', function () {
-    register_block_bindings_source('imagewize/theme-icon', &#91;
+    register_block_bindings_source('imagewize/theme-icon', [
         'label' => __('Theme Icon', 'imagewize'),
         'get_value_callback' => function (array $source_args, \WP_Block $block_instance, string $attribute_name): ?string {
-            if ($attribute_name !== 'url' || empty($source_args&#91;'path'])) {
+            if ($attribute_name !== 'url' || empty($source_args['path'])) {
                 return null;
             }
 
-            $icon_path = ltrim(str_replace('..', '', $source_args&#91;'path']), '/');
+            $icon_path = ltrim(str_replace('..', '', $source_args['path']), '/');
 
             try {
                 return Vite::asset('resources/images/icons/'.$icon_path);
@@ -103,7 +105,9 @@ add_action('init', function () {
             }
         },
     ]);
-});</code></pre>
+});
+```
+
 
 
 
@@ -125,7 +129,9 @@ add_action('init', function () {
 
 
 
-<pre class="wp-block-code"><code>/**
+
+```php
+/**
  * Pass current Vite-resolved icon URLs to the block editor as window.imagewizeIcons.
  *
  * editor.jsx templates use these as the initial url attribute on core/image blocks
@@ -137,7 +143,7 @@ add_action('init', function () {
 add_action('enqueue_block_editor_assets', function () {
     // Keys are the icon paths (matching binding args.path) → current Vite asset URL.
     // Add an entry here whenever a new block uses imagewize/theme-icon bindings.
-    $icon_paths = &#91;
+    $icon_paths = [
         // icon-grid block
         'icon-link.svg',
         'icon-copy.svg',
@@ -162,12 +168,12 @@ add_action('enqueue_block_editor_assets', function () {
         'elayne/icon-accessible.svg',
     ];
 
-    $icons = &#91;];
+    $icons = [];
     foreach ($icon_paths as $path) {
         try {
-            $icons&#91;$path] = Vite::asset('resources/images/icons/'.$path);
+            $icons[$path] = Vite::asset('resources/images/icons/'.$path);
         } catch (\Exception $e) {
-            $icons&#91;$path] = '';
+            $icons[$path] = '';
         }
     }
 
@@ -176,7 +182,9 @@ add_action('enqueue_block_editor_assets', function () {
         'window.imagewizeIcons = '.wp_json_encode($icons).';',
         'before'
     );
-});</code></pre>
+});
+```
+
 
 
 

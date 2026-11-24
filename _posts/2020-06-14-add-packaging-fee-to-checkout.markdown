@@ -19,7 +19,11 @@ tags: [checkout, packaging, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code><code>add_action('woocommerce_cart_calculate_fees', function() { </code><code>if (is_admin() &amp;&amp; !defined('DOING_AJAX')) { return; } </code><code>WC()->cart->add_fee(__('Packaging Fee' 'txtdomain'), 5); </code><code>});</code></code></pre>
+
+```php
+add_action('woocommerce_cart_calculate_fees', function() { if (is_admin() && !defined('DOING_AJAX')) { return; } WC()->cart->add_fee(__('Packaging Fee' 'txtdomain'), 5); });
+```
+
 
 
 
@@ -47,21 +51,25 @@ tags: [checkout, packaging, woocommerce, wordpress]
 
 
 
-<pre class="wp-block-code"><code>/**
+
+```php
+/**
 Add a standard $ value surcharge to all transactions in cart / checkout
 */
 add_action( 'woocommerce_cart_calculate_fees','wc_add_surcharge' );
 function wc_add_surcharge() {
 global $woocommerce;
-if ( is_admin() &amp;&amp; ! defined( 'DOING_AJAX' ) )
+if ( is_admin() && ! defined( 'DOING_AJAX' ) )
 return;
 $county = array('US');
 // change the $fee to set the surcharge to a value to suit
 $fee = 1.00;
-if ( in_array( WC()-&gt;customer-&gt;get_shipping_country(), $county ) ) :
-$woocommerce-&gt;cart-&gt;add_fee( 'Surcharge', $fee, true, 'standard' );
+if ( in_array( WC()->customer->get_shipping_country(), $county ) ) :
+$woocommerce->cart->add_fee( 'Surcharge', $fee, true, 'standard' );
 endif;
-}</code></pre>
+}
+```
+
 
 
 
@@ -73,19 +81,23 @@ endif;
 
 
 
-<pre class="wp-block-code"><code>/**
+
+```php
+/**
 Add a 1% surcharge to your cart / checkout
 change the $percentage to set the surcharge to a value to suit
 */
 add_action( 'woocommerce_cart_calculate_fees','woocommerce_custom_surcharge' );
 function woocommerce_custom_surcharge() {
 global $woocommerce;
-if ( is_admin() &amp;&amp; ! defined( 'DOING_AJAX' ) )
+if ( is_admin() && ! defined( 'DOING_AJAX' ) )
 return;
 $percentage = 0.01;
-$surcharge = ( $woocommerce-&gt;cart-&gt;cart_contents_total + $woocommerce-&gt;cart-&gt;shipping_total ) * $percentage;
-$woocommerce-&gt;cart-&gt;add_fee( 'Surcharge', $surcharge, true, '' );
-}</code></pre>
+$surcharge = ( $woocommerce->cart->cart_contents_total + $woocommerce->cart->shipping_total ) * $percentage;
+$woocommerce->cart->add_fee( 'Surcharge', $surcharge, true, '' );
+}
+```
+
 
 
 

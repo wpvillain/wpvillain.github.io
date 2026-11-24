@@ -19,7 +19,11 @@ tags: [currency, load, next, switcher, wordpress, wpml]
 
 
 
-<pre class="wp-block-preformatted">woocommerce_default_catalog_orderby</pre>
+
+```
+woocommerce_default_catalog_orderby
+```
+
 
 
 
@@ -39,20 +43,24 @@ tags: [currency, load, next, switcher, wordpress, wpml]
 
 
 
-<pre class="wp-block-code"><code>function cw_add_postmeta_ordering_args( $args_sort_cw ) {
-$cw_orderby_value = isset( $_GET&#91;'orderby'] ) ? wc_clean( $_GET&#91;'orderby'] ) :
+
+```php
+function cw_add_postmeta_ordering_args( $args_sort_cw ) {
+$cw_orderby_value = isset( $_GET['orderby'] ) ? wc_clean( $_GET['orderby'] ) :
     apply_filters( 'woocommerce_default_catalog_orderby', get_option( 'woocommerce_default_catalog_orderby' ) );
 switch( $cw_orderby_value ) {
     case 'points_awarded':
-        $args_sort_cw&#91;'orderby'] = 'meta_value_num';
-        $args_sort_cw&#91;'order'] = 'desc';
-        $args_sort_cw&#91;'meta_key'] = 'points';
+        $args_sort_cw['orderby'] = 'meta_value_num';
+        $args_sort_cw['order'] = 'desc';
+        $args_sort_cw['meta_key'] = 'points';
         break;
    case 'location':
-        $args_sort_cw&#91;'orderby'] = 'meta_value';
-        $args_sort_cw&#91;'order'] = 'asc';
-        $args_sort_cw&#91;'meta_key'] = 'location';
-        break;</code></pre>
+        $args_sort_cw['orderby'] = 'meta_value';
+        $args_sort_cw['order'] = 'asc';
+        $args_sort_cw['meta_key'] = 'location';
+        break;
+```
+
 
 
 
@@ -76,9 +84,13 @@ switch( $cw_orderby_value ) {
 
 
 
-<pre class="wp-block-preformatted">function imwz_before_default_sorting () {
+
+```php
+function imwz_before_default_sorting () {
 do_action ('imwz_before_default_sorting');
-}</pre>
+}
+```
+
 
 
 
@@ -86,7 +98,11 @@ do_action ('imwz_before_default_sorting');
 
 
 
-<pre class="wp-block-preformatted">add_action('imwz_before_default_sorting', 'prod_cat_before_sorting')</pre>
+
+```php
+add_action('imwz_before_default_sorting', 'prod_cat_before_sorting')
+```
+
 
 
 
@@ -94,9 +110,13 @@ do_action ('imwz_before_default_sorting');
 
 
 
-<pre class="wp-block-preformatted">function prod_cat_before_sorting () {
+
+```php
+function prod_cat_before_sorting () {
 do_action('wcml_currency_switcher', array('format' => '%name% (%symbol%)'));
-}</pre>
+}
+```
+
 
 
 

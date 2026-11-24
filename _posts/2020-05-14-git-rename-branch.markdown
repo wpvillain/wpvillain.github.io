@@ -11,9 +11,13 @@ tags: [branch, devops, rename, wordpress]
 
 
 
-<pre class="wp-block-preformatted">git branch -m old_branch new_branch # Rename branch locally
+
+```bash
+git branch -m old_branch new_branch # Rename branch locally
 git push origin :old_branch # Delete the old branch
-git push --set-upstream origin new_branch # Push the new branch, set local branch to track the new remote</pre>
+git push --set-upstream origin new_branch # Push the new branch, set local branch to track the new remote
+```
+
 
 
 
@@ -25,7 +29,11 @@ git push --set-upstream origin new_branch # Push the new branch, set local branc
 
 
 
-<pre class="wp-block-preformatted">git checkout k8 --</pre>
+
+```bash
+git checkout k8 --
+```
+
 
 
 
@@ -33,8 +41,12 @@ git push --set-upstream origin new_branch # Push the new branch, set local branc
 
 
 
-<pre class="wp-block-preformatted">fatal: 'k8' could be both a local file and a tracking branch.
-Please use -- (and optionally --no-guess) to disambiguate</pre>
+
+```
+fatal: 'k8' could be both a local file and a tracking branch.
+Please use -- (and optionally --no-guess) to disambiguate
+```
+
 
 
 

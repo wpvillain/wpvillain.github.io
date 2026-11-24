@@ -31,7 +31,9 @@ tags: [bulk, framework, noindex, seo, wordpress]
 
 
 
-<pre class="wp-block-code"><code># Dry run — count posts                                                                                                      
+
+```bash
+# Dry run — count posts                                                                                                      
   wp eval '       
   $posts = get_posts(array(                                                                                                    
     "s" => "laravel",
@@ -42,7 +44,8 @@ tags: [bulk, framework, noindex, seo, wordpress]
   ));                                                                                                                          
   echo count($posts) . " posts\n";
   ' --path=web/wp
-                                                                                                                                             </code></pre>
+```
+
 
 
 
@@ -50,7 +53,9 @@ tags: [bulk, framework, noindex, seo, wordpress]
 
 
 
-<pre class="wp-block-code"><code># Live — noindex them
+
+```bash
+# Live — noindex them
   wp eval '                                                                                                                    
   $posts = get_posts(array(
     "s" => "laravel",
@@ -63,7 +68,9 @@ tags: [bulk, framework, noindex, seo, wordpress]
     update_post_meta($id, "_genesis_noindex", 1);
   }                                                                                                                            
   echo count($posts) . " noindexed\n";
-  ' --path=web/wp      </code></pre>
+  ' --path=web/wp
+```
+
 
 
 
@@ -75,7 +82,9 @@ tags: [bulk, framework, noindex, seo, wordpress]
 
 
 
-<pre class="wp-block-code"><code>./tools/scripts/bulk-noindex-category.sh --run --search="vue"   
+
+```
+./tools/scripts/bulk-noindex-category.sh --run --search="vue"   
 ==========================================
 Bulk Noindex - imagewize.com
 Date: Sun Apr  5 11:36:24 WIB 2026
@@ -83,16 +92,16 @@ Mode: LIVE RUN
 Method: keyword search for "vue"
 ==========================================
 
-&#91;1/3] Backing up database...
+[1/3] Backing up database...
 Success: Exported to '/tmp/backup-before-noindex-20260405_113624.sql'.
 ✓ Backup saved to /tmp/backup-before-noindex-20260405_113624.sql on production server
 
-&#91;2/3] Processing posts...
+[2/3] Processing posts...
 
 --- Keyword search: "vue" ---
   Noindexed: 31 published posts
 
-&#91;3/3] Summary
+[3/3] Summary
 ==========================================
 Done. Total posts noindexed: 31
 
@@ -100,7 +109,9 @@ Next steps:
   1. Verify in wp-admin: check SEO column on affected posts
   2. Submit updated sitemap to Google Search Console
   3. DB backup is at: /tmp/backup-before-noindex-20260405_113624.sql (on production server)
-==========================================</code></pre>
+==========================================
+```
+
 
 
 
@@ -112,7 +123,9 @@ Next steps:
 
 
 
-<pre class="wp-block-code"><code>#!/bin/bash
+
+```bash
+#!/bin/bash
 #
 # Bulk Noindex Posts by Category or Keyword Search for imagewize.com
 # Purpose: Set _genesis_noindex=1 (The SEO Framework) on all posts in given
@@ -162,39 +175,39 @@ done
 echo "=========================================="
 echo "Bulk Noindex - imagewize.com"
 echo "Date: $(date)"
-echo "Mode: $(&#91; "$DRY_RUN" = true ] &amp;&amp; echo 'DRY RUN (no changes)' || echo 'LIVE RUN')"
-if &#91; -n "$SEARCH_TERM" ]; then
+echo "Mode: $([ "$DRY_RUN" = true ] && echo 'DRY RUN (no changes)' || echo 'LIVE RUN')"
+if [ -n "$SEARCH_TERM" ]; then
   echo "Method: keyword search for \"${SEARCH_TERM}\""
-elif &#91; -n "$CUSTOM_CAT" ]; then
+elif [ -n "$CUSTOM_CAT" ]; then
   echo "Method: category \"${CUSTOM_CAT}\""
 else
-  echo "Method: default categories (${DEFAULT_CATEGORIES&#91;*]})"
+  echo "Method: default categories (${DEFAULT_CATEGORIES[*]})"
 fi
 echo "=========================================="
 echo ""
 
 # Step 1: Backup database (only when applying changes)
-if &#91; "$DRY_RUN" = false ]; then
+if [ "$DRY_RUN" = false ]; then
   BACKUP_FILE="${BACKUP_DIR}/backup-before-noindex-${DATE}.sql"
-  echo "&#91;1/3] Backing up database..."
-  ssh "$SSH_USER" "cd ${WP_DIR} &amp;&amp; wp db export ${BACKUP_FILE} --path=${WP_PATH}"
+  echo "[1/3] Backing up database..."
+  ssh "$SSH_USER" "cd ${WP_DIR} && wp db export ${BACKUP_FILE} --path=${WP_PATH}"
   echo "✓ Backup saved to ${BACKUP_FILE} on production server"
   echo ""
 else
-  echo "&#91;1/3] Skipping backup (dry run)"
+  echo "[1/3] Skipping backup (dry run)"
   echo ""
 fi
 
-echo "&#91;2/3] Processing posts..."
+echo "[2/3] Processing posts..."
 TOTAL_AFFECTED=0
 
 # --- Keyword search mode ---
-if &#91; -n "$SEARCH_TERM" ]; then
+if [ -n "$SEARCH_TERM" ]; then
   echo ""
   echo "--- Keyword search: \"${SEARCH_TERM}\" ---"
 
-  if &#91; "$DRY_RUN" = true ]; then
-    COUNT=$(ssh "$SSH_USER" "cd ${WP_DIR} &amp;&amp; wp eval '
+  if [ "$DRY_RUN" = true ]; then
+    COUNT=$(ssh "$SSH_USER" "cd ${WP_DIR} && wp eval '
 \$posts = get_posts(array(
   \"s\" => \"${SEARCH_TERM}\",
   \"post_type\" => \"post\",
@@ -207,7 +220,7 @@ echo count(\$posts);
     echo "  Would noindex: ${COUNT} published posts"
     TOTAL_AFFECTED=$((TOTAL_AFFECTED + COUNT))
   else
-    RESULT=$(ssh "$SSH_USER" "cd ${WP_DIR} &amp;&amp; wp eval '
+    RESULT=$(ssh "$SSH_USER" "cd ${WP_DIR} && wp eval '
 \$posts = get_posts(array(
   \"s\" => \"${SEARCH_TERM}\",
   \"post_type\" => \"post\",
@@ -226,18 +239,18 @@ echo count(\$posts);
 
 # --- Category mode ---
 else
-  if &#91; -n "$CUSTOM_CAT" ]; then
+  if [ -n "$CUSTOM_CAT" ]; then
     CATEGORIES=("$CUSTOM_CAT")
   else
-    CATEGORIES=("${DEFAULT_CATEGORIES&#91;@]}")
+    CATEGORIES=("${DEFAULT_CATEGORIES[@]}")
   fi
 
-  for CAT_NAME in "${CATEGORIES&#91;@]}"; do
+  for CAT_NAME in "${CATEGORIES[@]}"; do
     echo ""
     echo "--- Category: ${CAT_NAME} ---"
 
-    if &#91; "$DRY_RUN" = true ]; then
-      COUNT=$(ssh "$SSH_USER" "cd ${WP_DIR} &amp;&amp; wp eval '
+    if [ "$DRY_RUN" = true ]; then
+      COUNT=$(ssh "$SSH_USER" "cd ${WP_DIR} && wp eval '
 \$cat = get_term_by(\"name\", \"${CAT_NAME}\", \"category\");
 if (! \$cat) { echo 0; exit; }
 \$posts = get_posts(array(
@@ -252,7 +265,7 @@ echo count(\$posts);
       echo "  Would noindex: ${COUNT} published posts"
       TOTAL_AFFECTED=$((TOTAL_AFFECTED + COUNT))
     else
-      RESULT=$(ssh "$SSH_USER" "cd ${WP_DIR} &amp;&amp; wp eval '
+      RESULT=$(ssh "$SSH_USER" "cd ${WP_DIR} && wp eval '
 \$cat = get_term_by(\"name\", \"${CAT_NAME}\", \"category\");
 if (! \$cat) { echo \"Category not found: ${CAT_NAME}\"; exit; }
 \$posts = get_posts(array(
@@ -276,9 +289,9 @@ fi
 echo ""
 
 # Step 3: Summary
-echo "&#91;3/3] Summary"
+echo "[3/3] Summary"
 echo "=========================================="
-if &#91; "$DRY_RUN" = true ]; then
+if [ "$DRY_RUN" = true ]; then
   echo "DRY RUN complete."
   echo "Posts that would be noindexed: ${TOTAL_AFFECTED}"
   echo ""
@@ -295,4 +308,5 @@ else
   echo "  3. DB backup is at: ${BACKUP_FILE} (on production server)"
 fi
 echo "=========================================="
-</code></pre>
+```
+

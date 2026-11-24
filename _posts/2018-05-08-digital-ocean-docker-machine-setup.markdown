@@ -27,11 +27,14 @@ tags: [devops, digital, docker, machine, ocean, setup, wordpress]
 
 
 
-<pre class="wp-block-preformatted">docker-machine env larastudio
+
+```bash
+docker-machine env larastudio
 Error checking TLS connection: Error checking and/or regenerating the certs: There was an error validating certificates for host "xxx.xxx.xx.xxx": dial tcp: address xxx.xxx.xx.xxx: missing port in address
 You can attempt to regenerate them using 'docker-machine regenerate-certs [name]'.
 Be advised that this will trigger a Docker daemon restart which might stop running containers.
-</pre>
+```
+
 
 
 
@@ -39,12 +42,15 @@ Be advised that this will trigger a Docker daemon restart which might stop runni
 
 
 
-<pre class="wp-block-preformatted">jasper@~/code/domain.com/laradock $ docker-machine regenerate-certs larastudio
+
+```
+jasper@~/code/domain.com/laradock $ docker-machine regenerate-certs larastudio
 Regenerate TLS machine certs? Warning: this is irreversible. (y/n): y
 Regenerating TLS certificates
 Waiting for SSH to be available...
 Too many retries waiting for SSH to be available. Last error: Maximum number of retries (60) exceeded
-</pre>
+```
+
 
 
 
@@ -52,8 +58,11 @@ Too many retries waiting for SSH to be available. Last error: Maximum number of 
 
 
 
-<pre class="wp-block-preformatted">docker-machine -D env larastudio
-</pre>
+
+```bash
+docker-machine -D env larastudio
+```
+
 
 
 
@@ -61,13 +70,15 @@ Too many retries waiting for SSH to be available. Last error: Maximum number of 
 
 
 
-<pre class="wp-block-preformatted">Getting to WaitForSSH function...
+
+```
+Getting to WaitForSSH function...
 (larastudio) Calling .GetSSHHostname
 (larastudio) Calling .GetSSHPort
 (larastudio) Calling .GetSSHKeyPath
 (larastudio) Calling .GetSSHUsername
 Using SSH client type: external
-&amp;{[-F /dev/null -o PasswordAuthentication=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -o ControlMaster=no -o ControlPath=none @ -p 0] /usr/bin/ssh }
+&{[-F /dev/null -o PasswordAuthentication=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -o ControlMaster=no -o ControlPath=none @ -p 0] /usr/bin/ssh }
 About to run SSH command:
 exit 0
 SSH cmd err, output: exit status 255: usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spec]
@@ -88,9 +99,8 @@ output  : usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spe
            [-O ctl_cmd] [-o option] [-p port] [-Q query_option] [-R address]
            [-S ctl_path] [-W host:port] [-w local_tun[:remote_tun]]
            [user@]hostname [command]
+```
 
-
-</pre>
 
 
 
@@ -98,7 +108,11 @@ output  : usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spe
 
 
 
-<pre class="wp-block-preformatted">docker-machine create --driver generic --generic-ip-address xxx.xxx.xx.xxx --generic-ssh-user root larastudio</pre>
+
+```bash
+docker-machine create --driver generic --generic-ip-address xxx.xxx.xx.xxx --generic-ssh-user root larastudio
+```
+
 
 
 
@@ -106,7 +120,9 @@ output  : usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-b bind_address] [-c cipher_spe
 
 
 
-<pre class="wp-block-preformatted">Running pre-create checks...
+
+```
+Running pre-create checks...
 Creating machine...
 (larastudio) No SSH key specified. Assuming an existing key at the default location.
 Waiting for machine to be running, this may take a few minutes...
@@ -125,7 +141,8 @@ fi
 fi
 err : exit status 255
 output :
-</pre>
+```
+
 
 
 
@@ -133,14 +150,17 @@ output :
 
 
 
-<pre class="wp-block-preformatted">docker-machine create \
+
+```bash
+docker-machine create \
     --driver=generic \
     --generic-ip-address=IP_ADDRESS \
     --generic-ssh-user=USERNAME \
     --generic-ssh-key=PATH_TO_SSH_KEY \
     --generic-ssh-port=PORT \
         MACHINE_NAME
-</pre>
+```
+
 
 
 
@@ -156,7 +176,11 @@ output :
 
 
 
-<pre class="wp-block-preformatted">docker-machine create --driver digitalocean --digitalocean-access-token 1111111 domain-docker</pre>
+
+```bash
+docker-machine create --driver digitalocean --digitalocean-access-token 1111111 domain-docker
+```
+
 
 
 
@@ -164,7 +188,9 @@ output :
 
 
 
-<pre class="wp-block-preformatted">Running pre-create checks...
+
+```
+Running pre-create checks...
 Creating machine...
 (smart48-docker) Creating SSH key...
 (smart48-docker) Creating Digital Ocean droplet...
@@ -181,7 +207,8 @@ Setting Docker configuration on the remote daemon...
 Checking connection to Docker...
 Docker is up and running!
 To see how to connect your Docker Client to the Docker Engine running on this virtual machine, run: docker-machine env smart48-docker
-</pre>
+```
+
 
 
 
@@ -189,7 +216,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">docker-machine create --driver digitalocean -h</pre>
+
+```bash
+docker-machine create --driver digitalocean -h
+```
+
 
 
 
@@ -215,8 +246,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">docker-machine create --driver digitalocean --digitalocean-region "ams2" --digitalocean-ipv6 --digitalocean-monitoring --digitalocean-access-token 1111111 domain-docker
-</pre>
+
+```bash
+docker-machine create --driver digitalocean --digitalocean-region "ams2" --digitalocean-ipv6 --digitalocean-monitoring --digitalocean-access-token 1111111 domain-docker
+```
+
 
 
 
@@ -232,7 +266,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">eval $(docker-machine env <span class="highlight">machine-name</span>)</pre>
+
+```
+eval $(docker-machine env machine-name)
+```
+
 
 
 
@@ -248,7 +286,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">env | grep DOCKER</pre>
+
+```
+env | grep DOCKER
+```
+
 
 
 
@@ -256,7 +298,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">docker-machine env -u</pre>
+
+```bash
+docker-machine env -u
+```
+
 
 
 
@@ -264,7 +310,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted">eval $(docker-machine env -u)</pre>
+
+```
+eval $(docker-machine env -u)
+```
+
 
 
 
@@ -276,7 +326,11 @@ To see how to connect your Docker Client to the Docker Engine running on this vi
 
 
 
-<pre class="wp-block-preformatted"> docker-machine ssh box</pre>
+
+```bash
+docker-machine ssh box
+```
+
 
 
 
